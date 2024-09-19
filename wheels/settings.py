@@ -37,7 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'usuarios',
+    'vehiculos',
 ]
+# settings.py
+AUTH_USER_MODEL = 'usuarios.Usuario'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,9 +79,13 @@ WSGI_APPLICATION = 'wheels.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+      'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'neumaticos',  # El nombre de tu base de datos
+        'USER': 'root',         # Tu usuario de MySQL
+        'PASSWORD': 'graphimates123',         # La contraseña de tu usuario root (déjalo vacío si no hay contraseña)
+        'HOST': '127.0.0.1',    # Dirección del servidor de MySQL
+        'PORT': '3306',         # El puerto de MySQL
     }
 }
 
@@ -127,5 +136,11 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTHENTICATION_BACKENDS = [
+    'usuarios.backends.EmailBackend',  # Agregamos el backend de autenticación por email
+    'django.contrib.auth.backends.ModelBackend',  # El backend por defecto
+]
+
 
 
