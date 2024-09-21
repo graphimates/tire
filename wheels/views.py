@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache  # Importamos el decorador para deshabilitar la caché
 
 # Vista para el login
 def login_view(request):
@@ -9,7 +11,7 @@ def login_view(request):
         return redirect('index')
     
     if request.method == 'POST':
-        email = request.POST.get('email')  # Usamos 'email' en lugar de 'username'
+        email = request.POST.get('email')  # Usamos 'email' en lugar de 'username'git
         password = request.POST.get('password')
         print(f"Autenticando usuario con email: {email}")
 
@@ -31,10 +33,13 @@ def login_view(request):
 
 # Vista para el index (admin panel)
 @login_required
+@never_cache  # Deshabilitamos la caché para el panel de admin
 def index(request):
     return render(request, 'index.html')
 
 # Vista para usuarios normales (user_dashboard)
 @login_required
+@never_cache  # Deshabilitamos la caché para el panel de usuarios
 def user_dashboard(request):
     return render(request, 'user_dashboard.html')
+
