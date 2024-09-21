@@ -2,23 +2,19 @@ from django.db import models
 from usuarios.models import Usuario
 
 class Vehiculo(models.Model):
-    MODELOS_VEHICULOS = [
-        ('moto', 'Moto'),
-        ('auto', 'Auto'),
-        ('camion', 'Camión'),
-        # Puedes agregar más modelos según el tipo de vehículos que administre el negocio
+    TIPOS_VEHICULOS = [
+        (2, '2 Neumáticos'),
+        (3, '3 Neumáticos'),
+        (4, '4 Neumáticos'),
+        (16, '16 Neumáticos'),
     ]
-    
+
     usuario = models.ForeignKey(Usuario, related_name='vehiculos', on_delete=models.CASCADE)
-    modelo = models.CharField(max_length=20, choices=MODELOS_VEHICULOS)
-    cantidad_neumaticos = models.IntegerField()
+    placa = models.CharField(max_length=20)
+    marca = models.CharField(max_length=50)
+    modelo = models.CharField(max_length=50)
+    tipo = models.IntegerField(choices=TIPOS_VEHICULOS)
 
     def __str__(self):
-        return f"{self.modelo} - {self.cantidad_neumaticos} neumáticos"
+        return f"{self.marca} {self.modelo} ({self.placa}) - Dueño: {self.usuario.first_name} {self.usuario.last_name}, Empresa: {self.usuario.empresa}, Correo: {self.usuario.email}"
 
-class Neumatico(models.Model):
-    vehiculo = models.ForeignKey(Vehiculo, related_name='neumaticos', on_delete=models.CASCADE)
-    posicion = models.IntegerField()  # Ejemplo: Posición 1, 2, 3, etc.
-
-    def __str__(self):
-        return f"Neumático en posición {self.posicion} del {self.vehiculo.modelo}"
