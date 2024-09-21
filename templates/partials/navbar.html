@@ -36,7 +36,7 @@
         </a>
         <ul class="nav flex-column" id="adminUserOptions" style="padding-left: 20px;">
           <li class="nav-item"><a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Nuevo Usuario</a></li>  <!-- Nuevo usuario no tiene funcionalidad aún -->
+          <li class="nav-item"><a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a></li>  <!-- Nuevo usuario no tiene funcionalidad aún -->
         </ul>
       </li>
       {% endif %}
@@ -62,12 +62,8 @@
         <ul class="nav flex-column" id="adminUserOptionsMobile" style="padding-left: 20px;">
           <li class="nav-item"><a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
 
-          {% comment %} <li class="nav-item"><a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a></li> {% endcomment %}
-            
-              
-              
-            
-          
+          <li class="nav-item"><a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a></li>      
+             
             <!-- Nuevo usuario no tiene funcionalidad aún -->
         </ul>
       </li>

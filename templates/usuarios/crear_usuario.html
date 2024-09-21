@@ -1,11 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}
-  Crear Usuario
-{% endblock %}
+{% block title %}Crear Usuario{% endblock %}
 
 {% block content %}
-  <div class="container mt-5">
-    <h1>Crear un Nuevo Usuario</h1>
-  </div>
+<div class="container mt-5" style="background-color: #f4f5f7; padding: 20px; border-radius: 10px;">
+    <h2>Crear Nuevo Usuario</h2>
+    <form method="POST" class="row g-3">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="col-md-6">
+            <label for="id_first_name" class="form-label">Nombre</label>
+            {{ form.first_name }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_last_name" class="form-label">Apellido</label>
+            {{ form.last_name }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_email" class="form-label">Correo Electrónico</label>
+            {{ form.email }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_password" class="form-label">Contraseña</label>
+            {{ form.password }}
+        </div>
+        <div class="col-md-12">
+            <label for="id_empresa" class="form-label">Empresa</label>
+            {{ form.empresa }}
+        </div>
+        <!-- Lista desplegable para seleccionar si es administrador -->
+        <div class="col-12">
+            <label for="id_is_superuser" class="form-label">¿Es administrador?</label>
+            {{ form.is_superuser }}
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Crear Usuario</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

@@ -23,6 +23,7 @@ class UsuarioManager(BaseUserManager):
         return self.create_user(email, first_name, last_name, empresa, password, **extra_fields)
 
 class Usuario(AbstractUser):
+    username = None  # Desactivamos el campo username
     email = models.EmailField(unique=True)
     empresa = models.CharField(max_length=100)
     flota = models.IntegerField(default=0)  # Esta variable indica la cantidad de vehículos (flota) del usuario

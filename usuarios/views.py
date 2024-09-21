@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Usuario
 from django.contrib.auth.decorators import login_required
+from .forms import UsuarioForm
 
 # Vista para mostrar los usuarios en una tabla
 @login_required
@@ -20,4 +21,11 @@ def eliminar_usuario(request, user_id):
 # Vista para la página de creación de usuarios
 @login_required
 def crear_usuario(request):
-    return render(request, 'usuarios/crear_usuario.html')
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_usuarios')  # Redirigir a la lista de usuarios después de la creación
+    else:
+        form = UsuarioForm()
+    return render(request, 'usuarios/crear_usuario.html', {'form': form})
