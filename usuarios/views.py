@@ -41,3 +41,19 @@ def crear_usuario(request):
         form = UsuarioForm()
     return render(request, 'usuarios/crear_usuario.html', {'form': form})
 
+# Vista para editar un usuario
+@login_required
+@user_passes_test(is_admin)  # Solo administradores pueden acceder
+@never_cache  # Deshabilitar la caché
+def editar_usuario(request, user_id):
+    usuario = get_object_or_404(Usuario, id=user_id)  # Obtener el usuario por ID
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST, instance=usuario)  # Cargar el formulario con los datos existentes
+        if form.is_valid():
+            form.save()
+            return redirect('ver_usuarios')  # Redirigir a la lista de usuarios después de la edición
+    else:
+        form = UsuarioForm(instance=usuario)  # Precargar el formulario con los datos del usuario
+    return render(request, 'usuarios/crear_usuario.html', {'form': form, 'titulo': f'Editando al usuario {usuario.first_name}'})
+
+
