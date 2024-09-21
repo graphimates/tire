@@ -1,8 +1,8 @@
 <!-- Sidebar for large screens -->
 <div class="sidebar d-none d-lg-block" data-color="orange">
   <div class="logo">
-    <a href="#" class="simple-text logo-mini">GP</a>  <!-- Texto superior GP -->
-    <a href="#" class="simple-text logo-normal">Graphimates</a> <!-- Texto superior Graphimates -->
+    <a href="#" class="simple-text logo-mini">GP</a>
+    <a href="#" class="simple-text logo-normal">Graphimates</a>
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
@@ -15,18 +15,18 @@
       <li class="nav-item"><a class="nav-link" href="#"><i class="fa fa-car"></i><p>Reporte de Vehículos</p></a></li>
       <li class="nav-item"><a class="nav-link" href="#"><i class="fa fa-tools"></i><p>Reporte de Neumáticos</p></a></li>
       <li class="nav-item"><a class="nav-link" href="#"><i class="fa fa-database"></i><p>Histórico de Datos</p></a></li>
-      <!-- Botón de Logout -->
-<li class="nav-item">
-  <form method="POST" action="{% url 'logout' %}">
-    {% csrf_token %}
-    <button type="submit" class="nav-link btn btn-link" style="color: inherit;">
-      <i class="fa fa-sign-out-alt"></i>
-      <p>Cerrar Sesión</p>
-    </button>
-  </form>
-</li>
 
-      
+      <!-- Botón de Logout -->
+      <li class="nav-item">
+        <form method="POST" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="nav-link btn btn-link" style="color: inherit;">
+            <i class="fa fa-sign-out-alt"></i>
+            <p>Cerrar Sesión</p>
+          </button>
+        </form>
+      </li>
+
       <!-- Mostrar esto solo si el usuario es superusuario (admin) -->
       {% if user.is_superuser %}
       <li class="nav-item">
@@ -34,21 +34,12 @@
           <i class="fa fa-check"></i>
           <p>Administrador de Usuarios</p>
         </a>
-        <ul class="nav flex-column" id="adminUserOptions" style="padding-left: 20px; display: none;">
-          <li class="nav-item"><a class="nav-link" href="ver">Ver Usuarios</a></li>
-          <li class="nav-item"><a class="nav-link" href="crear">Nuevo Usuario</a></li>
-          <li class="nav-item"><a class="nav-link" href="borrar">Eliminar Usuario</a></li>
-          <li class="nav-item"><a class="nav-link" href="editar">Editar Usuario</a></li>
+        <ul class="nav flex-column" id="adminUserOptions" style="padding-left: 20px;">
+          <li class="nav-item"><a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Nuevo Usuario</a></li>  <!-- Nuevo usuario no tiene funcionalidad aún -->
         </ul>
       </li>
       {% endif %}
-      
-      <li class="nav-item active-pro">
-        <a class="nav-link" href="#">
-          <i class="fa fa-cloud-download-alt"></i>
-          <p>Upgrade to Pro</p>
-        </a>
-      </li>
     </ul>
   </div>
 </div>
@@ -68,17 +59,17 @@
         <a class="nav-link" href="#" id="adminUserLinkMobile">
           <i class="fa fa-check"></i> Administrador de Usuarios
         </a>
-        <ul class="nav flex-column" id="adminUserOptionsMobile" style="padding-left: 20px; display: none;">
-          <li class="nav-item"><a class="nav-link" href="ver">Ver Usuarios</a></li>
-          <li class="nav-item"><a class="nav-link" href="crear">Nuevo Usuario</a></li>
-          <li class="nav-item"><a class="nav-link" href="borrar">Eliminar Usuario</a></li>
-          <li class="nav-item"><a class="nav-link" href="editar">Editar Usuario</a></li>
+        <ul class="nav flex-column" id="adminUserOptionsMobile" style="padding-left: 20px;">
+          <li class="nav-item"><a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
+
+          {% comment %} <li class="nav-item"><a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a></li> {% endcomment %}
+            
+              
+              
+            
+          
+            <!-- Nuevo usuario no tiene funcionalidad aún -->
         </ul>
-      </li>
-      <li class="nav-item active-pro">
-        <a class="nav-link" href="#">
-          <i class="fa fa-cloud-download-alt"></i> Upgrade to Pro
-        </a>
       </li>
     </ul>
   </div>
