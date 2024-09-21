@@ -2,10 +2,11 @@ from django import forms
 from .models import Usuario
 
 class UsuarioForm(forms.ModelForm):
+    # Campo de contraseña opcional para que no sea obligatorio en la edición
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        label="Contraseña",
-        required=True
+        label="Contraseña (déjelo vacío si no desea cambiarla)",
+        required=False  # La contraseña es opcional en la edición
     )
     is_superuser = forms.ChoiceField(
         choices=[(True, 'Sí'), (False, 'No')],
@@ -13,7 +14,6 @@ class UsuarioForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=True
     )
-
 
     class Meta:
         model = Usuario
@@ -32,27 +32,17 @@ class UsuarioForm(forms.ModelForm):
             'empresa': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        # Verificamos si algún campo está vacío
-        if not cleaned_data.get('first_name'):
-            self.add_error('first_name', 'El nombre es obligatorio.')
-        if not cleaned_data.get('last_name'):
-            self.add_error('last_name', 'El apellido es obligatorio.')
-        if not cleaned_data.get('email'):
-            self.add_error('email', 'El correo electrónico es obligatorio.')
-        if not cleaned_data.get('empresa'):
-            self.add_error('empresa', 'La empresa es obligatoria.')
-        if not cleaned_data.get('password'):
-            self.add_error('password', 'La contraseña es obligatoria.')
-        
-        return cleaned_data
-
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])
+
+        # Si se ha ingresado una nueva contraseña, la actualizamos
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password)  # Actualiza la contraseña solo si se proporciona una nueva
+        else:
+            # Si no se proporciona una nueva contraseña, mantenemos la actual
+            user.password = Usuario.objects.get(pk=user.pk).password
+
         if commit:
             user.save()
         return user
-
-
