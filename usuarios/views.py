@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Usuario
 from django.contrib.auth.decorators import login_required
-from .forms import UsuarioForm
+from .forms import UsuarioForm, ModificarImagenForm  # Asegúrate de importar ModificarImagenForm
 
 # Vista para mostrar los usuarios en una tabla
 @login_required
@@ -22,10 +22,33 @@ def eliminar_usuario(request, user_id):
 @login_required
 def crear_usuario(request):
     if request.method == 'POST':
-        form = UsuarioForm(request.POST)
+        form = UsuarioForm(request.POST, request.FILES)  # Agregar request.FILES
         if form.is_valid():
-            form.save()
+            usuario = form.save(commit=False)
+            usuario.set_password(form.cleaned_data['password'])  # Encriptar la contraseña
+            usuario.save()
             return redirect('ver_usuarios')  # Redirigir a la lista de usuarios después de la creación
     else:
         form = UsuarioForm()
     return render(request, 'usuarios/crear_usuario.html', {'form': form})
+
+# Vista para modificar la imagen de perfil
+@login_required
+def modificar_imagen(request):
+    if request.method == 'POST':
+        form = ModificarImagenForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('perfil')  # Redirige a la página de perfil
+    else:
+        form = ModificarImagenForm(instance=request.user)
+    return render(request, 'usuarios/modificar_imagen.html', {'form': form})
+
+# Vista para mostrar el perfil del usuario
+@login_required
+def perfil(request):
+    return render(request, 'usuarios/perfil.html')
+
+@login_required
+def perfil(request):
+    return render(request, 'usuarios/perfil.html')

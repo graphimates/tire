@@ -10,7 +10,7 @@
 
     <!-- Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" crossorigin="anonymous">
 
     <!-- Bootstrap CSS -->
     <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" />
@@ -20,16 +20,15 @@
     <link href="{% static 'assets/css/custom.css' %}" rel="stylesheet" /> 
   </head>
   <body>
-    <div class="wrapper">
-      {% block sidebar %}
+    <!-- Incluir el header -->
+    {% include "partials/header.html" %}
 
+    <div class="wrapper">
       <!-- Verifica si el usuario está autenticado -->
       {% if user.is_authenticated %}
         <!-- Incluir el archivo navbar.html -->
         {% include "partials/navbar.html" %}
       {% endif %}
-      
-      {% endblock %}
 
       <div class="{% if not user.is_authenticated %}login-panel{% else %}main-panel{% endif %}">
         <!-- Content Section -->
@@ -46,22 +45,6 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-
-    <!-- Sidebar toggle functionality (Desktop) -->
-    <script>
-      document.getElementById('adminUserLink').addEventListener('click', function() {
-        var options = document.getElementById('adminUserOptions');
-        options.style.display = options.style.display === 'none' ? 'block' : 'none';
-      });
-    </script>
-
-    <!-- Sidebar toggle functionality (Mobile) -->
-    <script>
-      document.getElementById('adminUserLinkMobile').addEventListener('click', function() {
-        var options = document.getElementById('adminUserOptionsMobile');
-        options.style.display = options.style.display === 'none' ? 'block' : 'none';
-      });
-    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
   </body>
 </html>
