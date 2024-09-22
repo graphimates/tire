@@ -27,3 +27,10 @@ def crear_vehiculo(request, user_id):
         form = VehiculoForm()
     
     return render(request, 'vehiculos/crear_vehiculo.html', {'form': form, 'usuario': usuario})
+
+# Vista para el reporte de vehículos
+def reporte_vehiculos(request):
+    # Obtenemos todos los vehículos
+    vehiculos = Vehiculo.objects.select_related('usuario').all()
+    
+    return render(request, 'vehiculos/reporte_vehiculos.html', {'vehiculos': vehiculos})
