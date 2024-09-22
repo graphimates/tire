@@ -21,7 +21,7 @@ urlpatterns = [
     # Ruta para modificar imagen de perfil
     path('usuarios/modificar_imagen/', usuarios_views.modificar_imagen, name='modificar_imagen'),  # Nueva ruta para modificar la imagen de perfil
     path('usuarios/perfil/', usuarios_views.perfil, name='perfil'),
-
+    path('perfil/', usuarios_views.perfil_usuario, name='perfil_usuario'),
 
 ]
 

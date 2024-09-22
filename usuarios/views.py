@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Usuario
 from django.contrib.auth.decorators import login_required
 from .forms import UsuarioForm, ModificarImagenForm  # Asegúrate de importar ModificarImagenForm
+from .forms import ProfileForm
 
 # Vista para mostrar los usuarios en una tabla
 @login_required
@@ -52,3 +53,15 @@ def perfil(request):
 @login_required
 def perfil(request):
     return render(request, 'usuarios/perfil.html')
+
+@login_required
+def perfil_usuario(request):
+    usuario = request.user
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=usuario)
+        if form.is_valid():
+            form.save()
+            return redirect('perfil_usuario')
+    else:
+        form = ProfileForm(instance=usuario)
+    return render(request, 'usuarios/perfil_usuario.html', {'form': form})

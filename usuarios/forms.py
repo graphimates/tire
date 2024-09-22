@@ -65,3 +65,8 @@ class ModificarImagenForm(forms.ModelForm):
         widgets = {
             'profile_photo': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['profile_photo']
