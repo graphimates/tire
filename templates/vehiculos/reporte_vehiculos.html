@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Vehículos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Reporte de Vehículos</h2>
+
+    <div class="accordion" id="vehiculosAccordion">
+        {% for vehiculo in vehiculos %}
+        <div class="card">
+            <div class="card-header" id="heading{{ vehiculo.id }}">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ vehiculo.id }}">
+                        {{ vehiculo.placa }} : {{ vehiculo.usuario.first_name }} {{ vehiculo.usuario.last_name }}
+                    </button>
+                </h2>
+            </div>
+
+            <div id="collapse{{ vehiculo.id }}" class="collapse" aria-labelledby="heading{{ vehiculo.id }}" data-parent="#vehiculosAccordion">
+                <div class="card-body">
+                    <!-- Aquí va la información del vehículo -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Esquema del Vehículo</h4>
+                            <!-- Título de la imagen del esquema del vehículo -->
+                            <p>Aquí se mostrará el esquema del vehículo</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Neumáticos del Vehículo</h4>
+                            <!-- Título para la tabla de neumáticos -->
+                            <p>Aquí se mostrará la tabla de neumáticos del vehículo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
