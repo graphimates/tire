@@ -2,10 +2,10 @@
 
 /* Color de fondo del menú hamburguesa */
 .bg-orange {
-  background-color: #be5a03 !important;
+  background-color: #ff7a06 !important;
 }
 
-/* Asegurar la consistencia visual */
+/* Estructura principal */
 .main-panel {
   display: flex;
   flex-direction: column;
@@ -22,38 +22,38 @@
 
 /* Botón seleccionado (resaltado) */
 .nav-item.active a {
-  background-color: #fff !important; /* Fondo blanco para el botón seleccionado */
-  color: hsla(28, 93%, 48%, 0.911) !important;         /* Texto naranja para el botón seleccionado */
-  border-radius: 8px;                /* Bordes redondeados */
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(255, 133, 27, 0.4); /* Sombra */
+  background-color: #fff !important; 
+  color: hsla(4, 100%, 53%, 0.911) !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(255, 133, 27, 0.4);
 }
 
-/* Botón Upgrade to Pro al final del sidebar */
+/* Botón Upgrade to Pro */
 .sidebar-footer a.upgrade-pro {
-  background-color: #fff;            /* Fondo blanco */
-  color: #FF851B !important;         /* Texto naranja */
+  background-color: #fff;
+  color: #FF851B !important;
   padding: 15px 25px;
   text-align: center;
-  border-radius: 30px;               /* Botón redondeado */
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(255, 133, 27, 0.4); /* Sombra */
+  border-radius: 30px;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(255, 133, 27, 0.4);
   text-decoration: none;
   display: block;
-  margin: 0 auto;                    /* Centramos el botón */
-  width: calc(100% - 40px);          /* Ajustar el ancho para dejar márgenes */
+  margin: 0 auto;
+  width: calc(100% - 40px);
 }
 
 .sidebar-footer a.upgrade-pro:hover {
-  background-color: #f8440d;         /* Cambiar a un tono más claro al hacer hover */
-  color: #fff !important;            /* Texto blanco al hacer hover */
+  background-color: #f8440d;
+  color: #fff !important;
 }
 
-/* Cambiar el color de los íconos y el texto en el estado normal */
+/* Estilos de los íconos y botones */
 .nav-item a {
-  color: #fff !important;            /* Texto blanco para botones no seleccionados */
+  color: #fff !important;
 }
 
 .nav-item a:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* Fondo semi-transparente al pasar el mouse */
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Logo superior */
@@ -63,18 +63,13 @@
   text-transform: uppercase;
 }
 
-/* Responsive Adjustments */
+/* Ajustes responsive */
 @media (max-width: 768px) {
   .sidebar {
       display: none;
   }
   .main-panel {
       margin-left: 0;
-  }
-
-  /* Asegurarse de que los enlaces en pantallas pequeñas también se vean bien */
-  .navbar-nav .nav-link {
-      color: #fff !important;  /* Enlaces blancos para mejor contraste */
   }
 }
 
