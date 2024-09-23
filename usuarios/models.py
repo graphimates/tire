@@ -50,3 +50,4 @@ class Usuario(AbstractUser):
     def __str__(self):
         """Devuelve una representación del usuario con el correo."""
         return self.email
+
