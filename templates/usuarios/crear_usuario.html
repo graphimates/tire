@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Crear Usuario{% endblock %}
+{% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5" style="background-color: #f4f5f7; padding: 20px; border-radius: 10px;">
-    <h2>Crear Nuevo Usuario</h2>
+    <h2>{{ titulo }}</h2>
     <form method="POST" enctype="multipart/form-data" class="row g-3">
         {% csrf_token %}
         {{ form.non_field_errors }}

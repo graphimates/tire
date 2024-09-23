@@ -5,7 +5,7 @@ class UsuarioForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         label="Contraseña",
-        required=True
+        required=False  # La contraseña es opcional en la edición
     )
     is_superuser = forms.ChoiceField(
         choices=[(True, 'Sí'), (False, 'No')],
@@ -32,6 +32,21 @@ class UsuarioForm(forms.ModelForm):
             'empresa': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
             'profile_photo': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+
+        # Si se ha ingresado una nueva contraseña, la actualizamos
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password)  # Actualiza la contraseña solo si se proporciona una nueva
+        else:
+            # Si no se proporciona una nueva contraseña, mantenemos la actual
+            user.password = Usuario.objects.get(pk=user.pk).password
+
+        if commit:
+            user.save()
+        return user
 
 # Formulario para editar la imagen de perfil
 class ModificarImagenForm(forms.ModelForm):

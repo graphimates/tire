@@ -21,7 +21,6 @@ urlpatterns = [
 
     # Incluir las rutas de vehículos
     path('vehiculos/', include('vehiculos.urls')),  # Incluye las rutas de la app vehiculos
-    path('usuarios/perfil/', usuarios_views.perfil, name='perfil'),
     path('usuarios/modificar_imagen/', usuarios_views.modificar_imagen, name='modificar_imagen'),
     path('perfil/', usuarios_views.perfil_usuario, name='perfil_usuario'),
 

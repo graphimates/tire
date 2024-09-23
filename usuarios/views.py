@@ -21,7 +21,6 @@ def ver_usuarios(request):
     usuarios = Usuario.objects.all()  # Obtener todos los usuarios
     return render(request, 'usuarios/ver_usuarios.html', {'usuarios': usuarios})
 
-# Vista para eliminar un usuario
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
 @never_cache  # Deshabilitar la caché
@@ -32,7 +31,6 @@ def eliminar_usuario(request, user_id):
         return redirect('ver_usuarios')  # Redirigir de nuevo a la lista de usuarios
     return render(request, 'usuarios/eliminar_confirmacion.html', {'usuario': usuario})
 
-# Vista para la página de creación de usuarios
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
 @never_cache  # Deshabilitar la caché
@@ -48,7 +46,6 @@ def crear_usuario(request):
         form = UsuarioForm()
     return render(request, 'usuarios/crear_usuario.html', {'form': form})
 
-# Vista para editar un usuario
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
 @never_cache  # Deshabilitar la caché
@@ -64,7 +61,7 @@ def editar_usuario(request, user_id):
     return render(request, 'usuarios/crear_usuario.html', {'form': form, 'titulo': f'Editando al usuario {usuario.first_name}'})
 
 
-
+@never_cache  # Deshabilitar la caché
 @login_required
 def modificar_imagen(request):
     if request.method == 'POST':
@@ -77,11 +74,7 @@ def modificar_imagen(request):
     return render(request, 'usuarios/modificar_imagen.html', {'form': form})
 
 
-@login_required
-def perfil(request):
-    return render(request, 'usuarios/perfil.html')
-
-
+@never_cache  # Deshabilitar la caché
 @login_required
 def perfil_usuario(request):
     usuario = request.user
