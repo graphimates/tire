@@ -60,3 +60,8 @@ class ProfileForm(forms.ModelForm):
 
     # Si no hay contraseña en este formulario, elimina el método save relacionado con contraseñas
 
+
+
+    # Si no hay contraseña en este formulario, elimina el método save relacionado con contraseñas
+
+
