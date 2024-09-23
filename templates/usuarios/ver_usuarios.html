@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %} Ver Usuarios {% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2>Lista de Usuarios</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Apellido</th>
+          <th scope="col">Email</th>
+          <th scope="col">Empresa</th>
+          <th scope="col">¿Es Admin?</th>
+          <th scope="col">¿Activo?</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+          <th scope="row">{{ usuario.id }}</th>
+          <td>{{ usuario.first_name }}</td>
+          <td>{{ usuario.last_name }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>{{ usuario.empresa }}</td>
+          <td>{{ usuario.is_superuser|yesno:"Sí,No" }}</td>
+          <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
+          <td>
+            <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+            <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm">Añadir Vehículo</a>  
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
