@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ titulo }}</h2>
+    <form method="POST" class="row g-3">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="col-md-6">
+            <label for="id_nombre" class="form-label">Nombre de la Avería</label>
+            {{ form.nombre }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_estado_neumatico" class="form-label">Estado del Neumático</label>
+            {{ form.estado_neumatico }}
+        </div>
+        <div class="col-md-12">
+            <label for="id_descripcion" class="form-label">Descripción</label>
+            {{ form.descripcion }}
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Guardar Avería</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

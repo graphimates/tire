@@ -21,7 +21,12 @@
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
           <a class="dropdown-item" href="{% url 'perfil_usuario' %}">Perfil</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a>
+
+          <!-- Cerrar sesión con POST -->
+          <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item">Cerrar sesión</button>
+          </form>
         </div>
       </div>
     {% else %}
@@ -51,7 +56,6 @@
         </div>
       </li>
       {% endif %}
-
     </ul>
   </div>
 </nav>

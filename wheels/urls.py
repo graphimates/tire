@@ -24,6 +24,9 @@ urlpatterns = [
     path('usuarios/modificar_imagen/', usuarios_views.modificar_imagen, name='modificar_imagen'),
     path('perfil/', usuarios_views.perfil_usuario, name='perfil_usuario'),
 
+    # Incluimos las rutas de la app Averías
+    path('averias/', include('averias.urls')),  
+
 ]
 
 if settings.DEBUG:  # Solo se debe agregar en modo DEBUG (desarrollo)

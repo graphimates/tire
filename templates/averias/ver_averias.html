@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %} Ver Averías {% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2>Lista de Averías</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for averia in averias %}
+        <tr>
+          <th scope="row">{{ averia.id }}</th>
+          <td>{{ averia.nombre }}</td>
+          <td>{{ averia.get_estado_neumatico_display }}</td>
+          <td>{{ averia.descripcion }}</td>
+          <td>
+            <a href="{% url 'editar_averia' averia.id %}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="{% url 'eliminar_averia' averia.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'crear_averia' %}" class="btn btn-primary">Crear Nueva Avería</a>
+  </div>
+{% endblock %}

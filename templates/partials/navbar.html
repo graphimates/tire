@@ -12,9 +12,24 @@
           <p>Inicio</p>
         </a>
       </li>
-      <li class="nav-item"><a class="nav-link" href="{% url 'reporte_vehiculos' %}"><i class="fa fa-car"></i><p>Reporte de Vehículos</p></a></li>
-      <li class="nav-item"><a class="nav-link" href="#"><i class="fa fa-tools"></i><p>Reporte de Neumáticos</p></a></li>
-      <li class="nav-item"><a class="nav-link" href="#"><i class="fa fa-database"></i><p>Histórico de Datos</p></a></li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'reporte_vehiculos' %}">
+          <i class="fa fa-car"></i>
+          <p>Reporte de Vehículos</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="fa fa-tools"></i>
+          <p>Reporte de Neumáticos</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="fa fa-database"></i>
+          <p>Histórico de Datos</p>
+        </a>
+      </li>
 
       <!-- Mostrar esto solo si el usuario es superusuario (admin) -->
       {% if user.is_superuser %}
@@ -24,9 +39,21 @@
           <p>Administrador de Usuarios</p>
         </a>
         <ul class="nav flex-column" id="adminUserOptions" style="padding-left: 20px;">
-          <li class="nav-item"><a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a></li>  <!-- Nuevo usuario no tiene funcionalidad aún -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a>
+          </li>
         </ul>
+      </li>
+
+      <!-- Botón de Gestionar Averías -->
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'ver_averias' %}">
+          <i class="fa fa-exclamation-triangle"></i>
+          <p>Gestionar Averías</p>
+        </a>
       </li>
       {% endif %}
     </ul>
