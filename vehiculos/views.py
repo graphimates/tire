@@ -34,7 +34,12 @@ def crear_vehiculo(request, user_id):
 @never_cache  # Deshabilitar la caché
 @login_required
 def reporte_vehiculos(request):
-    # Obtenemos todos los vehículos
-    vehiculos = Vehiculo.objects.select_related('usuario').all()
+    # Si el usuario es administrador, mostrar todos los vehículos
+    if request.user.is_superuser:
+        vehiculos = Vehiculo.objects.select_related('usuario').all()
+    else:
+        # Si el usuario no es administrador, mostrar solo sus propios vehículos
+        vehiculos = Vehiculo.objects.filter(usuario=request.user)
     
     return render(request, 'vehiculos/reporte_vehiculos.html', {'vehiculos': vehiculos})
+
