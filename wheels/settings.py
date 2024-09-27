@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'usuarios',
     'vehiculos',
+    'neumatico',
+    'averias',
     'crispy_forms',
     'crispy_bootstrap5',  # Añadir crispy_bootstrap5 para soporte Bootstrap 5
 ]

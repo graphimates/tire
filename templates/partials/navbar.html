@@ -24,7 +24,7 @@
 
       <!-- Reporte de Neumáticos -->
       <li class="nav-item {% if request.resolver_match.url_name == 'reporte_neumaticos' %}active{% endif %}">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'reporte_neumaticos' %}">
           <i class="fa fa-tools"></i>
           <p class="sidebar-item-text">Reporte de Neumáticos</p>
         </a>
@@ -46,10 +46,22 @@
           <p class="sidebar-item-text">Administrador de Usuarios</p>
           <i class="fa fa-chevron-down"></i> <!-- Flecha para indicar submenú -->
         </a>
-        <ul class="nav flex-column" id="adminUserOptions" style="display:none;">
-          <li class="nav-item"><a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a></li>
+        <ul class="nav flex-column collapse" id="adminUserOptions" style="padding-left: 20px;">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a>
+          </li>
         </ul>
+      </li>
+      
+      <!-- Botón de Gestionar Averías -->
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'ver_averias' %}">
+          <i class="fa fa-exclamation-triangle"></i>
+          <p>Gestionar Averías</p>
+        </a>
       </li>
       {% endif %}
     </ul>
@@ -62,3 +74,4 @@
     </button>
   </div>
 </div>
+
