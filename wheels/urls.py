@@ -27,6 +27,10 @@ urlpatterns = [
     # Incluimos las rutas de la app Averías
     path('averias/', include('averias.urls')),  
 
+    # Ruta para crear un neumático
+   path('neumaticos/', include('neumatico.urls')),  # Asegúrate de que el nombre coincide
+
+
 ]
 
 if settings.DEBUG:  # Solo se debe agregar en modo DEBUG (desarrollo)

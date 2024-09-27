@@ -1,3 +1,4 @@
+# vehiculos/models.py
 from django.db import models
 from usuarios.models import Usuario
 
@@ -13,6 +14,7 @@ class Vehiculo(models.Model):
     placa = models.CharField(max_length=20)
     modelo = models.CharField(max_length=50)
     tipo = models.IntegerField(choices=TIPOS_VEHICULOS)
+    ultima_inspeccion = models.DateTimeField(null=True, blank=True)  # Nueva variable para la fecha de inspección
 
     def __str__(self):
         return f"{self.placa} - {self.modelo}"
