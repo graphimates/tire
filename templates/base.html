@@ -67,5 +67,19 @@
         options.style.display = options.style.display === 'none' ? 'block' : 'none';
       });
     </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const selects = document.querySelectorAll('.dynamic-select');
+          selects.forEach((select, index) => {
+              select.addEventListener('change', function() {
+                  if (select.value !== "" && index + 1 < selects.length) {
+                      selects[index + 1].style.display = 'block';
+                  }
+              });
+          });
+      });
+      </script>
+      
   </body>
 </html>

@@ -78,3 +78,91 @@
       margin-left: 250px;
   }
 }
+
+.table {
+  font-size: 14px; /* Ajustar el tamaño de la fuente */
+}
+
+.table-bordered th, 
+.table-bordered td {
+  border: 1px solid #dee2e6; /* Bordes visibles */
+}
+
+.vehicle-schema ul {
+  padding-left: 20px; /* Ajustar el padding para el esquema del vehículo */
+}
+
+
+.table thead {
+  background-color: #f8f9fa;
+}
+
+.table thead th {
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.table td {
+  padding: 10px;
+  vertical-align: middle;
+}
+
+.form-control {
+  border-radius: 5px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+button.btn-success {
+  font-size: 1.2rem;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.vehicle-schema {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.tire-position {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.tire-position:hover {
+  background-color: #eee;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.btn-success {
+  width: 150px;
+}
+.tire-btn {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  margin: 10px 0;
+}
+
+.tire-btn.btn-danger {
+  background-color: #dc3545;  /* Color rojo para neumáticos con averías */
+}
+
+.dynamic-select {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.add-averia {
+  margin-top: 10px;
+  display: block;
+}

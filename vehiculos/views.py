@@ -43,3 +43,14 @@ def reporte_vehiculos(request):
     
     return render(request, 'vehiculos/reporte_vehiculos.html', {'vehiculos': vehiculos})
 
+
+@never_cache
+@login_required
+@user_passes_test(is_admin)
+def borrar_vehiculo(request, vehiculo_id):
+    vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
+
+    # Eliminar el vehículo (los neumáticos asociados se eliminarán automáticamente por la relación on_delete)
+    vehiculo.delete()
+
+    return redirect('reporte_vehiculos')

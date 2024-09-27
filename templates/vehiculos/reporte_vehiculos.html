@@ -10,32 +10,85 @@
         {% if vehiculos %}
             {% for vehiculo in vehiculos %}
             <div class="card">
-                <div class="card-header" id="heading{{ vehiculo.id }}">
+                <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ vehiculo.id }}">
                     <h2 class="mb-0">
                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ vehiculo.id }}">
                             {{ vehiculo.placa }} : {{ vehiculo.usuario.first_name }} {{ vehiculo.usuario.last_name }}
                         </button>
                     </h2>
+                    <!-- Mostrar botones solo para administradores -->
+                    <div>
+                        {% if vehiculo.ultima_inspeccion %}
+                        <span><strong>Última Inspección:</strong> {{ vehiculo.ultima_inspeccion|date:"d/m/Y" }}</span>
+                        {% endif %}
+                        {% if user.is_superuser %}
+                        <a href="{% url 'crear_neumatico' vehiculo.id %}" class="btn btn-primary btn-sm">Inspeccionar</a>
+                        <a href="{% url 'borrar_vehiculo' vehiculo.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este vehículo?');">Borrar</a>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div id="collapse{{ vehiculo.id }}" class="collapse" aria-labelledby="heading{{ vehiculo.id }}" data-parent="#vehiculosAccordion">
                     <div class="card-body">
-                        <!-- Aquí va la información del vehículo -->
                         <div class="row">
-                            <div class="col-md-6">
+                            <!-- Esquema del vehículo (Columna izquierda) -->
+                            <div class="col-md-4">
                                 <h4>Esquema del Vehículo</h4>
-                                <!-- Título de la imagen del esquema del vehículo -->
-                                <p>Aquí se mostrará el esquema del vehículo</p>
+                                <div class="vehicle-schema">
+                                    <ul>
+                                        <li>Posición 1: Delantero Izquierdo</li>
+                                        <li>Posición 2: Delantero Derecho</li>
+                                        <li>Posición 3: Trasero Izquierdo</li>
+                                        <li>Posición 4: Trasero Derecho</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="col-md-6">
+
+                            <!-- Tabla de neumáticos (Columna derecha) -->
+                            <div class="col-md-8">
                                 <h4>Neumáticos del Vehículo</h4>
-                                <!-- Título para la tabla de neumáticos -->
-                                <p>Aquí se mostrará la tabla de neumáticos del vehículo</p>
+                                {% if vehiculo.neumaticos.all %}
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Posición</th>
+                                            <th>Modelo</th>
+                                            <th>Marca</th>
+                                            <th>Presión</th>
+                                            <th>Huella</th>
+                                            <th>DOT</th>
+                                            <th>Averías</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for neumatico in vehiculo.neumaticos.all %}
+                                        <tr>
+                                            <td>{{ neumatico.posicion }}</td>
+                                            <td>{{ neumatico.modelo }}</td>
+                                            <td>{{ neumatico.marca }}</td>
+                                            <td>{{ neumatico.presion }}</td>
+                                            <td>{{ neumatico.huella }}</td>
+                                            <td>{{ neumatico.dot }}</td>
+                                            <td>
+                                                {% for averia in neumatico.averias.all %}
+                                                    {{ averia.nombre }} ({{ averia.get_estado_neumatico_display }})
+                                                {% empty %}
+                                                    Sin averías
+                                                {% endfor %}
+                                            </td>
+                                            
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% else %}
+                                <p>No hay neumáticos registrados para este vehículo.</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+             </div>
             {% endfor %}
         {% else %}
             <p>No tienes vehículos registrados.</p>
@@ -43,4 +96,3 @@
     </div>
 </div>
 {% endblock %}
-
