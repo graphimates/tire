@@ -17,7 +17,6 @@
     <link href="{% static 'assets/css/now-ui-dashboard.css' %}" rel="stylesheet" />
     <!-- Custom CSS -->
     <link href="{% static 'assets/css/custom.css' %}" rel="stylesheet" /> 
-  
   </head>
   <body>
 
@@ -26,7 +25,7 @@
 
     <div class="wrapper">
       {% block sidebar %}
-
+      
       <!-- Verifica si el usuario está autenticado -->
       {% if user.is_authenticated %}
         <!-- Incluir el archivo navbar.html -->
@@ -35,7 +34,7 @@
       
       {% endblock %}
 
-      <div class="{% if not user.is_authenticated %}login-panel{% else %}main-panel{% endif %}">
+      <div class="{% if not user.is_authenticated %}login-panel{% else %}main-panel{% endif %} sidebar-adjust">
         <!-- Content Section -->
         <div class="content">
           {% block content %}
@@ -52,20 +51,30 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 
-    <!-- Sidebar toggle functionality (Desktop) -->
+    <!-- Sidebar and sub-menu toggle functionality -->
     <script>
-      document.getElementById('adminUserLink').addEventListener('click', function() {
-        var options = document.getElementById('adminUserOptions');
-        options.style.display = options.style.display === 'none' ? 'block' : 'none';
+      document.addEventListener('DOMContentLoaded', function() {
+        const adminUserLink = document.getElementById('adminUserLink');
+        const adminUserOptions = document.getElementById('adminUserOptions');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainPanel = document.querySelector('.main-panel');
+
+        // Funcionalidad para expandir y contraer el submenú
+        adminUserLink.addEventListener('click', function(event) {
+          event.preventDefault();
+          const isExpanded = adminUserOptions.style.display === 'block';
+          adminUserOptions.style.display = isExpanded ? 'none' : 'block';
+          adminUserLink.classList.toggle('active'); // Agregar clase active para la rotación de la flecha
+        });
+
+        // Funcionalidad para colapsar el sidebar
+        toggleSidebar.addEventListener('click', function() {
+          sidebar.classList.toggle('collapsed');
+          mainPanel.classList.toggle('sidebar-collapsed');
+        });
       });
     </script>
 
-    <!-- Sidebar toggle functionality (Mobile) -->
-    <script>
-      document.getElementById('adminUserLinkMobile').addEventListener('click', function() {
-        var options = document.getElementById('adminUserOptionsMobile');
-        options.style.display = options.style.display === 'none' ? 'block' : 'none';
-      });
-    </script>
   </body>
 </html>
