@@ -8,7 +8,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),
+    path('', views.index, name='index'),  # Asegúrate de tener esta línea
     path('login/', views.login_view, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('user_dashboard/', views.user_dashboard, name='user_dashboard'),
@@ -24,14 +24,8 @@ urlpatterns = [
     path('usuarios/modificar_imagen/', usuarios_views.modificar_imagen, name='modificar_imagen'),
     path('perfil/', usuarios_views.perfil_usuario, name='perfil_usuario'),
 
-    # Incluimos las rutas de la app Averías
-    path('averias/', include('averias.urls')),  
-
-    # Ruta para crear un neumático
-   path('neumaticos/', include('neumatico.urls')),  # Asegúrate de que el nombre coincide
-
-
 ]
+
 
 if settings.DEBUG:  # Solo se debe agregar en modo DEBUG (desarrollo)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
