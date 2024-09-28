@@ -1,14 +1,9 @@
-/* Color de fondo del header */
-.navbar, .navbar-light, .navbar-dark, .bg-orange {
+/* Color de fondo del header y estilos generales */
+.navbar, .bg-orange {
   background-color: #f96332 !important;
 }
 
-/* Otros estilos que ya tenías */
-.bg-orange {
-  background-color: #f96332 !important;
-}
-
-/* Botón seleccionado (resaltado) */
+/* Botón seleccionado */
 .nav-item.active a {
   background-color: #fff !important;
   color: hsla(4, 100%, 53%, 0.911) !important;
@@ -33,39 +28,63 @@
 }
 
 /* Pantallas pequeñas y tabletas: Ocultar el sidebar completamente */
-@media (max-width: 992px) { /* Aumenté el límite a 992px para incluir tabletas más grandes */
+@media (max-width: 992px) {
   .sidebar {
-      display: none !important; /* Sidebar completamente oculto en pantallas más pequeñas */
+    display: none !important;
   }
-  
   .main-panel {
-      margin-left: 0 !important; /* El contenido debe ocupar el 100% del ancho */
-      width: 100% !important; /* Asegurarse de que el contenido use todo el ancho disponible */
-      transition: all 0.2s ease-out;
+    margin-left: 0 !important;
+    width: 100% !important;
+    transition: all 0.2s ease-out;
   }
 }
 
 /* Pantallas grandes: Mostrar el sidebar en su tamaño completo o colapsado */
 @media (min-width: 993px) {
   .sidebar {
-    width: 250px; /* Ancho del sidebar completo */
+    width: 250px;
     transition: all 0.2s ease-out;
   }
 
   .sidebar.collapsed {
-    width: 70px; /* Ancho del sidebar cuando está colapsado */
+    box-shadow: none !important;
+    width: 70px;
   }
 
   .main-panel {
-    margin-left: 250px; /* Espacio que deja el sidebar en su tamaño completo */
-    width: calc(100% - 250px); /* Ajuste del contenido al espacio restante */
+    margin-left: 250px;
+    width: calc(100% - 250px);
     transition: all 0.2s ease-out;
   }
 
   .main-panel.sidebar-collapsed {
-    margin-left: 70px; /* Ajuste del espacio cuando el sidebar está colapsado */
-    width: calc(100% - 70px); /* Ajuste del contenido al espacio restante cuando el sidebar está colapsado */
+    margin-left: 70px;
+    width: calc(100% - 70px);
   }
+}
+
+/* Submenú dentro del sidebar */
+.admin-options {
+  display: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.admin-options.show {
+  display: block;
+  max-height: 500px; /* Ajusta según sea necesario */
+}
+
+/* Estilos del submenú */
+.nav-item ul.nav {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.nav-item ul.nav.show {
+  max-height: 500px; /* Ajusta según sea necesario */
 }
 
 /* Estilos personalizados para el formulario de Crear Usuario */
@@ -102,7 +121,6 @@
 }
 
 /* Ajuste del header para eliminar la barra blanca no deseada */
-/* Sobrescribir el estilo de la navbar para eliminar el margin-bottom */
 .navbar {
   margin-bottom: 0 !important;
   padding-top: 0.625rem !important;
@@ -111,15 +129,10 @@
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Asegurar que el sidebar y el botón estén en la capa superior */
+/* Ajustes del sidebar para transiciones */
 .sidebar {
-  z-index: 1000;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
   background-color: #f96332;
-  transition: all 0.2s ease-out;
+  transition: all 0.3s ease;
 }
 
 .sidebar.collapsed .sidebar-item-text,
@@ -159,105 +172,102 @@
   box-shadow: none !important;
 }
 
-/* Eliminar el espacio dejado por el sidebar en pantallas grandes */
-.main-panel.sidebar-collapsed {
-  margin-left: 70px !important;
-  width: calc(100% - 70px) !important;
+/* Collapse de Bootstrap */
+.collapse {
+  transition: height 0.3s ease;
 }
 
-/* Eliminar el espacio dejado por el sidebar en pantallas pequeñas */
-@media (max-width: 992px) { /* Aumentamos a 992px */
-  .main-panel {
-    margin-left: 0 !important;
-    width: 100% !important;
-    transition: all 0.2s ease-out;
-  }
-}
-
-.table {
-  font-size: 14px; /* Ajustar el tamaño de la fuente */
-}
-
-.table-bordered th, 
-.table-bordered td {
-  border: 1px solid #dee2e6; /* Bordes visibles */
-}
-
-.vehicle-schema ul {
-  padding-left: 20px; /* Ajustar el padding para el esquema del vehículo */
+.collapse.show {
+  display: block !important;
 }
 
 
-.table thead {
-  background-color: #f8f9fa;
+/* Styles for the submenu */
+.nav-item .collapse {
+  transition: all 0.3s ease;
 }
 
-.table thead th {
-  font-weight: bold;
-  text-transform: uppercase;
+.nav-item .collapse.show {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item .collapse .nav-item .nav-link {
+  padding-left: 55px;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-item .collapse .nav-item {
+  margin-top: 5px;
+}
+
+.nav-item .collapse .nav-item .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-item .collapse .nav-item .nav-link .sidebar-mini {
+  float: left;
+  width: 30px;
   text-align: center;
+  margin-right: 15px;
 }
 
-.table td {
-  padding: 10px;
+.nav-item .collapse .nav-item .nav-link .sidebar-normal {
+  display: block;
+  white-space: nowrap;
+}
+
+/* Caret styles */
+.nav-link .caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
   vertical-align: middle;
+  border-top: 4px dashed;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  transition: transform 0.3s ease;
 }
 
-.form-control {
-  border-radius: 5px;
-  padding: 0.5rem;
-  font-size: 0.9rem;
+.nav-link[aria-expanded="true"] .caret {
+  transform: rotate(180deg);
 }
 
-button.btn-success {
-  font-size: 1.2rem;
+/* Estilos para la lista de navegación */
+.nav .nav-dropdown-items {
+  display: none;
+  padding-left: 20px;
+  list-style-type: none;
+}
+
+.nav-item.has-dropdown.open .nav-dropdown-items {
+  display: block;
+}
+
+.nav-dropdown-toggle {
+  cursor: pointer;
+}
+
+.nav-item a.nav-link {
+  color: #fff;
   padding: 10px;
-  margin-top: 20px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
-.vehicle-schema {
-  list-style: none;
+.nav-item a.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ajustes generales para el menú */
+.sidebar-wrapper .nav {
   padding: 0;
-  text-align: left;
 }
 
-.tire-position {
-  margin: 10px 0;
-  padding: 10px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  font-weight: bold;
-  border-radius: 5px;
-}
-
-.tire-position:hover {
-  background-color: #eee;
-}
-
-.table th, .table td {
-  vertical-align: middle;
-}
-
-.btn-success {
-  width: 150px;
-}
-.tire-btn {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  margin: 10px 0;
-}
-
-.tire-btn.btn-danger {
-  background-color: #dc3545;  /* Color rojo para neumáticos con averías */
-}
-
-.dynamic-select {
-  width: 100%;
+.nav-item {
+  list-style: none;
   margin-bottom: 10px;
 }
 
-.add-averia {
-  margin-top: 10px;
-  display: block;
-}
+

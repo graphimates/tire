@@ -1,8 +1,8 @@
-<!-- Sidebar for large screens --> 
-<div class="sidebar" id="sidebar" data-color="orange">
+<!-- Sidebar for large screens -->
+<div class="sidebar d-none d-lg-block" data-color="orange">
   <div class="logo">
     <a href="#" class="simple-text logo-mini">GP</a>
-    <a href="#" class="simple-text logo-normal" id="sidebar-text">Graphimates</a>
+    <a href="#" class="simple-text logo-normal">Graphimates</a>
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
@@ -10,7 +10,7 @@
       <li class="nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
         <a class="nav-link" href="{% url 'index' %}">
           <i class="fa fa-home"></i>
-          <p class="sidebar-item-text">Inicio</p>
+          <p>Inicio</p>
         </a>
       </li>
 
@@ -18,15 +18,15 @@
       <li class="nav-item {% if request.resolver_match.url_name == 'reporte_vehiculos' %}active{% endif %}">
         <a class="nav-link" href="{% url 'reporte_vehiculos' %}">
           <i class="fa fa-car"></i>
-          <p class="sidebar-item-text">Reporte de Vehículos</p>
+          <p>Reporte de Vehículos</p>
         </a>
       </li>
 
       <!-- Reporte de Neumáticos -->
-      <li class="nav-item {% if request.resolver_match.url_name == 'reporte_neumaticos' %}active{% endif %}">
-        <a class="nav-link" href="{% url 'reporte_neumaticos' %}">
+      <li class="nav-item {% if request.resolver_match.url_name == 'ver_neumaticos' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'ver_neumaticos' %}">
           <i class="fa fa-tools"></i>
-          <p class="sidebar-item-text">Reporte de Neumáticos</p>
+          <p>Reporte de Neumáticos</p>
         </a>
       </li>
 
@@ -34,19 +34,18 @@
       <li class="nav-item {% if request.resolver_match.url_name == 'historico_datos' %}active{% endif %}">
         <a class="nav-link" href="#">
           <i class="fa fa-database"></i>
-          <p class="sidebar-item-text">Histórico de Datos</p>
+          <p>Histórico de Datos</p>
         </a>
       </li>
 
-      <!-- Administrador de Usuarios (Solo para admin) -->
+      <!-- Administrador de Usuarios (solo para admin) -->
       {% if user.is_superuser %}
-      <li class="nav-item {% if request.resolver_match.url_name == 'ver_usuarios' or request.resolver_match.url_name == 'crear_usuario' %}active{% endif %}">
-        <a class="nav-link" href="#" id="adminUserLink">
+      <li class="nav-item has-dropdown">
+        <a class="nav-link nav-dropdown-toggle" href="#">
           <i class="fa fa-check"></i>
-          <p class="sidebar-item-text">Administrador de Usuarios</p>
-          <i class="fa fa-chevron-down"></i> <!-- Flecha para indicar submenú -->
+          <p>Administrador de Usuarios</p>
         </a>
-        <ul class="nav flex-column collapse" id="adminUserOptions" style="padding-left: 20px;">
+        <ul class="nav-dropdown-items">
           <li class="nav-item">
             <a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
           </li>
@@ -55,7 +54,8 @@
           </li>
         </ul>
       </li>
-      
+      {% endif %}
+
       <!-- Botón de Gestionar Averías -->
       <li class="nav-item">
         <a class="nav-link" href="{% url 'ver_averias' %}">
@@ -63,15 +63,13 @@
           <p>Gestionar Averías</p>
         </a>
       </li>
-      {% endif %}
     </ul>
   </div>
 
-  <!-- Botón de colapso al final -->
+  <!-- Botón de colapso del sidebar -->
   <div class="sidebar-footer">
     <button class="btn btn-secondary" id="toggleSidebar">
       <i class="fas fa-chevron-left"></i>
     </button>
   </div>
 </div>
-
