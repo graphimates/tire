@@ -1,8 +1,14 @@
+{% load static %} <!-- Cargar el tag static al inicio -->
+
 <!-- Sidebar for large screens -->
-<div class="sidebar d-none d-lg-block" data-color="orange">
-  <div class="logo">
-    <a href="#" class="simple-text logo-mini">GP</a>
-    <a href="#" class="simple-text logo-normal">Graphimates</a>
+<div class="sidebar d-none d-lg-block" data-color="orange" id="sidebar">
+  <div class="logo text-center">
+    <a href="#" class="simple-text logo-mini d-lg-none"> <!-- Logo mini para pantallas pequeñas -->
+      GP
+    </a>
+    <a href="#">
+      <img src="{% static 'assets/img/logo-empresa.png' %}" alt="Logo de la Empresa" class="img-fluid logo-large d-none d-lg-block" style="max-width: 180px; height: auto;"> <!-- Logo grande para pantallas grandes -->
+    </a>
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
@@ -10,7 +16,7 @@
       <li class="nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
         <a class="nav-link" href="{% url 'index' %}">
           <i class="fa fa-home"></i>
-          <p>Inicio</p>
+          <p class="sidebar-item-text">Inicio</p>
         </a>
       </li>
 
@@ -18,7 +24,7 @@
       <li class="nav-item {% if request.resolver_match.url_name == 'reporte_vehiculos' %}active{% endif %}">
         <a class="nav-link" href="{% url 'reporte_vehiculos' %}">
           <i class="fa fa-car"></i>
-          <p>Reporte de Vehículos</p>
+          <p class="sidebar-item-text">Reporte de Vehículos</p>
         </a>
       </li>
 
@@ -26,7 +32,7 @@
       <li class="nav-item {% if request.resolver_match.url_name == 'ver_neumaticos' %}active{% endif %}">
         <a class="nav-link" href="{% url 'ver_neumaticos' %}">
           <i class="fa fa-tools"></i>
-          <p>Reporte de Neumáticos</p>
+          <p class="sidebar-item-text">Reporte de Neumáticos</p>
         </a>
       </li>
 
@@ -34,22 +40,22 @@
       <li class="nav-item {% if request.resolver_match.url_name == 'historico_datos' %}active{% endif %}">
         <a class="nav-link" href="#">
           <i class="fa fa-database"></i>
-          <p>Histórico de Datos</p>
+          <p class="sidebar-item-text">Histórico de Datos</p>
         </a>
       </li>
 
       <!-- Administrador de Usuarios (solo para admin) -->
       {% if user.is_superuser %}
-      <li class="nav-item has-dropdown">
-        <a class="nav-link nav-dropdown-toggle" href="#">
+      <li class="nav-item has-dropdown {% if request.resolver_match.url_name == 'ver_usuarios' or request.resolver_match.url_name == 'crear_usuario' %}open{% endif %}">
+        <a class="nav-link nav-dropdown-toggle" href="#" id="adminUserToggle">
           <i class="fa fa-check"></i>
-          <p>Administrador de Usuarios</p>
+          <p class="sidebar-item-text">Administrador de Usuarios</p>
         </a>
-        <ul class="nav-dropdown-items">
-          <li class="nav-item">
+        <ul class="nav-dropdown-items collapse {% if request.resolver_match.url_name == 'ver_usuarios' or request.resolver_match.url_name == 'crear_usuario' %}show{% endif %}" id="adminUserOptions">
+          <li class="nav-item {% if request.resolver_match.url_name == 'ver_usuarios' %}active{% endif %}">
             <a class="nav-link" href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item {% if request.resolver_match.url_name == 'crear_usuario' %}active{% endif %}">
             <a class="nav-link" href="{% url 'crear_usuario' %}">Nuevo Usuario</a>
           </li>
         </ul>
@@ -57,10 +63,10 @@
       {% endif %}
 
       <!-- Botón de Gestionar Averías -->
-      <li class="nav-item">
+      <li class="nav-item {% if request.resolver_match.url_name == 'ver_averias' %}active{% endif %}">
         <a class="nav-link" href="{% url 'ver_averias' %}">
           <i class="fa fa-exclamation-triangle"></i>
-          <p>Gestionar Averías</p>
+          <p class="sidebar-item-text">Gestionar Averías</p>
         </a>
       </li>
     </ul>

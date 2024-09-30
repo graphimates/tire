@@ -50,25 +50,44 @@
     
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const dropdownToggle = document.querySelector('.nav-dropdown-toggle');
-        const dropdownParent = dropdownToggle.closest('.nav-item');
+        const dropdownToggle = document.getElementById('adminUserToggle');
+        const adminUserOptions = document.getElementById('adminUserOptions');
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const mainPanel = document.querySelector('.main-panel');
+        
+        // Mantener expandido el submenú si la página actual pertenece a la sección 'Administrador de Usuarios'
+        if (window.location.pathname.includes('ver_usuarios') || window.location.pathname.includes('crear_usuario')) {
+          adminUserOptions.classList.add('show');
+        }
       
+        // Agrega un evento para expandir el sidebar cuando se hace clic en 'Administrador de Usuarios'
         dropdownToggle.addEventListener('click', function(event) {
           event.preventDefault();
-          dropdownParent.classList.toggle('open');
+          
+          // Si el sidebar está colapsado, expándelo
+          if (sidebar.classList.contains('collapsed')) {
+            sidebar.classList.remove('collapsed');
+            mainPanel.classList.remove('sidebar-collapsed');
+          }
+          
+          // Desplegar el menú de opciones de administrador
+          adminUserOptions.classList.toggle('show');
         });
-      
-        // Función para colapsar el sidebar
-        const toggleSidebar = document.getElementById('toggleSidebar');
-        const sidebar = document.querySelector('.sidebar');
-        const mainPanel = document.querySelector('.main-panel');
+    
+        // Función para colapsar el sidebar con el botón de colapso
         toggleSidebar.addEventListener('click', function() {
           sidebar.classList.toggle('collapsed');
           mainPanel.classList.toggle('sidebar-collapsed');
+    
+          // Asegurarse de que los submenús no estén abiertos cuando se colapsa el sidebar
+          if (sidebar.classList.contains('collapsed')) {
+            adminUserOptions.classList.remove('show');
+          }
         });
       });
-      
-      
     </script>
+    
+    
   </body>
 </html>

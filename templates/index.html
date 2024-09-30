@@ -5,11 +5,43 @@
 {% endblock %}
 
 {% block content %}
+  <!-- Panel header -->
+  <div class="panel-header panel-header-sm"></div>
+  
+  <div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4 text-primary">Bienvenido a la Página Principal</h1>
+        <p class="lead">Esta es la página principal del sistema, desde aquí podrás acceder a las distintas secciones y funcionalidades.</p>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card text-center shadow">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-car mr-2"></i>Reporte de Vehículos</h5>
+            <p class="card-text">Accede a los reportes y gestiona tus vehículos fácilmente.</p>
+            <a href="{% url 'reporte_vehiculos' %}" class="btn btn-primary">Ir al Reporte de Vehículos</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card text-center shadow">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-tools mr-2"></i>Reporte de Neumáticos</h5>
+            <p class="card-text">Consulta y administra el estado de los neumáticos de tus vehículos.</p>
+            <a href="{% url 'ver_neumaticos' %}" class="btn btn-primary">Ir al Reporte de Neumáticos</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="container mt-5" > <!-- Agregamos margen superior con mt-5 -->
-    <h1>Bienvenido a la página principal</h1>
-   
+    <div class="row mt-4">
+      <div class="col-md-12 text-center">
+        <p class="text-muted">Para más opciones, navega utilizando el menú lateral.</p>
+      </div>
+    </div>
   </div>
-
-
 {% endblock %}
