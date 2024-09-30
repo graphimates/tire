@@ -39,11 +39,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'usuarios',
     'vehiculos',
-    'crispy_forms'
+    'neumatico',
+    'averias',
+    'crispy_forms',
+    'crispy_bootstrap5',  # Añadir crispy_bootstrap5 para soporte Bootstrap 5
 ]
 # settings.py
 AUTH_USER_MODEL = 'usuarios.Usuario'
+# Configuración de crispy-forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"  # Cambiar a 'bootstrap4' si usas Bootstrap 4
+CRISPY_TEMPLATE_PACK = "bootstrap5"  # Cambiar a 'bootstrap4' si usas Bootstrap 4
 
+# Configuración del modelo de usuario personalizado
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -65,7 +73,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # Necesario para crispy_forms
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -80,13 +88,13 @@ WSGI_APPLICATION = 'wheels.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-      'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'neumaticos',  # El nombre de tu base de datos
-        'USER': 'root',         # Tu usuario de MySQL
-        'PASSWORD': 'graphimates123',         # La contraseña de tu usuario root (déjalo vacío si no hay contraseña)
-        'HOST': '127.0.0.1',    # Dirección del servidor de MySQL
-        'PORT': '3306',         # El puerto de MySQL
+        'NAME': 'neumaticos',       # El nombre de tu base de datos
+        'USER': 'root',             # Tu usuario de MySQL
+        'PASSWORD': 'graphimates123',  # La contraseña de tu usuario root
+        'HOST': '127.0.0.1',        # Dirección del servidor de MySQL
+        'PORT': '3306',             # El puerto de MySQL
     }
 }
 
@@ -95,18 +103,10 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
 
@@ -121,27 +121,53 @@ USE_I18N = True
 
 USE_TZ = True
 
-LOGIN_URL = '/login/'  # URL personalizada para login
-LOGIN_REDIRECT_URL = '/'  # Redirige a la página principal después de login
-LOGOUT_REDIRECT_URL = '/login/'  # Redirige a la página de login después de logout
 
+# Login/Logout URLs
+LOGIN_URL = '/login/'            # URL personalizada para login
+LOGIN_REDIRECT_URL = '/'         # Redirige a la página principal después de login
+LOGOUT_REDIRECT_URL = '/login/'  # Redirige a la página de login después de logout
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
+# Media files (Imágenes de perfil, etc.)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '@gmail.com'  # El correo emisor
+EMAIL_HOST_PASSWORD = ''  # La contraseña o clave de aplicación generada
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Backends de autenticación
 AUTHENTICATION_BACKENDS = [
     'usuarios.backends.EmailBackend',  # Agregamos el backend de autenticación por email
     'django.contrib.auth.backends.ModelBackend',  # El backend por defecto
 ]
 
+# Configuración para servir archivos media en desarrollo
+from django.conf import settings
+from django.conf.urls.static import static
 
+urlpatterns = [
+    # ... tus rutas ...
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

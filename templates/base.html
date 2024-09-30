@@ -15,11 +15,15 @@
     <!-- Bootstrap CSS -->
     <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" />
     <link href="{% static 'assets/css/now-ui-dashboard.css' %}" rel="stylesheet" />
-
     <!-- Custom CSS -->
     <link href="{% static 'assets/css/custom.css' %}" rel="stylesheet" /> 
+  
   </head>
   <body>
+
+    <!-- Incluir el header -->
+    {% include "partials/header.html" %}
+
     <div class="wrapper">
       {% block sidebar %}
 
@@ -63,5 +67,19 @@
         options.style.display = options.style.display === 'none' ? 'block' : 'none';
       });
     </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const selects = document.querySelectorAll('.dynamic-select');
+          selects.forEach((select, index) => {
+              select.addEventListener('change', function() {
+                  if (select.value !== "" && index + 1 < selects.length) {
+                      selects[index + 1].style.display = 'block';
+                  }
+              });
+          });
+      });
+      </script>
+      
   </body>
 </html>

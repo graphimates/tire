@@ -1,0 +1,65 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-orange ">
+  <div class="container-fluid">
+    <!-- Navbar Toggler (Mobile) -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav mr-auto d-lg-none"> <!-- Ocultar en pantallas grandes -->
+        <li class="nav-item active">
+          <a class="nav-link" href="#"><i class="fa fa-home"></i> Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'reporte_vehiculos' %}"><i class="fa fa-car"></i> Reporte de Vehículos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fa fa-tools"></i> Reporte de Neumáticos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fa fa-database"></i> Histórico de Datos</a>
+        </li>
+
+        <!-- Mostrar esto solo si el usuario es superusuario (admin) -->
+        {% if user.is_superuser %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="adminUserLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-check"></i> Administrador de Usuarios
+          </a>
+          <div class="dropdown-menu" aria-labelledby="adminUserLink">
+            <a class="dropdown-item" href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
+            <a class="dropdown-item" href="{% url 'crear_usuario' %}">Nuevo Usuario</a>
+          </div>
+        </li>
+        {% endif %}
+      </ul>
+
+      <!-- User Dropdown -->
+      {% if user.is_authenticated %}
+      <div class="dropdown ml-auto">
+        <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {% if user.profile_photo %}
+          <img src="{{ user.profile_photo.url }}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
+          {% else %}
+          <img src="{% static 'assets/img/default-user.png' %}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
+          {% endif %}
+          <span class="ml-2 d-none d-md-inline">{{ user.get_full_name }}</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
+          <a class="dropdown-item" href="{% url 'perfil_usuario' %}">Perfil</a>
+          <div class="dropdown-divider"></div>
+          <!-- Cerrar sesión con POST -->
+          <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item">Cerrar sesión</button>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <span class="navbar-text text-white ml-auto">Bienvenido</span>
+      {% endif %}
+    </div>
+  </div>
+</nav>

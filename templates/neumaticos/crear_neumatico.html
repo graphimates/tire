@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Inspección de Neumáticos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Inspección de Neumáticos para {{ vehiculo.placa }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Tabla para organizar el formulario como si fuera una hoja de cálculo -->
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Neumático</th>
+                    <th>Modelo</th>
+                    <th>Marca</th>
+                    <th>DOT</th>
+                    <th>Presión</th>
+                    <th>Huella</th>
+                    <th>Averías</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in forms %}
+                <tr>
+                    <!-- Mostrar el número de neumático -->
+                    <td>Neumático {{ forloop.counter }}</td>
+
+                    <!-- Mostrar cada campo del formulario en su respectiva columna -->
+                    <td>{{ form.modelo }}</td>
+                    <td>{{ form.marca }}</td>
+                    <td>{{ form.dot }}</td>
+                    <td>{{ form.presion }}</td>
+                    <td>{{ form.huella }}</td>
+                    <td>{{ form.averias }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success btn-block">Guardar Inspección</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Inspecciones{% endblock %}
+
+{% block content %}
+<h2>Historial de Inspecciones - Vehículo: {{ vehiculo.placa }}</h2>
+
+{% if historial %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha de Inspección</th>
+                <th>Posición</th>
+                <th>Modelo</th>
+                <th>Marca</th>
+                <th>Presión</th>
+                <th>Huella</th>
+                <th>DOT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inspec in historial %}
+            <tr>
+                <td>{{ inspec.fecha_inspeccion|date:"d/m/Y H:i" }}</td>
+                <td>{{ inspec.posicion }}</td>
+                <td>{{ inspec.modelo }}</td>
+                <td>{{ inspec.marca }}</td>
+                <td>{{ inspec.presion }}</td>
+                <td>{{ inspec.huella }}</td>
+                <td>{{ inspec.dot }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay inspecciones registradas para este vehículo.</p>
+{% endif %}
+{% endblock %}
