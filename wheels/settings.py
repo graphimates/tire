@@ -146,8 +146,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '@gmail.com'  # El correo emisor
-EMAIL_HOST_PASSWORD = ''  # La contraseña o clave de aplicación generada
+EMAIL_HOST_USER = 'graphimates@gmail.com'  # El correo emisor
+EMAIL_HOST_PASSWORD = 'noze pfln dzlp eqnb'  # La contraseña o clave de aplicación generada
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
