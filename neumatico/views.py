@@ -29,7 +29,7 @@ def crear_neumatico(request, vehiculo_id):
         vehiculo.neumaticos.all().delete()
 
         # Procesar los formularios de nuevos neumáticos
-        for posicion in range(1, vehiculo.tipo + 1):
+        for posicion in range(1, vehiculo.cantidad_neumaticos + 1):
             form = NeumaticoForm(request.POST, prefix=f'neumatico_{posicion}')
 
             # Asignar la posición manualmente si no se envía desde el formulario
@@ -56,7 +56,7 @@ def crear_neumatico(request, vehiculo_id):
             return redirect('reporte_vehiculos')  # Redirigir al reporte de vehículos
 
     # Crear un formulario para cada neumático
-    forms = [NeumaticoForm(prefix=f'neumatico_{posicion}') for posicion in range(1, vehiculo.tipo + 1)]
+    forms = [NeumaticoForm(prefix=f'neumatico_{posicion}') for posicion in range(1, vehiculo.cantidad_neumaticos + 1)]
     return render(request, 'neumaticos/crear_neumatico.html', {'forms': forms, 'vehiculo': vehiculo})
 
 

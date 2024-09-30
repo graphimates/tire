@@ -5,13 +5,13 @@
 {% block content %}
 <div class="panel-header panel-header-sm"></div>
 
-<div class="container-fluid mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
     <h2 class="text-primary">Inspección de Neumáticos para {{ vehiculo.placa }}</h2>
 
     <form method="POST" class="w-100"> <!-- Clase w-100 para que ocupe el 100% del ancho disponible -->
         {% csrf_token %}
 
-        <!-- Tabla responsiva para evitar scroll lateral -->
+        <!-- Tabla para organizar el formulario como si fuera una hoja de cálculo -->
         <div class="table-responsive"> <!-- Asegura que la tabla sea responsiva -->
             <table class="table table-bordered table-hover table-striped">
                 <thead class="thead-light">

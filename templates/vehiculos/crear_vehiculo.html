@@ -3,33 +3,27 @@
 {% block title %}Añadir Vehículo{% endblock %}
 
 {% block content %}
-  <div class="panel-header panel-header-sm"></div>
-
-  <div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
-    <h2 class="text-primary">Añadir Vehículo para {{ usuario.first_name }} {{ usuario.last_name }}</h2>
-    
-    <form method="POST" class="row g-3 mt-4">
-      {% csrf_token %}
-      {{ form.non_field_errors }}
-
-      <div class="col-md-6">
-        <label for="id_placa" class="form-label text-primary">Placa</label>
-        {{ form.placa }}
-      </div>
-      
-      <div class="col-md-6">
-        <label for="id_modelo" class="form-label text-primary">Modelo</label>
-        {{ form.modelo }}
-      </div>
-      
-      <div class="col-md-6">
-        <label for="id_tipo" class="form-label text-primary">Tipo de Vehículo</label>
-        {{ form.tipo }}
-      </div>
-
-      <div class="col-12 mt-3">
-        <button type="submit" class="btn btn-primary btn-block">Guardar Vehículo</button>
-      </div>
+<div class="container mt-5">
+    <h2>Añadir Vehículo para {{ usuario.first_name }} {{ usuario.last_name }}</h2>
+    <form method="POST" class="row g-3">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
+        <div class="col-md-6">
+            <label for="id_placa" class="form-label">Placa</label>
+            {{ form.placa }}
+        </div>      
+        <div class="col-md-6">
+            <label for="id_modelo" class="form-label">Modelo</label>
+            {{ form.modelo }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_tipo" class="form-label">Tipo de Vehículo</label>
+            {{ form.tipo }}  <!-- Selección del tipo de vehículo -->
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Guardar Vehículo</button>
+        </div>
     </form>
-  </div>
+</div>
 {% endblock %}
