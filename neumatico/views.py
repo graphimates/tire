@@ -1,11 +1,26 @@
-# neumatico/views.py
+
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Neumatico, HistorialInspeccion
 from vehiculos.models import Vehiculo
+from usuarios.models import Usuario
+from averias.models import Averia  # Asegúrate de importar Averia
 from .forms import NeumaticoForm
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.cache import never_cache
 
 
+
+# Función para verificar si el usuario es administrador
+def is_admin(user):
+    return user.is_superuser
+
+
+# Vista para crear neumáticos
+@never_cache
+@login_required
+@user_passes_test(is_admin)
 def crear_neumatico(request, vehiculo_id):
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
     
@@ -60,6 +75,11 @@ def crear_neumatico(request, vehiculo_id):
     return render(request, 'neumaticos/crear_neumatico.html', {'forms': forms, 'vehiculo': vehiculo})
 
 
+# Vista para ver todos los neumáticos
+@never_cache
+@login_required
+@user_passes_test(is_admin)
 def ver_neumaticos(request):
     neumaticos = Neumatico.objects.select_related('vehiculo').all()
     return render(request, 'neumaticos/ver_neumaticos.html', {'neumaticos': neumaticos})
+
