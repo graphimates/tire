@@ -30,6 +30,18 @@ urlpatterns = [
     # Ruta para crear un neumático
    path('neumaticos/', include('neumatico.urls')),  # Asegúrate de que el nombre coincide
 
+    # Ruta para solicitar el reset de contraseña
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+
+    # Ruta para mostrar el mensaje de éxito al enviar el email
+    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+
+    # Ruta para resetear la contraseña desde el link del correo
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+
+    # Ruta para confirmar que la contraseña fue cambiada
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
 
 ]
 
