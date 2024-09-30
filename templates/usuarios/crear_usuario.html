@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mt-5" style="background-color: #f4f5f7; padding: 20px; border-radius: 10px;">
     <h2>{{ titulo }}</h2>
-    <form method="POST" class="row g-3">
+    <form method="POST" enctype="multipart/form-data" class="row g-3">
         {% csrf_token %}
         {{ form.non_field_errors }}
 
@@ -29,13 +29,18 @@
             <label for="id_empresa" class="form-label">Empresa</label>
             {{ form.empresa }}
         </div>
-        <!-- Lista desplegable para seleccionar si es administrador -->
-        <div class="col-12">
-            <label for="id_is_superuser" class="form-label">¿Es administrador?</label>
+        <!-- Campo para la foto de perfil -->
+        <div class="col-md-12">
+            <label for="id_profile_photo" class="form-label">Foto de Perfil</label>
+            {{ form.profile_photo }}
+        </div>
+        <!-- Checkbox para determinar si es administrador -->
+        <div class="col-12 form-check">
             {{ form.is_superuser }}
+            <label for="id_is_superuser" class="form-label">¿Es administrador?</label>
         </div>
         <div class="col-12">
-            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            <button type="submit" class="btn btn-primary">Crear Usuario</button>
         </div>
     </form>
 </div>
