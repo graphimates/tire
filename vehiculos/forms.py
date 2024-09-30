@@ -1,10 +1,11 @@
+# vehiculos/forms.py
 from django import forms
 from .models import Vehiculo
 
 class VehiculoForm(forms.ModelForm):
     class Meta:
         model = Vehiculo
-        fields = ['placa', 'modelo', 'tipo']  # Elimina 'marca'
+        fields = ['placa', 'modelo', 'tipo']  # Campos del formulario
         labels = {
             'placa': 'Placa',
             'modelo': 'Modelo',

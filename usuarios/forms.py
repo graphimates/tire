@@ -8,7 +8,7 @@ class UsuarioForm(forms.ModelForm):
         required=False  # La contraseña es opcional en la edición
     )
     is_superuser = forms.ChoiceField(
-        choices=[(True, 'Sí'), (False, 'No')],
+        choices=[(False, 'No'), (True, 'Sí')],  # Cambié el orden para que "No" esté primero
         label="¿Es administrador?",
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=True
@@ -42,13 +42,14 @@ class UsuarioForm(forms.ModelForm):
             user.set_password(password)  # Actualiza la contraseña solo si se proporciona una nueva
         else:
             # Si no se proporciona una nueva contraseña, mantenemos la actual
-            user.password = Usuario.objects.get(pk=user.pk).password
+            if user.pk:  # Verificamos si el usuario ya existe
+                user.password = Usuario.objects.get(pk=user.pk).password
 
         if commit:
             user.save()
         return user
 
-# Formulario para editar la imagen de perfil
+# Formulario para modificar la imagen de perfil
 class ModificarImagenForm(forms.ModelForm):
     class Meta:
         model = Usuario
@@ -60,23 +61,10 @@ class ModificarImagenForm(forms.ModelForm):
             'profile_photo': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
-# Formulario para editar la imagen de perfil usuarios
+# Formulario para modificar solo la imagen de perfil
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields = ['profile_photo']  # Solo este campo está presente en ProfileForm
+        fields = ['profile_photo']
 
-    # Elimina las validaciones de los campos que no están en este formulario
-    def clean(self):
-        cleaned_data = super().clean()
-        if not cleaned_data.get('profile_photo'):
-            self.add_error('profile_photo', 'La foto de perfil es obligatoria.')
-        return cleaned_data
-
-    # Si no hay contraseña en este formulario, elimina el método save relacionado con contraseñas
-
-
-
-    # Si no hay contraseña en este formulario, elimina el método save relacionado con contraseñas
-
-
+    # No es necesario el método `clean` aquí, ya que Django manejará la validación automáticamente

@@ -140,18 +140,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# settings.py
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '@gmail.com'  # El correo emisor
-EMAIL_HOST_PASSWORD = ''  # La contraseña o clave de aplicación generada
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -170,4 +158,3 @@ from django.conf.urls.static import static
 urlpatterns = [
     # ... tus rutas ...
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

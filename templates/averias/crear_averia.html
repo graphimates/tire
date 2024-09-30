@@ -3,26 +3,31 @@
 {% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>{{ titulo }}</h2>
-    <form method="POST" class="row g-3">
+<div class="panel-header panel-header-sm"></div>  <!-- Panel Header Pequeño -->
+
+<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+    <h2 class="text-primary">{{ titulo }}</h2>
+    <form method="POST" class="row g-3 mt-4">
         {% csrf_token %}
         {{ form.non_field_errors }}
 
         <div class="col-md-6">
-            <label for="id_nombre" class="form-label">Nombre de la Avería</label>
+            <label for="id_nombre" class="form-label text-primary">Nombre de la Avería</label>
             {{ form.nombre }}
         </div>
+
         <div class="col-md-6">
-            <label for="id_estado_neumatico" class="form-label">Estado del Neumático</label>
+            <label for="id_estado_neumatico" class="form-label text-primary">Estado del Neumático</label>
             {{ form.estado_neumatico }}
         </div>
+
         <div class="col-md-12">
-            <label for="id_descripcion" class="form-label">Descripción</label>
+            <label for="id_descripcion" class="form-label text-primary">Descripción</label>
             {{ form.descripcion }}
         </div>
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Guardar Avería</button>
+
+        <div class="col-12 text-center mt-4">
+            <button type="submit" class="btn btn-success btn-lg">Guardar Avería</button>
         </div>
     </form>
 </div>

@@ -3,13 +3,16 @@
 {% block title %}Reporte de Vehículos{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Reporte de Vehículos</h2>
+<!-- Aquí agregamos el div con las clases panel-header panel-header-sm -->
+<div class="panel-header panel-header-sm"></div>
+
+<div class="container mt-5 mb-5">
+    <h2 class="report-title">Reporte de Vehículos</h2>
 
     <div class="accordion" id="vehiculosAccordion">
         {% if vehiculos %}
             {% for vehiculo in vehiculos %}
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ vehiculo.id }}">
                     <h2 class="mb-0">
                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ vehiculo.id }}">
@@ -34,14 +37,7 @@
                             <!-- Esquema del vehículo (Columna izquierda) -->
                             <div class="col-md-4">
                                 <h4>Esquema del Vehículo</h4>
-                                <div class="vehicle-schema">
-                                    <ul>
-                                        <li>Posición 1: Delantero Izquierdo</li>
-                                        <li>Posición 2: Delantero Derecho</li>
-                                        <li>Posición 3: Trasero Izquierdo</li>
-                                        <li>Posición 4: Trasero Derecho</li>
-                                    </ul>
-                                </div>
+                                <img src="/media/tipo-vehiculos/{{ vehiculo.tipo }}.png" alt="Esquema del Vehículo" class="img-fluid">
                             </div>
 
                             <!-- Tabla de neumáticos (Columna derecha) -->
@@ -76,7 +72,6 @@
                                                     Sin averías
                                                 {% endfor %}
                                             </td>
-                                            
                                         </tr>
                                         {% endfor %}
                                     </tbody>
