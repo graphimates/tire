@@ -468,3 +468,9 @@ input {
     display: block; /* Mostrar logo mini en pantallas pequeñas */
   }
 }
+
+  .collapse.show {
+    display: block !important;
+  }
+
+  

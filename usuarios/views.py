@@ -7,6 +7,7 @@ from .forms import ModificarImagenForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import ProfileForm
+from averias.models import Averia
 
 
 # Función para verificar si el usuario es administrador
@@ -60,7 +61,6 @@ def editar_usuario(request, user_id):
         form = UsuarioForm(instance=usuario)  # Precargar el formulario con los datos del usuario
     return render(request, 'usuarios/crear_usuario.html', {'form': form, 'titulo': f'Editando al usuario {usuario.first_name}'})
 
-
 @never_cache  # Deshabilitar la caché
 @login_required
 def modificar_imagen(request):
@@ -86,3 +86,9 @@ def perfil_usuario(request):
     else:
         form = ProfileForm(instance=usuario)
     return render(request, 'usuarios/perfil_usuario.html', {'form': form})
+
+@login_required
+@user_passes_test(is_admin)  # Solo administradores pueden acceder
+def ver_averias(request):
+    averias = Averia.objects.all()
+    return render(request, 'averias/ver_averias.html', {'averias': averias})

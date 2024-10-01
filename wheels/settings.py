@@ -92,7 +92,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'graphimates@gmail.com'  # El correo emisor
-EMAIL_HOST_PASSWORD = 'hdat fllg vrch rfpj'  # La contraseña o clave de aplicación generada
+EMAIL_HOST_PASSWORD = 'qxdz rusp dbao xzxq'  # La contraseña o clave de aplicación generada
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
