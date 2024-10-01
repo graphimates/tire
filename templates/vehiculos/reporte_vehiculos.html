@@ -3,75 +3,139 @@
 {% block title %}Reporte de Vehículos{% endblock %}
 
 {% block content %}
-<!-- Aquí agregamos el div con las clases panel-header panel-header-sm -->
 <div class="panel-header panel-header-sm"></div>
 
 <div class="container mt-5 mb-5">
     <h2 class="report-title">Reporte de Vehículos</h2>
 
     <div class="accordion" id="vehiculosAccordion">
-        {% if vehiculos %}
-            {% for vehiculo in vehiculos %}
+        {% if vehiculos_con_neumaticos %}
+            {% for item in vehiculos_con_neumaticos %}
             <div class="card mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ vehiculo.id }}">
+                <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ item.vehiculo.id }}">
                     <h2 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ vehiculo.id }}">
-                            {{ vehiculo.placa }} : {{ vehiculo.usuario.first_name }} {{ vehiculo.usuario.last_name }}
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ item.vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ item.vehiculo.id }}">
+                            {{ item.vehiculo.placa }} : {{ item.vehiculo.usuario.first_name }} {{ item.vehiculo.usuario.last_name }}
                         </button>
                     </h2>
-                    <!-- Mostrar botones solo para administradores -->
                     <div>
-                        {% if vehiculo.ultima_inspeccion %}
-                        <span><strong>Última Inspección:</strong> {{ vehiculo.ultima_inspeccion|date:"d/m/Y" }}</span>
+                        {% if item.vehiculo.ultima_inspeccion %}
+                        <span><strong>Última Inspección:</strong> {{ item.vehiculo.ultima_inspeccion|date:"d/m/Y" }}</span>
                         {% endif %}
                         {% if user.is_superuser %}
-                        <a href="{% url 'crear_neumatico' vehiculo.id %}" class="btn btn-primary btn-sm">Inspeccionar</a>
-                        <a href="{% url 'borrar_vehiculo' vehiculo.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este vehículo?');">Borrar</a>
+                        <a href="{% url 'crear_neumatico' item.vehiculo.id %}" class="btn btn-primary btn-sm">Inspeccionar</a>
+                        <a href="{% url 'borrar_vehiculo' item.vehiculo.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este vehículo?');">Borrar</a>
                         {% endif %}
                     </div>
                 </div>
 
-                <div id="collapse{{ vehiculo.id }}" class="collapse" aria-labelledby="heading{{ vehiculo.id }}" data-parent="#vehiculosAccordion">
+                <div id="collapse{{ item.vehiculo.id }}" class="collapse" aria-labelledby="heading{{ item.vehiculo.id }}" data-parent="#vehiculosAccordion">
                     <div class="card-body">
                         <div class="row">
                             <!-- Esquema del vehículo (Columna izquierda) -->
                             <div class="col-md-4">
                                 <h4>Esquema del Vehículo</h4>
-                                <img src="/media/tipo-vehiculos/{{ vehiculo.tipo }}.png" alt="Esquema del Vehículo" class="img-fluid">
+                                <div class="neumatico-esquema" style="position: relative;">
+                                    {% if item.vehiculo.tipo == '2x2' %}
+                                        <img src="/media/tipo-vehiculos/2x2.png" alt="Esquema 2x2" class="img-fluid">
+                                        <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
+                                        <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
+                                    {% elif item.vehiculo.tipo == '4x2' or item.vehiculo.tipo == '4x2L' %}
+                                        <img src="/media/tipo-vehiculos/4x2.png" alt="Esquema 4x2" class="img-fluid">
+                                        <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
+                                        <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; left: 100px; color: {% if item.neumaticos_por_posicion.5.averias.exists %}red{% else %}black{% endif %};">5</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; right: 100px; color: {% if item.neumaticos_por_posicion.6.averias.exists %}red{% else %}black{% endif %};">6</span>
+                                    {% elif item.vehiculo.tipo == '6x2' or item.vehiculo.tipo == '6x2M' or item.vehiculo.tipo == '6x4' %}
+                                        <img src="/media/tipo-vehiculos/6x2.png" alt="Esquema 6x2" class="img-fluid">
+                                        <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
+                                        <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; left: 100px; color: {% if item.neumaticos_por_posicion.5.averias.exists %}red{% else %}black{% endif %};">5</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; right: 100px; color: {% if item.neumaticos_por_posicion.6.averias.exists %}red{% else %}black{% endif %};">6</span>
+                                        <span class="neumatico-posicion" style="bottom: 80px; left: 150px; color: {% if item.neumaticos_por_posicion.7.averias.exists %}red{% else %}black{% endif %};">7</span>
+                                        <span class="neumatico-posicion" style="bottom: 80px; right: 150px; color: {% if item.neumaticos_por_posicion.8.averias.exists %}red{% else %}black{% endif %};">8</span>
+                                        <span class="neumatico-posicion" style="bottom: 110px; left: 200px; color: {% if item.neumaticos_por_posicion.9.averias.exists %}red{% else %}black{% endif %};">9</span>
+                                        <span class="neumatico-posicion" style="bottom: 110px; right: 200px; color: {% if item.neumaticos_por_posicion.10.averias.exists %}red{% else %}black{% endif %};">10</span>
+                                    {% elif item.vehiculo.tipo == 'T2x0' %}
+                                        <img src="/media/tipo-vehiculos/T2x0.png" alt="Esquema T2x0" class="img-fluid">
+                                        <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
+                                        <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
+                                    {% elif item.vehiculo.tipo == 'T4x0' %}
+                                        <img src="/media/tipo-vehiculos/T4x0.png" alt="Esquema T4x0" class="img-fluid">
+                                        <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
+                                        <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; left: 100px; color: {% if item.neumaticos_por_posicion.5.averias.exists %}red{% else %}black{% endif %};">5</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; right: 100px; color: {% if item.neumaticos_por_posicion.6.averias.exists %}red{% else %}black{% endif %};">6</span>
+                                        <span class="neumatico-posicion" style="bottom: 80px; left: 150px; color: {% if item.neumaticos_por_posicion.7.averias.exists %}red{% else %}black{% endif %};">7</span>
+                                        <span class="neumatico-posicion" style="bottom: 80px; right: 150px; color: {% if item.neumaticos_por_posicion.8.averias.exists %}red{% else %}black{% endif %};">8</span>
+                                    {% elif item.vehiculo.tipo == 'T6x0' %}
+                                        <img src="/media/tipo-vehiculos/T6x0.png" alt="Esquema T6x0" class="img-fluid">
+                                        <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
+                                        <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; left: 100px; color: {% if item.neumaticos_por_posicion.5.averias.exists %}red{% else %}black{% endif %};">5</span>
+                                        <span class="neumatico-posicion" style="bottom: 50px; right: 100px; color: {% if item.neumaticos_por_posicion.6.averias.exists %}red{% else %}black{% endif %};">6</span>
+                                        <span class="neumatico-posicion" style="bottom: 80px; left: 150px; color: {% if item.neumaticos_por_posicion.7.averias.exists %}red{% else %}black{% endif %};">7</span>
+                                        <span class="neumatico-posicion" style="bottom: 80px; right: 150px; color: {% if item.neumaticos_por_posicion.8.averias.exists %}red{% else %}black{% endif %};">8</span>
+                                        <span class="neumatico-posicion" style="bottom: 110px; left: 200px; color: {% if item.neumaticos_por_posicion.9.averias.exists %}red{% else %}black{% endif %};">9</span>
+                                        <span class="neumatico-posicion" style="bottom: 110px; right: 200px; color: {% if item.neumaticos_por_posicion.10.averias.exists %}red{% else %}black{% endif %};">10</span>
+                                        <span class="neumatico-posicion" style="bottom: 140px; left: 250px; color: {% if item.neumaticos_por_posicion.11.averias.exists %}red{% else %}black{% endif %};">11</span>
+                                        <span class="neumatico-posicion" style="bottom: 140px; right: 250px; color: {% if item.neumaticos_por_posicion.12.averias.exists %}red{% else %}black{% endif %};">12</span>
+                                    {% endif %}
+                                </div>
                             </div>
 
                             <!-- Tabla de neumáticos (Columna derecha) -->
                             <div class="col-md-8">
                                 <h4>Neumáticos del Vehículo</h4>
-                                {% if vehiculo.neumaticos.all %}
+                                {% if item.vehiculo.neumaticos.all %}
                                 <table class="table table-bordered table-sm">
                                     <thead>
                                         <tr>
                                             <th>Posición</th>
                                             <th>Modelo</th>
                                             <th>Marca</th>
+                                            <th>Medida</th>
                                             <th>Presión</th>
                                             <th>Huella</th>
                                             <th>DOT</th>
                                             <th>Averías</th>
+                                            <th>Diseño</th>
+                                            <th>Renovable</th>
+                                            <th>Precio Estimado</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for neumatico in vehiculo.neumaticos.all %}
+                                        {% for neumatico in item.vehiculo.neumaticos.all %}
                                         <tr>
                                             <td>{{ neumatico.posicion }}</td>
                                             <td>{{ neumatico.modelo }}</td>
                                             <td>{{ neumatico.marca }}</td>
+                                            <td>{{ neumatico.medida.medida }}</td>
                                             <td>{{ neumatico.presion }}</td>
                                             <td>{{ neumatico.huella }}</td>
                                             <td>{{ neumatico.dot }}</td>
                                             <td>
                                                 {% for averia in neumatico.averias.all %}
-                                                    {{ averia.nombre }} ({{ averia.get_estado_neumatico_display }})
+                                                    {{ averia.nombre }}
                                                 {% empty %}
                                                     Sin averías
                                                 {% endfor %}
                                             </td>
+                                            <td>{{ neumatico.diseño }}</td>
+                                            <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>
+                                            <td>{{ neumatico.precio_estimado }} USD</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

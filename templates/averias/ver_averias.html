@@ -1,3 +1,4 @@
+<!-- templates/averias/ver_averias.html -->
 {% extends "base.html" %}
 
 {% block title %} Ver Averías {% endblock %}
@@ -13,8 +14,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Nombre</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Descripción</th>
+                    <th scope="col">Servicio Requerido</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
@@ -23,8 +23,7 @@
                 <tr>
                     <th scope="row">{{ averia.id }}</th>
                     <td>{{ averia.nombre }}</td>
-                    <td>{{ averia.get_estado_neumatico_display }}</td>
-                    <td>{{ averia.descripcion }}</td>
+                    <td>{{ averia.get_servicio_requerido_display }}</td>
                     <td>
                         <a href="{% url 'editar_averia' averia.id %}" class="btn btn-warning btn-sm">Editar</a>
                         <a href="{% url 'eliminar_averia' averia.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro que deseas eliminar esta avería?');">Eliminar</a>

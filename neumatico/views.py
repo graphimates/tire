@@ -1,11 +1,64 @@
 # neumatico/views.py
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Neumatico, HistorialInspeccion
+from .models import Neumatico, HistorialInspeccion, MedidaNeumatico
 from vehiculos.models import Vehiculo
-from .forms import NeumaticoForm
+from .forms import NeumaticoForm, MedidaForm
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
+
+# Función para verificar si el usuario es administrador
+def is_admin(user):
+    return user.is_superuser
+
+# Vista para gestionar medidas
+@login_required
+@user_passes_test(is_admin)
+def ver_medidas(request):
+    medidas = MedidaNeumatico.objects.all()
+    return render(request, 'medidas/ver_medidas.html', {'medidas': medidas})
+
+# Vista para crear una nueva medida
+@login_required
+@user_passes_test(is_admin)
+def crear_medida(request):
+    if request.method == 'POST':
+        form = MedidaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_medidas')
+    else:
+        form = MedidaForm()
+    
+    return render(request, 'medidas/crear_medida.html', {'form': form})
+
+@login_required
+@user_passes_test(is_admin)
+def editar_medida(request, medida_id):
+    medida = get_object_or_404(MedidaNeumatico, id=medida_id)
+    if request.method == 'POST':
+        form = MedidaForm(request.POST, instance=medida)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_medidas')
+    else:
+        form = MedidaForm(instance=medida)
+    
+    return render(request, 'medidas/editar_medida.html', {'form': form, 'medida': medida})
+
+@login_required
+@user_passes_test(is_admin)
+def eliminar_medida(request, medida_id):
+    medida = get_object_or_404(MedidaNeumatico, id=medida_id)
+    if request.method == 'POST':
+        medida.delete()
+        return redirect('ver_medidas')
+    
+    return render(request, 'medidas/eliminar_medida.html', {'medida': medida})
+
+
+# views.py
 def crear_neumatico(request, vehiculo_id):
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
     
@@ -23,6 +76,9 @@ def crear_neumatico(request, vehiculo_id):
                 huella=neumatico.huella,
                 dot=neumatico.dot,
                 fecha_inspeccion=timezone.now(),
+                medida=neumatico.medida,
+                renovable=neumatico.renovable,
+                precio_estimado=neumatico.precio_estimado,
             )
 
         # Eliminar los neumáticos actuales para reemplazarlos con los nuevos datos
@@ -32,19 +88,22 @@ def crear_neumatico(request, vehiculo_id):
         for posicion in range(1, vehiculo.cantidad_neumaticos + 1):
             form = NeumaticoForm(request.POST, prefix=f'neumatico_{posicion}')
 
-            # Asignar la posición manualmente si no se envía desde el formulario
-            if not form.data.get(f'neumatico_{posicion}-posicion'):
-                form.data = form.data.copy()
-                form.data[f'neumatico_{posicion}-posicion'] = posicion
-
             if form.is_valid():
                 neumatico = form.save(commit=False)
                 neumatico.vehiculo = vehiculo
                 neumatico.posicion = posicion
+
+                # Obtener el precio estimado de la medida
+                neumatico.actualizar_precio()
                 neumatico.save()
 
-                # Guardar las averías después de guardar el neumático
-                form.save_m2m()  # Esto guarda las relaciones de muchos a muchos como las averías
+                # Si alguna de las averías es de montura, marcar como no operativo
+                for averia in form.cleaned_data['averias']:
+                    if averia.servicio_requerido == 'montura':
+                        neumatico.renovable = False
+
+                # Guardar las averías
+                form.save_m2m()
             else:
                 valid_forms = False
                 print(f"Formulario de posición {posicion} no es válido: {form.errors}")
@@ -53,11 +112,13 @@ def crear_neumatico(request, vehiculo_id):
             # Actualizar la fecha de última inspección
             vehiculo.ultima_inspeccion = timezone.now()
             vehiculo.save()
-            return redirect('reporte_vehiculos')  # Redirigir al reporte de vehículos
+            return redirect('reporte_vehiculos')
 
     # Crear un formulario para cada neumático
     forms = [NeumaticoForm(prefix=f'neumatico_{posicion}') for posicion in range(1, vehiculo.cantidad_neumaticos + 1)]
     return render(request, 'neumaticos/crear_neumatico.html', {'forms': forms, 'vehiculo': vehiculo})
+
+
 
 
 def ver_neumaticos(request):

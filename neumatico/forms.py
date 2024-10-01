@@ -1,18 +1,33 @@
-# forms.py
 from django import forms
-from .models import Neumatico
-from averias.models import Averia
+from .models import Neumatico, MedidaNeumatico
 
 class NeumaticoForm(forms.ModelForm):
     class Meta:
         model = Neumatico
-        fields = ['posicion', 'modelo', 'marca', 'dot', 'presion', 'huella', 'averias']
+        fields = ['modelo', 'medida', 'marca', 'diseño', 'dot', 'presion', 'huella', 'averias', 'renovable']
         widgets = {
-            'posicion': forms.HiddenInput(),
+            'modelo': forms.TextInput(attrs={'class': 'form-control'}),  # Campo de modelo
+            'medida': forms.Select(attrs={'class': 'form-control'}),
+            'diseño': forms.TextInput(attrs={'class': 'form-control'}),
             'averias': forms.CheckboxSelectMultiple(),
+            'renovable': forms.CheckboxInput(),
         }
 
-    # Marcar el campo averias como no requerido
     def __init__(self, *args, **kwargs):
         super(NeumaticoForm, self).__init__(*args, **kwargs)
         self.fields['averias'].required = False
+        self.fields['renovable'].initial = False  # No marcar por defecto 'renovable'
+
+
+class MedidaForm(forms.ModelForm):
+    class Meta:
+        model = MedidaNeumatico
+        fields = ['medida', 'precio_estimado']
+        labels = {
+            'medida': 'Medida del Neumático',
+            'precio_estimado': 'Precio Estimado',
+        }
+        widgets = {
+            'medida': forms.TextInput(attrs={'class': 'form-control'}),
+            'precio_estimado': forms.NumberInput(attrs={'class': 'form-control'}),
+        }

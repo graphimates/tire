@@ -1,3 +1,4 @@
+<!-- templates/averias/crear_averia.html -->
 {% extends "base.html" %}
 
 {% block title %}{{ titulo }}{% endblock %}
@@ -17,13 +18,8 @@
         </div>
 
         <div class="col-md-6">
-            <label for="id_estado_neumatico" class="form-label text-primary">Estado del Neumático</label>
-            {{ form.estado_neumatico }}
-        </div>
-
-        <div class="col-md-12">
-            <label for="id_descripcion" class="form-label text-primary">Descripción</label>
-            {{ form.descripcion }}
+            <label for="id_servicio_requerido" class="form-label text-primary">Servicio Requerido</label>
+            {{ form.servicio_requerido }}
         </div>
 
         <div class="col-12 text-center mt-4">

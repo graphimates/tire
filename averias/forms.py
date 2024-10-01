@@ -1,17 +1,16 @@
+# averias/forms.py
 from django import forms
 from .models import Averia
 
 class AveriaForm(forms.ModelForm):
     class Meta:
         model = Averia
-        fields = ['nombre', 'estado_neumatico', 'descripcion']
+        fields = ['nombre', 'servicio_requerido']
         labels = {
             'nombre': 'Nombre de la Avería',
-            'estado_neumatico': 'Estado del Neumático',
-            'descripcion': 'Descripción de la Avería',
+            'servicio_requerido': 'Servicio Requerido',
         }
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'estado_neumatico': forms.Select(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'servicio_requerido': forms.Select(attrs={'class': 'form-control'}),
         }

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Medida{% endblock %}
+
+{% block content %}
+<div class="panel-header panel-header-sm"></div>
+
+<div class="container mt-5">
+    <h2 class="text-primary">Editar Medida: {{ medida.medida }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+    </form>
+</div>
+{% endblock %}

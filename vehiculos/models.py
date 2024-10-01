@@ -2,7 +2,6 @@
 from django.db import models
 from usuarios.models import Usuario
 
-# vehiculos/models.py
 class Vehiculo(models.Model):
     TIPOS_VEHICULOS = [
         ('2x2', 'Vehículo 2x2'),
@@ -11,6 +10,7 @@ class Vehiculo(models.Model):
         ('6x2', 'Vehículo 6x2'),
         ('6x2M', 'Vehículo 6x2M'),
         ('6x4', 'Vehículo 6x4'),
+        ('T2x0', 'Vehículo T2x0'),
         ('T4x0', 'Vehículo T4x0'),
         ('T6x0', 'Vehículo T6x0'),
     ]
@@ -26,5 +26,16 @@ class Vehiculo(models.Model):
 
     @property
     def cantidad_neumaticos(self):
-        # Extrae el número inicial del tipo de vehículo (e.g., '2x2' devolverá 2)
-        return int(self.tipo[0]) * 2  # Por ejemplo, 2x2 = 4 neumáticos
+        # Definir la cantidad de neumáticos según el tipo de vehículo
+        cantidad_por_tipo = {
+            '2x2': 4,
+            '4x2': 6,
+            '4x2L': 6,
+            '6x2': 10,
+            '6x2M': 10,
+            '6x4': 10,
+            'T2x0': 4,
+            'T4x0': 8,
+            'T6x0': 12,  # Aquí especificamos que el tipo T6x0 tiene 12 neumáticos
+        }
+        return cantidad_por_tipo.get(self.tipo, 4)  # Valor por defecto si el tipo no existe
