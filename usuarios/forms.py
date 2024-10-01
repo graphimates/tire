@@ -68,3 +68,4 @@ class ProfileForm(forms.ModelForm):
         fields = ['profile_photo']
 
     # No es necesario el método `clean` aquí, ya que Django manejará la validación automáticamente
+

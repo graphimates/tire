@@ -60,15 +60,15 @@
           </li>
         </ul>
       </li>
-      {% endif %}
 
-      <!-- Botón de Gestionar Averías -->
+      <!-- Botón de Gestionar Averías (solo para admin) -->
       <li class="nav-item {% if request.resolver_match.url_name == 'ver_averias' %}active{% endif %}">
         <a class="nav-link" href="{% url 'ver_averias' %}">
           <i class="fa fa-exclamation-triangle"></i>
           <p class="sidebar-item-text">Gestionar Averías</p>
         </a>
       </li>
+      {% endif %}
     </ul>
   </div>
 

@@ -3,27 +3,38 @@
 {% block title %}Añadir Vehículo{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Añadir Vehículo para {{ usuario.first_name }} {{ usuario.last_name }}</h2>
-    <form method="POST" class="row g-3">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        
-        <div class="col-md-6">
-            <label for="id_placa" class="form-label">Placa</label>
-            {{ form.placa }}
-        </div>      
-        <div class="col-md-6">
-            <label for="id_modelo" class="form-label">Modelo</label>
-            {{ form.modelo }}
-        </div>
-        <div class="col-md-6">
-            <label for="id_tipo" class="form-label">Tipo de Vehículo</label>
-            {{ form.tipo }}  <!-- Selección del tipo de vehículo -->
-        </div>
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Guardar Vehículo</button>
-        </div>
-    </form>
+<!-- Añadimos el panel-header-sm para consistencia visual -->
+<div class="panel-header panel-header-sm"></div>
+
+<div class="container mt-5 mb-5">
+    <!-- Título estilizado -->
+    <div class="text-center mb-4">
+        <h2 class="styled-title">Añadir Vehículo</h2>
+        <p class="styled-subtitle">Para {{ usuario.first_name }} {{ usuario.last_name }}</p>
+    </div>
+
+    <!-- Contenedor estilizado para el formulario -->
+    <div class="form-container p-4 shadow-sm rounded">
+        <form method="POST" class="row g-3">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            <div class="col-md-6">
+                <label for="id_placa" class="form-label">Placa</label>
+                {{ form.placa }}
+            </div>      
+            <div class="col-md-6">
+                <label for="id_modelo" class="form-label">Modelo</label>
+                {{ form.modelo }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_tipo" class="form-label">Tipo de Vehículo</label>
+                {{ form.tipo }}  <!-- Selección del tipo de vehículo -->
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Guardar Vehículo</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
