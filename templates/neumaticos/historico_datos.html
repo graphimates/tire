@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico de Datos{% endblock %}
+
+{% block content %}
+<div class="panel-header panel-header-sm"></div>
+
+<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+    <h2 class="text-primary">Histórico de Averías</h2>
+
+    <canvas id="historicoChart"></canvas> <!-- Aquí irá nuestra gráfica -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('historicoChart').getContext('2d');
+        
+        const labels = {{ labels|safe }};
+        const dataBarras = {{ data_barras|safe }};
+        const dataLinea = {{ porcentaje_acumulado|safe }};
+        
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Averías (%)',
+                        data: dataBarras,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y',
+                    },
+                    {
+                        type: 'line',
+                        label: 'Porcentaje Acumulado (%)',
+                        data: dataLinea,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        yAxisID: 'y1',
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        ticks: {
+                            beginAtZero: true,
+                            max: 100
+                        },
+                        title: {
+                            display: true,
+                            text: 'Porcentaje de Averías'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        ticks: {
+                            beginAtZero: true,
+                            max: 100
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Porcentaje Acumulado'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</div>
+{% endblock %}

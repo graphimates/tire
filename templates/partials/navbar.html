@@ -38,7 +38,7 @@
 
       <!-- Histórico de Datos -->
       <li class="nav-item {% if request.resolver_match.url_name == 'historico_datos' %}active{% endif %}">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'historico_datos' request.user.id %}">
           <i class="fa fa-database"></i>
           <p class="sidebar-item-text">Histórico de Datos</p>
         </a>

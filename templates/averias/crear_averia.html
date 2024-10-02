@@ -12,14 +12,19 @@
         {% csrf_token %}
         {{ form.non_field_errors }}
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="id_nombre" class="form-label text-primary">Nombre de la Avería</label>
             {{ form.nombre }}
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="id_servicio_requerido" class="form-label text-primary">Servicio Requerido</label>
             {{ form.servicio_requerido }}
+        </div>
+
+        <div class="col-md-4">
+            <label for="id_codigo" class="form-label text-primary">Código de la Avería</label>
+            {{ form.codigo }}
         </div>
 
         <div class="col-12 text-center mt-4">
@@ -28,3 +33,4 @@
     </form>
 </div>
 {% endblock %}
+

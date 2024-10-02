@@ -13,6 +13,7 @@
             <thead class="thead-light">
                 <tr>
                     <th scope="col">#</th>
+                    <th scope="col">Código</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Servicio Requerido</th>
                     <th scope="col">Acciones</th>
@@ -22,6 +23,7 @@
                 {% for averia in averias %}
                 <tr>
                     <th scope="row">{{ averia.id }}</th>
+                    <td>{{ averia.codigo }}</td>
                     <td>{{ averia.nombre }}</td>
                     <td>{{ averia.get_servicio_requerido_display }}</td>
                     <td>

@@ -2,15 +2,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Neumatico, HistorialInspeccion, MedidaNeumatico
 from vehiculos.models import Vehiculo
+
 from .forms import NeumaticoForm, MedidaForm
 from django.utils import timezone
+from collections import Counter
 from django.contrib.auth.decorators import login_required, user_passes_test
-
 
 
 # Función para verificar si el usuario es administrador
 def is_admin(user):
     return user.is_superuser
+
 
 # Vista para gestionar medidas
 @login_required
@@ -18,6 +20,7 @@ def is_admin(user):
 def ver_medidas(request):
     medidas = MedidaNeumatico.objects.all()
     return render(request, 'medidas/ver_medidas.html', {'medidas': medidas})
+
 
 # Vista para crear una nueva medida
 @login_required
@@ -33,6 +36,8 @@ def crear_medida(request):
     
     return render(request, 'medidas/crear_medida.html', {'form': form})
 
+
+# Vista para editar una medida
 @login_required
 @user_passes_test(is_admin)
 def editar_medida(request, medida_id):
@@ -47,10 +52,20 @@ def editar_medida(request, medida_id):
     
     return render(request, 'medidas/editar_medida.html', {'form': form, 'medida': medida})
 
+
+# Vista para eliminar una medida
 @login_required
 @user_passes_test(is_admin)
 def eliminar_medida(request, medida_id):
     medida = get_object_or_404(MedidaNeumatico, id=medida_id)
+
+    # Verificar si la medida está asociada a algún neumático
+    if Neumatico.objects.filter(medida=medida).exists():
+        # Si existen neumáticos asociados, evitar la eliminación
+        return render(request, 'medidas/eliminar_medida.html', {
+            'error': 'No se puede eliminar esta medida porque está asociada a neumáticos.'
+        })
+    
     if request.method == 'POST':
         medida.delete()
         return redirect('ver_medidas')
@@ -58,7 +73,9 @@ def eliminar_medida(request, medida_id):
     return render(request, 'medidas/eliminar_medida.html', {'medida': medida})
 
 
-# views.py
+# Vista para crear neumático
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def crear_neumatico(request, vehiculo_id):
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
     
@@ -76,9 +93,10 @@ def crear_neumatico(request, vehiculo_id):
                 huella=neumatico.huella,
                 dot=neumatico.dot,
                 fecha_inspeccion=timezone.now(),
-                medida=neumatico.medida,
+                medida=neumatico.medida.medida if neumatico.medida else 'Desconocida',
                 renovable=neumatico.renovable,
                 precio_estimado=neumatico.precio_estimado,
+                averia=neumatico.averias.first() if neumatico.averias.exists() else None,  # Añadir la avería
             )
 
         # Eliminar los neumáticos actuales para reemplazarlos con los nuevos datos
@@ -93,34 +111,73 @@ def crear_neumatico(request, vehiculo_id):
                 neumatico.vehiculo = vehiculo
                 neumatico.posicion = posicion
 
-                # Obtener el precio estimado de la medida
-                neumatico.actualizar_precio()
-                neumatico.save()
+                if not neumatico.medida:
+                    form.add_error('medida', 'La medida seleccionada no es válida.')
+                    valid_forms = False
+                else:
+                    neumatico.actualizar_precio()
+                    neumatico.save()
 
-                # Si alguna de las averías es de montura, marcar como no operativo
-                for averia in form.cleaned_data['averias']:
-                    if averia.servicio_requerido == 'montura':
+                    if 'montura' in [averia.servicio_requerido for averia in form.cleaned_data['averias']]:
                         neumatico.renovable = False
 
-                # Guardar las averías
-                form.save_m2m()
+                    form.save_m2m()
             else:
                 valid_forms = False
                 print(f"Formulario de posición {posicion} no es válido: {form.errors}")
 
         if valid_forms:
-            # Actualizar la fecha de última inspección
             vehiculo.ultima_inspeccion = timezone.now()
             vehiculo.save()
             return redirect('reporte_vehiculos')
 
-    # Crear un formulario para cada neumático
     forms = [NeumaticoForm(prefix=f'neumatico_{posicion}') for posicion in range(1, vehiculo.cantidad_neumaticos + 1)]
     return render(request, 'neumaticos/crear_neumatico.html', {'forms': forms, 'vehiculo': vehiculo})
 
 
 
 
+# Vista para ver neumáticos
+@login_required
 def ver_neumaticos(request):
     neumaticos = Neumatico.objects.select_related('vehiculo').all()
     return render(request, 'neumaticos/ver_neumaticos.html', {'neumaticos': neumaticos})
+
+
+
+
+@login_required
+def historico_datos(request, user_id):
+    # Obtener todos los neumáticos del usuario seleccionado
+    neumaticos = Neumatico.objects.filter(vehiculo__usuario__id=user_id)
+    
+    # Inicializar un contador de averías
+    averias_counter = Counter()
+    
+    # Recorrer los neumáticos y contar las averías
+    for neumatico in neumaticos:
+        for averia in neumatico.averias.all():
+            averias_counter[averia.nombre] += 1
+    
+    # Obtener las averías más frecuentes y ordenarlas de mayor a menor
+    averias_ordenadas = sorted(averias_counter.items(), key=lambda x: x[1], reverse=True)
+
+    # Preparar los datos para la gráfica
+    labels = [item[0] for item in averias_ordenadas]  # Nombres de las averías
+    data_barras = [item[1] for item in averias_ordenadas]  # Frecuencias de las averías
+    
+    # Calcular el porcentaje acumulativo para la línea
+    total_averias = sum(data_barras)
+    porcentaje_acumulado = []
+    suma_acumulada = 0
+    for cantidad in data_barras:
+        suma_acumulada += cantidad
+        porcentaje_acumulado.append(round((suma_acumulada / total_averias) * 100, 2))
+
+    context = {
+        'labels': labels,
+        'data_barras': data_barras,
+        'porcentaje_acumulado': porcentaje_acumulado
+    }
+    
+    return render(request, 'neumaticos/historico_datos.html', context)
