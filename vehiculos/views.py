@@ -31,17 +31,25 @@ def crear_vehiculo(request, user_id):
     return render(request, 'vehiculos/crear_vehiculo.html', {'form': form, 'usuario': usuario})
 
 # Vista para el reporte de vehículos
-@never_cache  # Deshabilitar la caché
+@never_cache
 @login_required
 def reporte_vehiculos(request):
-    # Si el usuario es administrador, mostrar todos los vehículos
     if request.user.is_superuser:
-        vehiculos = Vehiculo.objects.select_related('usuario').all()
+        vehiculos = Vehiculo.objects.select_related('usuario').prefetch_related('neumaticos').all()
     else:
-        # Si el usuario no es administrador, mostrar solo sus propios vehículos
-        vehiculos = Vehiculo.objects.filter(usuario=request.user)
-    
-    return render(request, 'vehiculos/reporte_vehiculos.html', {'vehiculos': vehiculos})
+        vehiculos = Vehiculo.objects.filter(usuario=request.user).prefetch_related('neumaticos')
+
+    # Preparar los neumáticos con su posición y avería
+    vehiculos_con_neumaticos = []
+    for vehiculo in vehiculos:
+        neumaticos = vehiculo.neumaticos.order_by('posicion')
+        neumaticos_por_posicion = {neumatico.posicion: neumatico for neumatico in neumaticos}
+        vehiculos_con_neumaticos.append({
+            'vehiculo': vehiculo,
+            'neumaticos_por_posicion': neumaticos_por_posicion
+        })
+
+    return render(request, 'vehiculos/reporte_vehiculos.html', {'vehiculos_con_neumaticos': vehiculos_con_neumaticos})
 
 
 @never_cache
