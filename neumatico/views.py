@@ -2,7 +2,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Neumatico, HistorialInspeccion, MedidaNeumatico
 from vehiculos.models import Vehiculo
-
+from usuarios.models import Usuario
 from .forms import NeumaticoForm, MedidaForm
 from django.utils import timezone
 from collections import Counter
@@ -145,19 +145,31 @@ def ver_neumaticos(request):
 
 
 
-
 @login_required
-def historico_datos(request, user_id):
-    # Obtener todos los neumáticos del usuario seleccionado
-    neumaticos = Neumatico.objects.filter(vehiculo__usuario__id=user_id)
+def historico_datos(request, user_id=None):
+    # Obtener el usuario seleccionado o el actual
+    selected_user_id = request.GET.get('usuario_id', user_id)
+    if request.user.is_superuser:
+        selected_user = Usuario.objects.get(id=selected_user_id)
+    else:
+        selected_user = request.user
+
+    # Obtener todos los neumáticos del usuario seleccionado (incluyendo los de la última inspección)
+    neumaticos = Neumatico.objects.filter(vehiculo__usuario=selected_user)
     
     # Inicializar un contador de averías
     averias_counter = Counter()
-    
-    # Recorrer los neumáticos y contar las averías
+
+    # Recorrer los neumáticos y contar las averías de la última inspección
     for neumatico in neumaticos:
         for averia in neumatico.averias.all():
             averias_counter[averia.nombre] += 1
+    
+    # Recorrer el historial de inspecciones y contar las averías
+    historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=selected_user)
+    for inspeccion in historial_inspecciones:
+        if inspeccion.averia:
+            averias_counter[inspeccion.averia.nombre] += 1
     
     # Obtener las averías más frecuentes y ordenarlas de mayor a menor
     averias_ordenadas = sorted(averias_counter.items(), key=lambda x: x[1], reverse=True)
@@ -165,9 +177,14 @@ def historico_datos(request, user_id):
     # Preparar los datos para la gráfica
     labels = [item[0] for item in averias_ordenadas]  # Nombres de las averías
     data_barras = [item[1] for item in averias_ordenadas]  # Frecuencias de las averías
-    
-    # Calcular el porcentaje acumulativo para la línea
+
+    # Calcular el total de averías
     total_averias = sum(data_barras)
+
+    # Convertir a porcentaje
+    data_barras_porcentaje = [(cantidad / total_averias) * 100 for cantidad in data_barras]
+
+    # Calcular el porcentaje acumulativo para la línea
     porcentaje_acumulado = []
     suma_acumulada = 0
     for cantidad in data_barras:
@@ -176,8 +193,11 @@ def historico_datos(request, user_id):
 
     context = {
         'labels': labels,
-        'data_barras': data_barras,
-        'porcentaje_acumulado': porcentaje_acumulado
+        'data_barras': data_barras_porcentaje,  # Enviar los porcentajes en lugar de los valores absolutos
+        'porcentaje_acumulado': porcentaje_acumulado,
+        'usuarios': Usuario.objects.all(),
+        'selected_user': selected_user,
+        'averias_counter': dict(averias_counter)  # Convertir el Counter a un diccionario para pasarlo al template
     }
     
     return render(request, 'neumaticos/historico_datos.html', context)

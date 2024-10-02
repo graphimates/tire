@@ -8,14 +8,30 @@
 <div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
     <h2 class="text-primary">Histórico de Averías</h2>
 
-    <canvas id="historicoChart"></canvas> <!-- Aquí irá nuestra gráfica -->
+    <!-- Filtro para seleccionar el usuario (solo visible para el admin) -->
+    {% if request.user.is_superuser %}
+    <form method="GET" id="userFilterForm">
+        <label for="usuario">Selecciona un usuario para ver su historial:</label>
+        <select name="usuario_id" id="usuario" class="form-control" onchange="document.getElementById('userFilterForm').submit();">
+            <option value="{{ request.user.id }}">{{ request.user.get_full_name }} ({{ request.user.email }})</option>
+            {% for usuario in usuarios %}
+                <option value="{{ usuario.id }}" {% if selected_user.id == usuario.id %}selected{% endif %}>
+                    {{ usuario.get_full_name }} ({{ usuario.email }})
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+    {% endif %}
+
+    <!-- Aquí va la gráfica -->
+    <canvas id="historicoChart"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx = document.getElementById('historicoChart').getContext('2d');
         
         const labels = {{ labels|safe }};
-        const dataBarras = {{ data_barras|safe }};
+        const dataBarras = {{ data_barras|safe }};  // Ahora ya estamos pasando los porcentajes
         const dataLinea = {{ porcentaje_acumulado|safe }};
         
         const chart = new Chart(ctx, {
@@ -40,6 +56,10 @@
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         fill: false,
                         yAxisID: 'y1',
+                        tension: 0.3,
+                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }
                 ]
             },
@@ -50,7 +70,10 @@
                         position: 'left',
                         ticks: {
                             beginAtZero: true,
-                            max: 100
+                            callback: function(value) {
+                                return value + '%';  // Mostrar porcentaje en el eje Y izquierdo
+                            },
+                            max: 100  // Limitar el máximo a 100%
                         },
                         title: {
                             display: true,
@@ -62,7 +85,10 @@
                         position: 'right',
                         ticks: {
                             beginAtZero: true,
-                            max: 100
+                            callback: function(value) {
+                                return value + '%';  // Mostrar porcentaje acumulado en el eje Y derecho
+                            },
+                            max: 100  // Limitar el máximo a 100%
                         },
                         grid: {
                             drawOnChartArea: false
@@ -76,5 +102,14 @@
             }
         });
     </script>
+
+    <!-- Mostrar el conteo de averías -->
+    <h4 class="mt-5">Conteo de Averías</h4>
+    <ul>
+        {% for averia, count in averias_counter.items %}
+            <li>{{ averia }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
+
 </div>
 {% endblock %}
