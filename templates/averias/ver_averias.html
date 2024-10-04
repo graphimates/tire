@@ -1,42 +1,57 @@
-<!-- templates/averias/ver_averias.html -->
 {% extends "base.html" %}
 
 {% block title %} Ver Averías {% endblock %}
 
 {% block content %}
-<div class="panel-header panel-header-sm"></div> <!-- Panel Header Pequeño -->
-
-<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
-    <h2 class="text-primary">Lista de Averías</h2>
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="thead-light">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Código</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Servicio Requerido</th>
-                    <th scope="col">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for averia in averias %}
-                <tr>
-                    <th scope="row">{{ averia.id }}</th>
-                    <td>{{ averia.codigo }}</td>
-                    <td>{{ averia.nombre }}</td>
-                    <td>{{ averia.get_servicio_requerido_display }}</td>
-                    <td>
-                        <a href="{% url 'editar_averia' averia.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="{% url 'eliminar_averia' averia.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro que deseas eliminar esta avería?');">Eliminar</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<!-- Panel Header Pequeño con título centrado -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2 class="text-white mb-4" style="font-weight: 700;">Lista de Averías</h2>
+            </div>
+        </div>
     </div>
-    <div class="text-right">
-        <a href="{% url 'crear_averia' %}" class="btn btn-primary btn-lg mt-3">Crear Nueva Avería</a>
+</div>
+
+<!-- Contenido principal -->
+<div class="content d-flex justify-content-center">
+    <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 1200px;">
+
+        <!-- Tabla de averías -->
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="thead-light">
+                    <tr class="text-primary">
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Servicio Requerido</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for averia in averias %}
+                    <tr>
+                        <th scope="row">{{ averia.id }}</th>
+                        <td>{{ averia.codigo }}</td>
+                        <td>{{ averia.nombre }}</td>
+                        <td>{{ averia.get_servicio_requerido_display }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'editar_averia' averia.id %}" class="btn btn-warning btn-sm mr-2">Editar</a>
+                            <a href="{% url 'eliminar_averia' averia.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro que deseas eliminar esta avería?');">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botón para crear nueva avería -->
+        <div class="text-right">
+            <a href="{% url 'crear_averia' %}" class="btn btn-primary btn-lg mt-4">Crear Nueva Avería</a>
+        </div>
+
     </div>
 </div>
 {% endblock %}

@@ -4,18 +4,33 @@
 
 {% block content %}
 <div class="panel-header panel-header-sm">
+    <div class="header text-center">
+        <h2 class="title text-white">Lista de Usuarios</h2>
+    </div>
 </div>
+
 <div class="content">
   <div class="row">
     <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="card-title">Lista de Usuarios</h4>
+      <div class="card shadow-sm rounded-lg">
+        <div class="card-header bg-primary text-white">
+          <h4 class="card-title mb-0">Lista de Usuarios</h4>
         </div>
         <div class="card-body">
+          <!-- Formulario de búsqueda de usuarios por empresa -->
+          <form method="GET" class="mb-4 d-flex justify-content-between">
+            <div class="form-group mb-0">
+              <label for="search_empresa" class="sr-only">Buscar Empresa</label>
+              <input type="text" class="form-control form-control-lg" id="search_empresa" name="search_empresa" placeholder="Buscar empresa..." value="{{ search_query }}">
+            </div>
+            <button type="submit" class="btn btn-lg btn-primary ml-3">
+              <i class="fas fa-search"></i> Buscar
+            </button>
+          </form>
+
           <div class="table-responsive">
-            <table class="table">
-              <thead class="text-primary">
+            <table class="table table-hover table-bordered table-striped">
+              <thead class="thead-light">
                 <tr>
                   <th scope="col">#</th>
                   <th scope="col">Nombre</th>
@@ -38,16 +53,31 @@
                   <td>{{ usuario.is_superuser|yesno:"Sí,No" }}</td>
                   <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
                   <td>
-                    <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm">Añadir Vehículo</a>  
-                    <a href="{% url 'descargar_informacion_usuario' usuario.id %}" class="btn btn-info btn-sm">Descargar</a> 
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirm('¿Estás seguro que deseas eliminar a este usuario?');">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                      <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm" title="Añadir Vehículo">
+                        <i class="fas fa-car"></i>
+                      </a>
+                      <a href="{% url 'descargar_informacion_usuario' usuario.id %}" class="btn btn-success btn-sm" title="Descargar Información">
+                        <i class="fas fa-download"></i>
+                      </a>
+                    </div>
                   </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
+        </div>
+        <div class="card-footer text-right">
+          <a href="{% url 'crear_usuario' %}" class="btn btn-lg btn-success">
+            <i class="fas fa-user-plus"></i> Crear Nuevo Usuario
+          </a>
         </div>
       </div>
     </div>

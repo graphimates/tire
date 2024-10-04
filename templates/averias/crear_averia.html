@@ -1,36 +1,48 @@
-<!-- templates/averias/crear_averia.html -->
 {% extends "base.html" %}
 
 {% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-<div class="panel-header panel-header-sm"></div>  <!-- Panel Header Pequeño -->
-
-<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
-    <h2 class="text-primary">{{ titulo }}</h2>
-    <form method="POST" class="row g-3 mt-4">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-
-        <div class="col-md-4">
-            <label for="id_nombre" class="form-label text-primary">Nombre de la Avería</label>
-            {{ form.nombre }}
+<!-- Panel Header Pequeño para el título -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2 class="text-white mb-4" style="font-weight: 700;">{{ titulo }}</h2>
+            </div>
         </div>
+    </div>
+</div>
 
-        <div class="col-md-4">
-            <label for="id_servicio_requerido" class="form-label text-primary">Servicio Requerido</label>
-            {{ form.servicio_requerido }}
-        </div>
+<!-- Contenido principal con formulario en tarjeta centrada -->
+<div class="content d-flex justify-content-center">
+    <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 900px;">
 
-        <div class="col-md-4">
-            <label for="id_codigo" class="form-label text-primary">Código de la Avería</label>
-            {{ form.codigo }}
-        </div>
+        <!-- Formulario para crear o editar una avería -->
+        <form method="POST" class="row g-3">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
 
-        <div class="col-12 text-center mt-4">
-            <button type="submit" class="btn btn-success btn-lg">Guardar Avería</button>
-        </div>
-    </form>
+            <div class="col-md-4">
+                <label for="id_nombre" class="form-label text-primary">Nombre de la Avería</label>
+                {{ form.nombre }}
+            </div>
+
+            <div class="col-md-4">
+                <label for="id_servicio_requerido" class="form-label text-primary">Servicio Requerido</label>
+                {{ form.servicio_requerido }}
+            </div>
+
+            <div class="col-md-4">
+                <label for="id_codigo" class="form-label text-primary">Código de la Avería</label>
+                {{ form.codigo }}
+            </div>
+
+            <!-- Botón de Guardar centrado -->
+            <div class="col-12 text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg">Guardar Avería</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
-

@@ -3,32 +3,49 @@
 {% block title %}Gestionar Medidas{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-primary">Gestionar Medidas de Neumáticos</h2>
+<!-- Panel Header Pequeño con Título -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2 class="text-white mb-4" style="font-weight: 700;">Gestionar Medidas de Neumáticos</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <a href="{% url 'crear_medida' %}" class="btn btn-primary mb-3">Añadir Nueva Medida</a>
+<!-- Contenido Principal -->
+<div class="content d-flex justify-content-center">
+    <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 1000px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-primary">Lista de Medidas</h3>
+            <a href="{% url 'crear_medida' %}" class="btn btn-primary btn-lg">Añadir Nueva Medida</a>
+        </div>
 
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Medida</th>
-                <th>Precio Estimado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for medida in medidas %}
-            <tr>
-                <td>{{ medida.medida }}</td>
-                <td>${{ medida.precio_estimado }}</td>
-                <td>
-                    <a href="{% url 'editar_medida' medida.id %}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="{% url 'eliminar_medida' medida.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar esta medida?');">Eliminar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- Tabla de Medidas -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-light">
+                    <tr class="text-primary">
+                        <th scope="col">Medida</th>
+                        <th scope="col">Precio Estimado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medida in medidas %}
+                    <tr>
+                        <td>{{ medida.medida }}</td>
+                        <td>${{ medida.precio_estimado }}</td>
+                        <td>
+                            <a href="{% url 'editar_medida' medida.id %}" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{% url 'eliminar_medida' medida.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar esta medida?');">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}
-

@@ -8,7 +8,7 @@ class UsuarioForm(forms.ModelForm):
         required=False  # La contraseña es opcional en la edición
     )
     is_superuser = forms.ChoiceField(
-        choices=[(False, 'No'), (True, 'Sí')],  # Cambié el orden para que "No" esté primero
+        choices=[(False, 'No'), (True, 'Sí')],  # "No" está primero
         label="¿Es administrador?",
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=True
@@ -32,6 +32,12 @@ class UsuarioForm(forms.ModelForm):
             'empresa': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
             'profile_photo': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(UsuarioForm, self).__init__(*args, **kwargs)
+        if not self.instance.pk:
+            # Si es un nuevo usuario, la contraseña es obligatoria
+            self.fields['password'].required = True
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -66,6 +72,3 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['profile_photo']
-
-    # No es necesario el método `clean` aquí, ya que Django manejará la validación automáticamente
-

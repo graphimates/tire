@@ -3,16 +3,21 @@
 {% block title %} Confirmar Eliminación {% endblock %}
 
 {% block content %}
-<!-- Añadimos el panel-header-sm para consistencia visual -->
-<div class="panel-header panel-header-sm"></div>
+<!-- Panel Header con el título -->
+<div class="panel-header panel-header-sm">
+    <div class="header text-center">
+        <h2 class="title text-white">Confirmar Eliminación</h2>
+    </div>
+</div>
 
+<!-- Contenedor principal -->
 <div class="container mt-5 mb-5 text-center">
-    <!-- Título estilizado -->
+    <!-- Contenedor de confirmación estilizado -->
     <div class="confirmation-container p-4 shadow-sm rounded">
         <h2 class="styled-title">¿Estás seguro?</h2>
         <p class="styled-subtitle">Deseas eliminar al usuario <strong>"{{ usuario.first_name }} {{ usuario.last_name }}"</strong></p>
 
-        <!-- Formulario de confirmación -->
+        <!-- Formulario de confirmación de eliminación -->
         <form method="POST" class="mt-4">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger btn-lg px-4">Eliminar</button>

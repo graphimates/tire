@@ -5,7 +5,14 @@
 {% endblock %}
 
 {% block content %}
-  <div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+<div class="panel-header panel-header-sm">
+  <div class="header text-center">
+    <h2 class="title text-white">Panel de Usuario</h2>
+  </div>
+</div>
+
+<div class="content">
+  <div class="container" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
     <div class="row">
       <div class="col-md-12 text-center">
         <h1 class="display-4">Bienvenido, {{ user.first_name }} {{ user.last_name }}</h1>
@@ -35,4 +42,5 @@
       </div>
     </div>
   </div>
+</div>
 {% endblock %}

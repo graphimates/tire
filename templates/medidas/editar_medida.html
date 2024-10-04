@@ -3,14 +3,34 @@
 {% block title %}Editar Medida{% endblock %}
 
 {% block content %}
-<div class="panel-header panel-header-sm"></div>
+<!-- Panel Header Pequeño con Título -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2 class="text-white mb-4" style="font-weight: 700;">Editar Medida: {{ medida.medida }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="container mt-5">
-    <h2 class="text-primary">Editar Medida: {{ medida.medida }}</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-    </form>
+<!-- Contenido Principal -->
+<div class="content d-flex justify-content-center">
+    <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 800px;">
+        <!-- Formulario para Editar Medida -->
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Mostrar el formulario -->
+            <div class="form-row">
+                {{ form.as_p }}
+            </div>
+
+            <!-- Botón de Guardar -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

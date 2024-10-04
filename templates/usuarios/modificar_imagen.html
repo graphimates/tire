@@ -1,13 +1,25 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
+{% block title %} Modificar Imagen de Perfil {% endblock %}
+
 {% block content %}
-<div class="container">
-  <h2>Modificar Imagen de Perfil</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-primary">Actualizar Imagen</button>
-  </form>
+<!-- Panel Header con el título -->
+<div class="panel-header panel-header-sm">
+    <div class="header text-center">
+        <h2 class="title text-white">Modificar Imagen de Perfil</h2>
+    </div>
+</div>
+
+<!-- Contenedor principal -->
+<div class="container mt-5 mb-5">
+  <div class="card p-4 shadow-sm rounded">
+    <h4 class="text-primary">Actualiza tu Imagen de Perfil</h4>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button type="submit" class="btn btn-primary btn-lg mt-3">Actualizar Imagen</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

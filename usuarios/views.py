@@ -2,29 +2,40 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Usuario
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import UsuarioForm
-from django.views.decorators.cache import never_cache  # Importamos el decorador para deshabilitar la caché
-from .forms import ModificarImagenForm
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .forms import ProfileForm
+from django.views.decorators.cache import never_cache
+from .forms import ModificarImagenForm, ProfileForm
 from averias.models import Averia
 import csv
 from django.http import HttpResponse
 from neumatico.models import Neumatico, HistorialInspeccion
 from vehiculos.models import Vehiculo
+from django.db.models import Q  # Importamos Q para hacer búsquedas complejas
 
 
 # Función para verificar si el usuario es administrador
 def is_admin(user):
     return user.is_superuser
 
-# Vista para mostrar los usuarios en una tabla
+
+# Vista para mostrar los usuarios en una tabla con búsqueda por empresa
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
 @never_cache  # Deshabilitar la caché
 def ver_usuarios(request):
-    usuarios = Usuario.objects.all()  # Obtener todos los usuarios
-    return render(request, 'usuarios/ver_usuarios.html', {'usuarios': usuarios})
+    # Obtener el término de búsqueda de la empresa
+    search_query = request.GET.get('search_empresa', '')
+
+    # Filtrar los usuarios según el término de búsqueda en la empresa
+    if search_query:
+        usuarios = Usuario.objects.filter(Q(empresa__icontains=search_query))
+    else:
+        usuarios = Usuario.objects.all()  # Mostrar todos los usuarios si no hay búsqueda
+
+    return render(request, 'usuarios/ver_usuarios.html', {
+        'usuarios': usuarios,
+        'search_query': search_query,  # Pasamos el término de búsqueda a la plantilla
+    })
+
 
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
@@ -35,6 +46,7 @@ def eliminar_usuario(request, user_id):
         usuario.delete()  # Eliminar el usuario
         return redirect('ver_usuarios')  # Redirigir de nuevo a la lista de usuarios
     return render(request, 'usuarios/eliminar_confirmacion.html', {'usuario': usuario})
+
 
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
@@ -51,6 +63,7 @@ def crear_usuario(request):
         form = UsuarioForm()
     return render(request, 'usuarios/crear_usuario.html', {'form': form})
 
+
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
 @never_cache  # Deshabilitar la caché
@@ -64,6 +77,7 @@ def editar_usuario(request, user_id):
     else:
         form = UsuarioForm(instance=usuario)  # Precargar el formulario con los datos del usuario
     return render(request, 'usuarios/crear_usuario.html', {'form': form, 'titulo': f'Editando al usuario {usuario.first_name}'})
+
 
 @never_cache  # Deshabilitar la caché
 @login_required
@@ -90,6 +104,7 @@ def perfil_usuario(request):
     else:
         form = ProfileForm(instance=usuario)
     return render(request, 'usuarios/perfil_usuario.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder

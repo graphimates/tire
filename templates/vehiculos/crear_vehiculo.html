@@ -4,17 +4,21 @@
 
 {% block content %}
 <!-- Añadimos el panel-header-sm para consistencia visual -->
-<div class="panel-header panel-header-sm"></div>
+<div class="panel-header panel-header-sm">
+  <div class="header text-center">
+    <h2 class="title text-white">Añadir Vehículo</h2>
+  </div>
+</div>
 
-<div class="container mt-5 mb-5">
+<div class="content">
+  <div class="container mt-5 mb-5">
     <!-- Título estilizado -->
     <div class="text-center mb-4">
-        <h2 class="styled-title">Añadir Vehículo</h2>
-        <p class="styled-subtitle">Para {{ usuario.first_name }} {{ usuario.last_name }}</p>
+        <h2 class="styled-title">Para {{ usuario.first_name }} {{ usuario.last_name }}</h2>
     </div>
 
     <!-- Contenedor estilizado para el formulario -->
-    <div class="form-container p-4 shadow-sm rounded">
+    <div class="form-container p-4 shadow-sm rounded" style="background-color: #f4f5f7;">
         <form method="POST" class="row g-3">
             {% csrf_token %}
             {{ form.non_field_errors }}
@@ -31,10 +35,11 @@
                 <label for="id_tipo" class="form-label">Tipo de Vehículo</label>
                 {{ form.tipo }}  <!-- Selección del tipo de vehículo -->
             </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Guardar Vehículo</button>
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary btn-lg px-4">Guardar Vehículo</button>
             </div>
         </form>
     </div>
+  </div>
 </div>
 {% endblock %}
