@@ -2,11 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from neumatico.models import Neumatico
-from usuarios.models import Usuario  # Asegúrate de que estás usando el modelo correcto
-
+from usuarios.models import Usuario
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from averias.models import Averia
+import json
+from django.http import JsonResponse
+from django.db.models import Q
+
 
 # Vista para el login
 def login_view(request):
@@ -29,23 +32,37 @@ def login_view(request):
     
     return render(request, 'login.html')
 
-# Vista para el index (admin panel)
 
+# Vista para el index (admin panel)
 @login_required
 @never_cache
 def index(request):
-    # Si el usuario es admin puede seleccionar otros usuarios
-    selected_user_id = request.GET.get('usuario_id')
-    if request.user.is_superuser:
-        if selected_user_id:
-            selected_user = Usuario.objects.get(id=selected_user_id)
-        else:
-            selected_user = request.user  # El admin puede ver sus propios datos como predeterminado
-    else:
-        selected_user = request.user
+    # Obtener el término de búsqueda y el filtro seleccionado
+    search_empresa = request.GET.get('search_empresa', '')
+    selected_empresa = request.GET.get('selected_empresa', '')
 
-    # Obtener todos los neumáticos del usuario seleccionado
-    neumaticos = Neumatico.objects.filter(vehiculo__usuario=selected_user)
+    # Verificar si se seleccionó "Todas las empresas"
+    if selected_empresa == 'todas':
+        usuarios_filtrados = Usuario.objects.exclude(is_superuser=True)
+        selected_user = None  # No hay un usuario específico seleccionado
+    elif selected_empresa:
+        # Si hay una empresa seleccionada, filtrar por ella
+        usuarios_filtrados = Usuario.objects.filter(empresa__iexact=selected_empresa).exclude(is_superuser=True)
+        selected_user = usuarios_filtrados.first() if usuarios_filtrados.exists() else None
+    elif search_empresa:
+        # Búsqueda manual por empresa
+        usuarios_filtrados = Usuario.objects.filter(empresa__icontains=search_empresa).exclude(is_superuser=True)
+        selected_user = usuarios_filtrados.first() if usuarios_filtrados.exists() else None
+    else:
+        # Si no hay filtro, mostrar todos los usuarios (menos los admins)
+        usuarios_filtrados = Usuario.objects.exclude(is_superuser=True)
+        selected_user = None
+
+    # Obtener los neumáticos de todos los usuarios o de un usuario específico
+    if selected_user:
+        neumaticos = Neumatico.objects.filter(vehiculo__usuario=selected_user)
+    else:
+        neumaticos = Neumatico.objects.filter(vehiculo__usuario__in=usuarios_filtrados)
 
     # Inicializar contadores
     total_neumaticos = 0
@@ -64,7 +81,7 @@ def index(request):
         'calibracion': 0,
     }
 
-    # Recorrer todos los neumáticos del usuario seleccionado
+    # Recorrer todos los neumáticos seleccionados
     for neumatico in neumaticos:
         total_neumaticos += 1
 
@@ -92,8 +109,9 @@ def index(request):
             # Es no operativo si tiene avería de montura o huella = 0
             no_operativos_count += 1
 
-    # Obtener todos los usuarios (solo visible para el admin)
-    usuarios = Usuario.objects.all() if request.user.is_superuser else None
+    # Obtener todas las empresas para el autocompletado y la lista desplegable
+    empresas = Usuario.objects.values_list('empresa', flat=True).distinct().exclude(is_superuser=True)
+    empresas_json = json.dumps(list(empresas))  # Convertir a JSON para el autocompletar
 
     # Preparar el contexto para la vista
     context = {
@@ -104,8 +122,11 @@ def index(request):
         'huella_3_6': huella_3_6,
         'huella_6_mas': huella_6_mas,
         'servicios_por_vehiculo': servicios_por_vehiculo,
-        'usuarios': usuarios,
+        'usuarios': usuarios_filtrados,
         'selected_user': selected_user,
+        'empresas': empresas,
+        'empresas_json': empresas_json,
+        'selected_empresa': selected_empresa,
     }
     
     return render(request, 'index.html', context)
@@ -116,3 +137,4 @@ def index(request):
 @never_cache
 def user_dashboard(request):
     return render(request, 'user_dashboard.html')
+

@@ -473,18 +473,3 @@ input {
     display: block !important;
   }
 
-  
-
-
-
-  .neumatico-esquema {
-    position: relative;
-    width: 100%; /* Asegúrate de que la imagen se ajuste bien al contenedor */
-}
-
-.neumatico-posicion {
-    position: absolute;
-    font-size: 1.5rem; /* Tamaño del número */
-    font-weight: bold;
-    background-color: transparent;
-}
