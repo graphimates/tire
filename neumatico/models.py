@@ -25,7 +25,6 @@ class MedidaNeumatico(models.Model):
             historial.save()
 
 
-# models.py de Neumatico
 class Neumatico(models.Model):
     vehiculo = models.ForeignKey(Vehiculo, related_name='neumaticos', on_delete=models.CASCADE)
     posicion = models.IntegerField()  # Posición del neumático en el vehículo
@@ -37,16 +36,26 @@ class Neumatico(models.Model):
     huella = models.FloatField()
     medida = models.ForeignKey('MedidaNeumatico', on_delete=models.SET_NULL, null=True)  # Relacionado con medida
     averias = models.ManyToManyField(Averia, related_name='neumaticos')  # Relación con las averías
-    renovable = models.BooleanField(default=True)  # Campo para si es renovable
+    renovable = models.BooleanField(default=False)  # Campo para si es renovable
     precio_estimado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Precio estimado
+    fecha_inspeccion = models.DateTimeField(null=True, blank=True)  # Añadimos este campo
 
     def actualizar_precio(self):
         """Método para actualizar el precio basado en la medida seleccionada"""
         if self.medida:
             self.precio_estimado = self.medida.precio_estimado
+        else:
+            self.precio_estimado = None  # Si no hay medida asignada, no se asigna precio
+
+    def save(self, *args, **kwargs):
+        """Antes de guardar, actualizamos el precio basado en la medida"""
+        self.actualizar_precio()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Neumático en posición {self.posicion} del vehículo {self.vehiculo.placa}"
+
+
 
 # models.py dentro de neumaticos
 

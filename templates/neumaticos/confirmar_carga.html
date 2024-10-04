@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary">Confirmar Inspecciones</h2>
+    <p style="color: red;">Por favor, verifique los datos antes de subir:</p> <!-- Cambiado a letras rojas -->
+
+    {% if errores %}
+    <div class="alert alert-danger mt-4">
+        <h4>Errores encontrados:</h4>
+        <ul>
+            {% for error in errores %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <ul>
+        {% for inspeccion in inspecciones_pendientes %}
+        <li>
+            Cliente: {{ inspeccion['cliente'] }} - Vehículo: {{ inspeccion['vehiculo'] }} - Posición: {{ inspeccion['posicion'] }} - Medida: {{ inspeccion['medida'] }} - Renovable: {{ inspeccion['renovable'] }}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <form method="POST" action="{% url 'confirmar_inspecciones' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Subir datos</button> <!-- Cambiado a "Subir datos" -->
+    </form>
+</div>
+{% endblock %}

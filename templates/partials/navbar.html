@@ -77,6 +77,15 @@
         </a>
       </li>
 
+              <!-- Botón para la carga de inspecciones -->
+        <li class="nav-item {% if request.resolver_match.url_name == 'cargar_inspecciones' %}active{% endif %}">
+          <a class="nav-link" href="{% url 'cargar_inspecciones' %}">
+            <i class="fa fa-upload"></i>
+            <p class="sidebar-item-text">Cargar Inspecciones</p>
+          </a>
+        </li>
+
+
       {% endif %}
     </ul>
   </div>
