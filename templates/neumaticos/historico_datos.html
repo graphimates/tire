@@ -3,113 +3,132 @@
 {% block title %}Histórico de Datos{% endblock %}
 
 {% block content %}
-<div class="panel-header panel-header-sm"></div>
+<!-- Panel Header con el título -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2 class="text-white mb-4" style="font-weight: 700;">Histórico de Averías</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
-    <h2 class="text-primary">Histórico de Averías</h2>
+<!-- Contenido Principal -->
+<div class="content d-flex justify-content-center">
+    <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 900px;">
 
-    <!-- Filtro para seleccionar el usuario (solo visible para el admin) -->
-    {% if request.user.is_superuser %}
-    <form method="GET" id="userFilterForm">
-        <label for="usuario">Selecciona un usuario para ver su historial:</label>
-        <select name="usuario_id" id="usuario" class="form-control" onchange="document.getElementById('userFilterForm').submit();">
-            <option value="{{ request.user.id }}">{{ request.user.get_full_name }} ({{ request.user.email }})</option>
-            {% for usuario in usuarios %}
-                <option value="{{ usuario.id }}" {% if selected_user.id == usuario.id %}selected{% endif %}>
-                    {{ usuario.get_full_name }} ({{ usuario.email }})
-                </option>
+        <!-- Filtro para seleccionar el usuario (solo visible para el admin) -->
+        {% if request.user.is_superuser %}
+        <form method="GET" id="userFilterForm" class="mb-4">
+            <label for="usuario" class="form-label">Selecciona un usuario para ver su historial:</label>
+            <select name="usuario_id" id="usuario" class="form-control" onchange="document.getElementById('userFilterForm').submit();">
+                <option value="{{ request.user.id }}">{{ request.user.get_full_name }} ({{ request.user.email }})</option>
+                {% for usuario in usuarios %}
+                    <option value="{{ usuario.id }}" {% if selected_user.id == usuario.id %}selected{% endif %}>
+                        {{ usuario.get_full_name }} ({{ usuario.email }})
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+        
+        <!-- Gráfico Histórico de Averías -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <canvas id="historicoChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Conteo de Averías -->
+        <h4 class="mt-5">Conteo de Averías</h4>
+        <ul class="list-group">
+            {% for averia, count in averias_counter.items %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ averia }}
+                    <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                </li>
             {% endfor %}
-        </select>
-    </form>
-    {% endif %}
+        </ul>
 
-    <!-- Aquí va la gráfica -->
-    <canvas id="historicoChart"></canvas>
+    </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('historicoChart').getContext('2d');
-        
-        const labels = {{ labels|safe }};
-        const dataBarras = {{ data_barras|safe }};  // Ahora ya estamos pasando los porcentajes
-        const dataLinea = {{ porcentaje_acumulado|safe }};
-        
-        const chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        type: 'bar',
-                        label: 'Averías (%)',
-                        data: dataBarras,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1,
-                        yAxisID: 'y',
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('historicoChart').getContext('2d');
+
+    const labels = {{ labels|safe }};
+    const dataBarras = {{ data_barras|safe }};
+    const dataLinea = {{ porcentaje_acumulado|safe }};
+
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Averías (%)',
+                    data: dataBarras,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                },
+                {
+                    type: 'line',
+                    label: 'Porcentaje Acumulado (%)',
+                    data: dataLinea,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: false,
+                    yAxisID: 'y1',
+                    tension: 0.3,
+                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    type: 'linear',
+                    position: 'left',
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value) {
+                            return value + '%';  // Mostrar porcentaje en el eje Y izquierdo
+                        },
+                        max: 100  // Limitar el máximo a 100%
                     },
-                    {
-                        type: 'line',
-                        label: 'Porcentaje Acumulado (%)',
-                        data: dataLinea,
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        fill: false,
-                        yAxisID: 'y1',
-                        tension: 0.3,
-                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                    title: {
+                        display: true,
+                        text: 'Porcentaje de Averías'
                     }
-                ]
-            },
-            options: {
-                scales: {
-                    y: {
-                        type: 'linear',
-                        position: 'left',
-                        ticks: {
-                            beginAtZero: true,
-                            callback: function(value) {
-                                return value + '%';  // Mostrar porcentaje en el eje Y izquierdo
-                            },
-                            max: 100  // Limitar el máximo a 100%
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value) {
+                            return value + '%';  // Mostrar porcentaje acumulado en el eje Y derecho
                         },
-                        title: {
-                            display: true,
-                            text: 'Porcentaje de Averías'
-                        }
+                        max: 100  // Limitar el máximo a 100%
                     },
-                    y1: {
-                        type: 'linear',
-                        position: 'right',
-                        ticks: {
-                            beginAtZero: true,
-                            callback: function(value) {
-                                return value + '%';  // Mostrar porcentaje acumulado en el eje Y derecho
-                            },
-                            max: 100  // Limitar el máximo a 100%
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Porcentaje Acumulado'
-                        }
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Porcentaje Acumulado'
                     }
                 }
             }
-        });
-    </script>
-
-    <!-- Mostrar el conteo de averías -->
-    <h4 class="mt-5">Conteo de Averías</h4>
-    <ul>
-        {% for averia, count in averias_counter.items %}
-            <li>{{ averia }}: {{ count }}</li>
-        {% endfor %}
-    </ul>
-
-</div>
+        }
+    });
+</script>
 {% endblock %}
