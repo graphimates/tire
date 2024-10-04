@@ -473,4 +473,80 @@ input {
     display: block !important;
   }
 
-  
+  #empresa_autocomplete_suggestions {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    background-color: white;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+}
+
+#empresa_autocomplete_suggestions li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#empresa_autocomplete_suggestions li:hover {
+    background-color: #f1f1f1;
+}
+
+.panel-header {
+  height: 160px;
+  padding-top: 80px;
+  padding-bottom: 45px;
+  background: #292929;
+  background: -webkit-gradient(linear, left top, right top, from(#292929), color-stop(60%, #3a3a3a), to(#4a4a4a));
+  background: linear-gradient(to right, #292929 0%, #3a3a3a 60%, #4a4a4a 100%);
+  position: relative;
+  overflow: hidden;
+  color: white;
+}
+
+/* Mejorar la estética de las tablas */
+.table th, .table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* Sombra y bordes suaves */
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Tarjetas mejoradas */
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge estilizado para el conteo de averías */
+.badge.bg-primary {
+  font-size: 1rem;
+  padding: 8px 12px;
+}
+
+/* Listas estilizadas */
+.list-group-item {
+  font-size: 1.1rem;
+  border: none;
+  background-color: #fff;
+  margin-bottom: 8px;
+}
+
+/* Gráfico responsivo */
+#historicoChart {
+  max-width: 100%;
+  height: auto;
+}
