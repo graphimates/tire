@@ -41,6 +41,7 @@
                     <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm">Eliminar</a>
                     <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar</a>
                     <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm">Añadir Vehículo</a>  
+                    <a href="{% url 'descargar_informacion_usuario' usuario.id %}" class="btn btn-info btn-sm">Descargar</a> 
                   </td>
                 </tr>
                 {% endfor %}

@@ -42,6 +42,7 @@ urlpatterns = [
     # Ruta para confirmar que la contraseña fue cambiada
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
+ path('descargar_informacion_usuario/<int:user_id>/', usuarios_views.descargar_informacion_usuario, name='descargar_informacion_usuario'),
 
 ]
 
