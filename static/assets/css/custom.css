@@ -473,4 +473,21 @@ input {
     display: block !important;
   }
 
-  
+  #empresa_autocomplete_suggestions {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    background-color: white;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+}
+
+#empresa_autocomplete_suggestions li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#empresa_autocomplete_suggestions li:hover {
+    background-color: #f1f1f1;
+}

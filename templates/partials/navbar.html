@@ -38,7 +38,7 @@
 
       <!-- Histórico de Datos -->
       <li class="nav-item {% if request.resolver_match.url_name == 'historico_datos' %}active{% endif %}">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'historico_datos' request.user.id %}">
           <i class="fa fa-database"></i>
           <p class="sidebar-item-text">Histórico de Datos</p>
         </a>
@@ -68,6 +68,15 @@
           <p class="sidebar-item-text">Gestionar Averías</p>
         </a>
       </li>
+
+      <!-- Botón de Gestionar Medidas (solo para admin) -->
+      <li class="nav-item {% if request.resolver_match.url_name == 'ver_medidas' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'ver_medidas' %}">
+          <i class="fa fa-ruler-combined"></i>
+          <p class="sidebar-item-text">Gestionar Medidas</p>
+        </a>
+      </li>
+
       {% endif %}
     </ul>
   </div>
