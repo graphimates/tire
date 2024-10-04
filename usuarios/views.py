@@ -8,6 +8,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import ProfileForm
 from averias.models import Averia
+import csv
+from django.http import HttpResponse
+from neumatico.models import Neumatico, HistorialInspeccion
+from vehiculos.models import Vehiculo
 
 
 # Función para verificar si el usuario es administrador
@@ -92,3 +96,59 @@ def perfil_usuario(request):
 def ver_averias(request):
     averias = Averia.objects.all()
     return render(request, 'averias/ver_averias.html', {'averias': averias})
+
+
+@login_required
+@user_passes_test(is_admin)
+def descargar_informacion_usuario(request, user_id):
+    # Obtener el usuario seleccionado por el administrador
+    usuario = get_object_or_404(Usuario, id=user_id)
+    
+    # Obtener los vehículos del usuario seleccionado
+    vehiculos = Vehiculo.objects.filter(usuario=usuario)
+    
+    # Crear una respuesta HTTP con el archivo CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{usuario.first_name}_{usuario.last_name}_inspecciones.csv"'
+    
+    writer = csv.writer(response)
+    
+    # Escribir el encabezado del CSV
+    writer.writerow(['Placa Vehículo', 'Posición Neumático', 'Modelo', 'Marca', 'DOT', 'Presión', 'Huella', 'Fecha de Inspección', 'Averías', 'Renovable'])
+    
+    # Escribir la información de la última inspección de cada neumático (NO en el historial)
+    for vehiculo in vehiculos:
+        neumaticos = Neumatico.objects.filter(vehiculo=vehiculo)
+        for neumatico in neumaticos:
+            averias = ', '.join([averia.nombre for averia in neumatico.averias.all()]) or 'Sin averías'
+            writer.writerow([
+                vehiculo.placa,
+                neumatico.posicion,
+                neumatico.modelo,
+                neumatico.marca,
+                neumatico.dot,
+                neumatico.presion,
+                neumatico.huella,
+                neumatico.fecha_inspeccion,
+                averias,
+                'Sí' if neumatico.renovable else 'No'
+            ])
+    
+    # Escribir el historial de inspecciones del usuario
+    historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=usuario).order_by('-fecha_inspeccion')
+    for inspeccion in historial_inspecciones:
+        averia_nombre = inspeccion.averia.nombre if inspeccion.averia else 'Sin averías'
+        writer.writerow([
+            inspeccion.vehiculo.placa,
+            inspeccion.posicion,
+            inspeccion.modelo,
+            inspeccion.marca,
+            inspeccion.dot,
+            inspeccion.presion,
+            inspeccion.huella,
+            inspeccion.fecha_inspeccion,
+            averia_nombre,
+            'Sí' if inspeccion.renovable else 'No'
+        ])
+    
+    return response

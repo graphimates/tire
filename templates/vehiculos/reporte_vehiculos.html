@@ -38,10 +38,10 @@
                                 <div class="neumatico-esquema" style="position: relative;">
                                     {% if item.vehiculo.tipo == '2x2' %}
                                         <img src="/media/tipo-vehiculos/2x2.png" alt="Esquema 2x2" class="img-fluid">
-                                        <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
-                                        <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
-                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
-                                        <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
+                                        <span class="neumatico-posicion" style="top: 10px; left: 500px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
+                                        <span class="neumatico-posicion" style="top: 10px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
+                                        <span class="neumatico-posicion" style="bottom: 0px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 0px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
                                     {% elif item.vehiculo.tipo == '4x2' or item.vehiculo.tipo == '4x2L' %}
                                         <img src="/media/tipo-vehiculos/4x2.png" alt="Esquema 4x2" class="img-fluid">
                                         <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
@@ -54,7 +54,7 @@
                                         <img src="/media/tipo-vehiculos/6x2.png" alt="Esquema 6x2" class="img-fluid">
                                         <span class="neumatico-posicion" style="top: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.1.averias.exists %}red{% else %}black{% endif %};">1</span>
                                         <span class="neumatico-posicion" style="top: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.2.averias.exists %}red{% else %}black{% endif %};">2</span>
-                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticos_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
+                                        <span class="neumatico-posicion" style="bottom: 20px; left: 50px; color: {% if item.neumaticosknkjn_por_posicion.3.averias.exists %}red{% else %}black{% endif %};">3</span>
                                         <span class="neumatico-posicion" style="bottom: 20px; right: 50px; color: {% if item.neumaticos_por_posicion.4.averias.exists %}red{% else %}black{% endif %};">4</span>
                                         <span class="neumatico-posicion" style="bottom: 50px; left: 100px; color: {% if item.neumaticos_por_posicion.5.averias.exists %}red{% else %}black{% endif %};">5</span>
                                         <span class="neumatico-posicion" style="bottom: 50px; right: 100px; color: {% if item.neumaticos_por_posicion.6.averias.exists %}red{% else %}black{% endif %};">6</span>
@@ -113,7 +113,7 @@
                                             <th>Averías</th>
                                             <th>Diseño</th>
                                             <th>Renovable</th>
-                                            <th>Precio Estimado</th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -135,7 +135,7 @@
                                             </td>
                                             <td>{{ neumatico.diseño }}</td>
                                             <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>
-                                            <td>{{ neumatico.precio_estimado }} USD</td>
+                                            
                                         </tr>
                                         {% endfor %}
                                     </tbody>

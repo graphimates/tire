@@ -208,7 +208,6 @@ def historico_datos(request, user_id=None):
     
     return render(request, 'neumaticos/historico_datos.html', context)
 
-
 @login_required
 @user_passes_test(is_admin)
 def cargar_inspecciones(request):
@@ -266,7 +265,15 @@ def cargar_inspecciones(request):
                 errores.append(f"La medida {row['medida']} no está registrada.")
                 continue
 
-            # Note: We will handle empty 'averia' fields later.
+            # Nueva validación de huella
+            try:
+                huella = float(row['huella'])
+                if huella < 0:
+                    errores.append(f"La huella no puede ser menor a 0 en la posición {posicion} del vehículo con placa {placa}.")
+                    continue
+            except ValueError:
+                errores.append(f"La huella en la posición {posicion} del vehículo con placa {placa} no es un número válido.")
+                continue
 
             # Agregando 'modelo' y 'diseño' a la inspección
             inspeccion = {
@@ -302,6 +309,7 @@ def cargar_inspecciones(request):
             return render(request, 'neumaticos/cargar_inspecciones.html', context)
 
     return render(request, 'neumaticos/cargar_inspecciones.html')
+
 
 @login_required
 @user_passes_test(is_admin)
