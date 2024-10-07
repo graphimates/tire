@@ -492,15 +492,12 @@ input {
     background-color: #f1f1f1;
 }
 
+/* Panel Header */
 .panel-header {
   height: 160px;
-  padding-top: 80px;
-  padding-bottom: 45px;
-  background: #292929;
-  background: -webkit-gradient(linear, left top, right top, from(#292929), color-stop(60%, #3a3a3a), to(#4a4a4a));
-  background: linear-gradient(to right, #292929 0%, #3a3a3a 60%, #4a4a4a 100%);
+  background: linear-gradient(to right, rgba(41, 41, 41, 0.8), rgba(58, 58, 58, 0.8)), url('/media/panel/tire.jpg') no-repeat center center;
+  background-size: cover;
   position: relative;
-  overflow: hidden;
   color: white;
 }
 
@@ -551,3 +548,71 @@ input {
   height: auto;
 }
 
+/* Asegurar que las tablas sean responsivas */
+.table {
+    width: 100%;
+    table-layout: auto; /* Permite que las columnas se ajusten automáticamente */
+}
+
+.table-responsive {
+    overflow-x: auto; /* Asegura que la tabla no se desborde en pantallas pequeñas */
+}
+
+/* Para que los encabezados no se corten en varias líneas */
+.table th, .table td {
+    white-space: nowrap; /* Mantiene el texto en una sola línea */
+    text-align: center; /* Alinea el texto al centro */
+    font-size: 1rem; /* Tamaño del texto */
+}
+
+/* Ajustar las fuentes en pantallas pequeñas */
+@media (max-width: 768px) {
+    .table th, .table td {
+        font-size: 0.85rem; /* Reduce ligeramente el tamaño del texto en pantallas pequeñas */
+        padding: 0.5rem; /* Reduce el espacio entre celdas */
+    }
+
+    /* Ajustar los títulos para que no se desborden */
+    h4 {
+        font-size: 1.2rem; /* Título más pequeño en pantallas pequeñas */
+    }
+
+    .card-body h4 {
+        font-size: 1rem; /* Títulos dentro de las tarjetas más pequeños */
+    }
+
+    /* Asegurar que los encabezados de la tabla no se desborden */
+    .table thead th {
+        white-space: nowrap; /* Evitar que el texto de los encabezados se parta en varias líneas */
+    }
+}
+
+/* Ajustar la altura de las tarjetas en pantallas pequeñas */
+.card {
+    margin-bottom: 20px;
+}
+
+/* Asegurar que los contenedores y el texto tengan suficiente espacio y no se rompan */
+.card-body p, .card-body .text {
+    font-size: 0.9rem; /* Texto ligeramente más pequeño */
+    line-height: 1.5; /* Espacio entre líneas */
+}
+
+
+/* Estilos para las imágenes de los esquemas del vehículo */
+.neumatico-esquema img {
+  max-width: 100%;
+  height: auto;
+}
+
+.neumatico-posicion {
+  position: absolute;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+@media (max-width: 576px) {
+  .neumatico-posicion {
+    font-size: 0.85rem;
+  }
+}

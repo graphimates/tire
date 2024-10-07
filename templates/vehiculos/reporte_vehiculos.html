@@ -5,7 +5,7 @@
 {% block content %}
 <div class="panel-header panel-header-sm">
   <div class="header text-center">
-    <h2 class="title text-white">Reporte de Vehículos</h2>
+    <h2 class="display-4 text-white">Reporte de Vehículos</h2>
   </div>
 </div>
 
@@ -37,7 +37,7 @@
                         <div class="row">
                             <!-- Esquema del vehículo (Columna izquierda) -->
                             <div class="col-md-4">
-                                <h4>Esquema del Vehículo</h4>
+                                <h4 class="display-6">Esquema del Vehículo</h4>
                                 <div class="neumatico-esquema" style="position: relative;">
                                     {% if item.vehiculo.tipo == '2x2' %}
                                         <img src="/media/tipo-vehiculos/2x2.png" alt="Esquema 2x2" class="img-fluid">
@@ -62,46 +62,48 @@
 
                             <!-- Tabla de neumáticos (Columna derecha) -->
                             <div class="col-md-8">
-                                <h4>Neumáticos del Vehículo</h4>
+                                <h4 class="display-6">Neumáticos del Vehículo</h4>
                                 {% if item.vehiculo.neumaticos.all %}
-                                <table class="table table-bordered table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Posición</th>
-                                            <th>Modelo</th>
-                                            <th>Marca</th>
-                                            <th>Medida</th>
-                                            <th>Presión</th>
-                                            <th>Huella</th>
-                                            <th>DOT</th>
-                                            <th>Averías</th>
-                                            <th>Diseño</th>
-                                            <th>Renovable</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for neumatico in item.vehiculo.neumaticos.all %}
-                                        <tr>
-                                            <td>{{ neumatico.posicion }}</td>
-                                            <td>{{ neumatico.modelo }}</td>
-                                            <td>{{ neumatico.marca }}</td>
-                                            <td>{{ neumatico.medida.medida }}</td>
-                                            <td>{{ neumatico.presion }}</td>
-                                            <td>{{ neumatico.huella }}</td>
-                                            <td>{{ neumatico.dot }}</td>
-                                            <td>
-                                                {% for averia in neumatico.averias.all %}
-                                                    {{ averia.nombre }}
-                                                {% empty %}
-                                                    Sin averías
-                                                {% endfor %}
-                                            </td>
-                                            <td>{{ neumatico.diseño }}</td>
-                                            <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Posición</th>
+                                                <th>Modelo</th>
+                                                <th>Marca</th>
+                                                <th>Medida</th>
+                                                <th>Presión</th>
+                                                <th>Huella</th>
+                                                <th>DOT</th>
+                                                <th>Averías</th>
+                                                <th>Diseño</th>
+                                                <th>Renovable</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for neumatico in item.vehiculo.neumaticos.all %}
+                                            <tr>
+                                                <td class="text-center">{{ neumatico.posicion }}</td>
+                                                <td>{{ neumatico.modelo }}</td>
+                                                <td>{{ neumatico.marca }}</td>
+                                                <td>{{ neumatico.medida.medida }}</td>
+                                                <td>{{ neumatico.presion }}</td>
+                                                <td>{{ neumatico.huella }}</td>
+                                                <td>{{ neumatico.dot }}</td>
+                                                <td>
+                                                    {% for averia in neumatico.averias.all %}
+                                                        {{ averia.nombre }}
+                                                    {% empty %}
+                                                        Sin averías
+                                                    {% endfor %}
+                                                </td>
+                                                <td>{{ neumatico.diseño }}</td>
+                                                <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
                                 {% else %}
                                 <p>No hay neumáticos registrados para este vehículo.</p>
                                 {% endif %}

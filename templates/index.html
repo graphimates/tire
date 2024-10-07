@@ -8,24 +8,24 @@
         <div class="row">
             <!-- Título dentro de la cabecera -->
             <div class="col-md-12 text-center">
-                <h2 class="text-white mb-4" style="font-weight: 700;">Resumen de Neumáticos</h2>
+                <h2 class="text-white mb-4 main-title">Resumen de Neumáticos</h2>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container mt-5 mb-5 p-5 shadow-lg rounded" style="background-color: #ffffff;">
+<div class="container mt-5 mb-5 p-5 shadow-lg rounded bg-light">
     <div class="row justify-content-center">
         <div class="col-md-6">
             {% if user.is_superuser %}
             <!-- Filtro de búsqueda de usuarios por autocompletar (visible solo para el admin) -->
-            <form method="GET" action="" class="d-flex align-items-center mb-4">
+            <form method="GET" action="" class="d-flex align-items-center mb-4 search-form">
                 <div class="input-group">
-                    <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Buscar por empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
+                    <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control search-input" placeholder="Buscar por empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
                     <div class="dropdown-menu" id="autocomplete-results" style="max-width: 400px;"></div>
                 </div>
                 <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit">
+                    <button class="btn btn-primary search-btn" type="submit">
                         <i class="fas fa-search"></i> Buscar
                     </button>
                 </div>
@@ -62,8 +62,8 @@
     <div class="card mt-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table">
-                    <thead class=" text-primary">
+                <table class="table text-center">
+                    <thead class="text-primary table-header">
                         <tr>
                             <th>Total de Neumáticos</th>
                             <th>Operativos</th>
@@ -87,8 +87,8 @@
         <div class="card-body">
             <h4 class="text-secondary">Huella de los Neumáticos Operativos</h4>
             <div class="table-responsive">
-                <table class="table">
-                    <thead class=" text-primary">
+                <table class="table text-center">
+                    <thead class="text-primary">
                         <tr>
                             <th>Huella 0 a ≤3 mm</th>
                             <th>Huella >3 a ≤6 mm</th>
@@ -97,9 +97,9 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="background-color: #e74c3c; color: white;">{{ huella_0_3 }}</td>
-                            <td style="background-color: #f1c40f; color: black;">{{ huella_3_6 }}</td>
-                            <td style="background-color: #2ecc71; color: white;">{{ huella_6_mas }}</td>
+                            <td class="bg-danger text-white">{{ huella_0_3 }}</td>
+                            <td class="bg-warning text-dark">{{ huella_3_6 }}</td>
+                            <td class="bg-success text-white">{{ huella_6_mas }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -112,8 +112,8 @@
         <div class="card-body">
             <h4 class="text-secondary">Requerimiento de Servicios por Vehículos</h4>
             <div class="table-responsive">
-                <table class="table">
-                    <thead class=" text-primary">
+                <table class="table text-center">
+                    <thead class="text-primary">
                         <tr>
                             <th>Alineación</th>
                             <th>Balanceo</th>
@@ -139,45 +139,4 @@
     <p class="text-muted">No se han encontrado usuarios o no hay datos disponibles para mostrar.</p>
     {% endif %}
 </div>
-
-<!-- Agregar el script de autocompletar -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const empresaInput = document.getElementById('empresa_autocomplete');
-        const autocompleteResults = document.getElementById('autocomplete-results');
-        const empresas = {% autoescape off %}{{ empresas_json|safe }}{% endautoescape %};
-
-        empresaInput.addEventListener('input', function() {
-            const input = this.value.toLowerCase();
-            let filteredEmpresas = empresas.filter(empresa => empresa.toLowerCase().includes(input));
-
-            autocompleteResults.innerHTML = '';  // Limpiar los resultados anteriores
-            if (filteredEmpresas.length > 0) {
-                filteredEmpresas.forEach(function(empresa) {
-                    const suggestionItem = document.createElement('div');
-                    suggestionItem.classList.add('dropdown-item');
-                    suggestionItem.textContent = empresa;
-
-                    // Hacer clic en una sugerencia para autocompletar
-                    suggestionItem.addEventListener('click', function() {
-                        empresaInput.value = empresa;
-                        autocompleteResults.innerHTML = '';  // Limpiar las sugerencias después de seleccionar
-                    });
-
-                    autocompleteResults.appendChild(suggestionItem);
-                });
-                autocompleteResults.classList.add('show');
-            } else {
-                autocompleteResults.classList.remove('show');
-            }
-        });
-
-        // Cerrar la lista si el usuario hace clic fuera de las sugerencias
-        document.addEventListener('click', function(event) {
-            if (!empresaInput.contains(event.target) && !autocompleteResults.contains(event.target)) {
-                autocompleteResults.classList.remove('show');
-            }
-        });
-    });
-</script>
 {% endblock %}
