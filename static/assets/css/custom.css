@@ -1,0 +1,475 @@
+/*==================== Estilos Generales ====================*/
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Elimina el scroll horizontal */
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/*==================== Estilos del Header ====================*/
+/* Color de fondo del header y estilos generales */
+.navbar, .bg-orange {
+  background-color: #f96332 !important;
+}
+
+.navbar {
+  margin-bottom: 0 !important; /* Eliminar espacio debajo del header */
+  padding-top: 0.625rem !important;
+  padding-bottom: 0.625rem !important;
+  min-height: 53px !important;
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Logo superior */
+.logo a {
+  color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Ajustar el ícono de neumático en lugar del ícono de hamburguesa */
+.navbar-toggler {
+  padding: 0.5rem !important; /* Espacio alrededor del ícono */
+  width: auto !important;
+  height: auto !important;
+}
+
+.navbar-toggler img {
+  width: 40px !important;  /* Forzar ancho */
+  height: 40px !important; /* Forzar alto */
+  object-fit: contain;     /* Mantener la proporción de la imagen */
+}
+
+/* Asegurar que la imagen no cambie de color al hacer hover */
+.navbar-toggler:hover img {
+  background-color: transparent !important;
+}
+
+/* Alinear el perfil del usuario en el header */
+.navbar .dropdown.ml-auto {
+  display: flex;
+  align-items: center;
+}
+
+/* Ajustar el espaciado y el tamaño del ícono del perfil */
+.navbar .dropdown img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+/* Ajustar el texto del nombre del usuario */
+.navbar .dropdown span {
+  font-size: 16px;
+  color: white;
+}
+
+/* Estilo para el menú desplegable del perfil */
+.dropdown-menu {
+  background-color: #292929 !important; /* Fondo oscuro */
+  border: none !important;             /* Sin borde */
+}
+
+.dropdown-menu .dropdown-item {
+  color: white !important; /* Letras blancas */
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important; /* Fondo semitransparente en hover */
+  color: white !important;
+}
+
+/* Separador dentro del menú desplegable */
+.dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.2) !important; /* Separador semitransparente */
+}
+
+/* Ocultar el nombre del usuario en pantallas pequeñas */
+@media (max-width: 767px) {
+  .navbar .dropdown span {
+    display: none;
+  }
+}
+
+/* Posición fija para el perfil del usuario */
+.fixed-profile {
+  position: absolute;
+  right: 20px; /* Distancia desde el borde derecho */
+  top: 10px;   /* Distancia desde la parte superior */
+  z-index: 1050; /* Encima de otros elementos */
+}
+
+/*==================== Estilos del Sidebar ====================*/
+/* Sidebar expandido */
+.sidebar {
+  width: 250px;
+  transition: all 0.2s ease-out;
+}
+
+/* Estilos de los íconos y botones */
+.nav-item a {
+  color: #fff !important;
+}
+
+/* Hover en íconos del sidebar */
+.nav-item a:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Fondo semitransparente al hover */
+}
+
+/* Botón seleccionado en sidebar expandido */
+.nav-item.active a {
+  background-color: #292929 !important; /* Fondo cuando está expandido */
+  color: hsla(0, 0%, 100%, 0.911) !important;
+  border-radius: 8px;
+  box-shadow: 
+    0 4px 20px 0 rgba(0, 0, 0, 0.14),
+    0 7px 10px -5px rgba(255, 133, 27, 0.4);
+}
+
+/* Sidebar colapsado */
+.sidebar.collapsed {
+  box-shadow: none !important;
+  width: 70px;
+}
+
+/* Ocultar títulos en sidebar colapsado */
+.sidebar.collapsed .nav-item p,
+.sidebar.collapsed .nav-item .sidebar-item-text {
+  display: none !important; /* Oculta los títulos completamente */
+}
+
+/* Mostrar títulos solo en hover (estado colapsado) */
+.sidebar.collapsed .nav-item:hover .sidebar-item-text {
+  display: block !important;
+  position: absolute;
+  left: 70px; /* Posición a la derecha del ícono */
+  background-color: rgba(0, 0, 0, 0.8); /* Fondo del tooltip */
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  white-space: nowrap;
+  z-index: 1050;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra del tooltip */
+}
+
+/* Ajustar tamaño de los íconos en sidebar colapsado */
+.sidebar.collapsed .nav-item a i {
+  font-size: 18px;
+}
+
+/* Estilo para el ícono activo cuando el sidebar está colapsado */
+.sidebar.collapsed .nav-item.active a {
+  background-color: transparent !important;  /* Sin fondo */
+  color: #fff !important;                    /* Mantener el color blanco del ícono */
+  border-radius: 50%;                        /* Mantener el borde redondeado alrededor del ícono */
+  padding: 0 !important;                     /* Eliminar cualquier padding adicional */
+  box-shadow: none !important;               /* Sin sombras */
+  border-left: none !important;              /* Sin borde izquierdo */
+  display: flex;                             /* Usar flexbox */
+  align-items: center;                       /* Mantener el ícono centrado verticalmente */
+  justify-content: center;                   /* Mantener el ícono centrado horizontalmente */
+  width: 70px;                               /* Ancho fijo */
+  height: 50px;                              /* Altura fija */
+  transition: none !important;               /* Evitar animaciones al cambiar de estado */
+}
+
+/* Ajustar el tamaño del ícono cuando el sidebar está colapsado */
+.sidebar.collapsed .nav-item.active a i {
+  font-size: 20px;                           /* Tamaño del ícono */
+  position: relative;                        /* Asegurar que no se mueva de su posición */
+  margin: 0;                                 /* Eliminar márgenes */
+  left: 0 !important;                        /* Evitar cualquier desplazamiento hacia la derecha */
+}
+
+/* Ajustar la alineación de los íconos cuando el sidebar está colapsado */
+.sidebar.collapsed .nav-item a {
+  justify-content: center;      /* Centrar los íconos dentro del contenedor */
+  align-items: center;          /* Asegurar que estén alineados verticalmente */
+  display: flex;                /* Usar flexbox para asegurar la alineación */
+  padding: 0 !important;        /* Eliminar el padding adicional */
+  width: 70px;                  /* Ancho fijo para todos los íconos */
+  height: 50px;                 /* Altura fija para todos los íconos */
+  transition: none !important;  /* Evitar animaciones en la alineación */
+}
+
+
+
+/* Deshabilitar hover y focus en sidebar colapsado */
+.sidebar.collapsed .nav li:hover:not(.active)>a, 
+.sidebar.collapsed .nav li:focus:not(.active)>a, 
+.off-canvas-sidebar.collapsed .nav li:hover:not(.active)>a, 
+.off-canvas-sidebar.collapsed .nav li:focus:not(.active)>a {
+  background-color: transparent !important; /* Sin fondo en colapso */
+}
+
+/* Botón de colapso */
+.sidebar-footer {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  z-index: 1001;
+}
+
+#toggleSidebar {
+  background-color: #292929;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 10px;
+  transition: all 0.2s ease-out;
+}
+
+#toggleSidebar:hover {
+  background-color: #d86000;
+}
+
+/* Rotación del ícono al colapsar el sidebar */
+.sidebar.collapsed .fa-chevron-left {
+  transform: rotate(180deg);
+}
+
+/* Submenús en hover (sidebar colapsado) */
+.sidebar.collapsed ul.nav.flex-column {
+  display: none;
+}
+
+.sidebar.collapsed:hover ul.nav.flex-column {
+  display: none !important;
+}
+
+.sidebar ul.nav li.nav-item.active ul.nav.flex-column {
+  display: block;
+}
+
+/* Estilos para submenús */
+.nav-item.has-dropdown.open ul.nav {
+  max-height: 500px;
+}
+
+.nav-item ul.nav {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.nav-item ul.nav.show {
+  max-height: 500px;
+}
+
+/* Evitar que el ícono activo cambie de color al colapsar */
+.sidebar[data-color="orange"] .nav li.active>a:not([data-toggle="collapse"]) i,
+.off-canvas-sidebar[data-color="orange"] .nav li.active>a:not([data-toggle="collapse"]) i {
+  color: #fff !important; /* Mantener color blanco */
+}
+
+/*==================== Área de Contenido ====================*/
+/* Asegurar que el contenido esté justo debajo del header */
+.content {
+  padding-top: 70px; /* Altura del header */
+  margin-top: 0 !important;
+  padding: 20px;     /* Puedes ajustar esto según lo que necesites */
+}
+
+/* Ajustar el contenedor principal */
+.container {
+  margin-top: 0 !important; /* Sin margen superior */
+}
+
+/* Panel principal */
+.main-panel {
+  flex-grow: 1;
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  transition: all 0.2s ease-out;
+}
+
+/* Ajuste del panel principal cuando el sidebar está colapsado */
+.main-panel.sidebar-collapsed {
+  margin-left: 70px;
+  width: calc(100% - 70px);
+}
+
+/*==================== Estilos del Footer ====================*/
+.footer {
+  background-color: #292929;
+  color: #fff;
+  width: 100%; /* Asegurar que ocupe el ancho completo */
+  text-align: center;
+  padding: 10px 0;
+  position: absolute; /* Lo asegura en la parte inferior */
+  bottom: 0;
+  left: 0;
+}
+
+.footer a {
+  color: white;
+  text-decoration: none;
+}
+
+/*==================== Estilos de Formularios ====================*/
+/* Estilos personalizados para el formulario de Crear Usuario */
+.card {
+  border-radius: 10px;
+  background-color: #f4f5f7;
+  padding: 20px;
+}
+
+.card h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-primary {
+  background-color: #ff7a06;
+  border-color: #ff7a06;
+}
+
+.btn-primary:hover {
+  background-color: #e86d05;
+  border-color: #e86d05;
+}
+
+/*==================== Estilos de Bootstrap Collapse ====================*/
+.collapse {
+  transition: height 0.3s ease;
+}
+
+.collapse.show {
+  display: block !important;
+}
+
+/*==================== Estilos Responsivos ====================*/
+/* Pantallas pequeñas y tabletas: Ocultar el sidebar completamente */
+@media (max-width: 992px) {
+  .sidebar {
+    display: none !important;
+  }
+  .main-panel {
+    margin-left: 0 !important;
+    width: 100% !important;
+    transition: all 0.2s ease-out;
+    flex: 1; /* El contenido principal toma todo el espacio */
+  }
+}
+
+/* Pantallas grandes: Mostrar el sidebar completo o colapsado */
+@media (min-width: 993px) {
+  .sidebar {
+    width: 250px;
+    transition: all 0.2s ease-out;
+  }
+
+  .sidebar.collapsed {
+    box-shadow: none !important;
+    width: 70px;
+  }
+
+  .main-panel {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    transition: all 0.2s ease-out;
+  }
+
+  .main-panel.sidebar-collapsed {
+    margin-left: 70px;
+    width: calc(100% - 70px);
+  }
+}
+
+/* Ocultar el nombre del usuario en pantallas pequeñas */
+@media (max-width: 767px) {
+  .navbar .dropdown span {
+    display: none;
+  }
+}
+
+/*==================== Misceláneos ====================*/
+/* Evitar overflow horizontal */
+html, body {
+  overflow-x: hidden;
+}
+
+
+/* Submenú activo dentro de 'Administrador de Usuarios' */
+.nav-dropdown-items .nav-item.active a {
+  background-color: #292929 !important; /* Fondo negro */
+  color: #fff !important;               /* Texto blanco */
+  border-radius: 8px;
+  box-shadow: 
+    0 4px 20px 0 rgba(0, 0, 0, 0.14),
+    0 7px 10px -5px rgba(255, 133, 27, 0.4);
+}
+
+/* Menú 'Administrador de Usuarios' no debe marcarse como activo al seleccionar un submenú */
+.nav-item.has-dropdown.open > a {
+  background-color: transparent !important; /* Fondo transparente */
+  color: #fff !important;                   /* Mantener color blanco */
+  box-shadow: none !important;
+}
+
+/*==================== formularios responsive ====================*/
+
+.table-responsive {
+  overflow-x: auto; /* Esto mantendrá la tabla ajustada en pantallas pequeñas sin afectar grandes */
+}
+
+table {
+  width: 100%; /* Asegura que la tabla ocupe el ancho completo del contenedor */
+  table-layout: fixed; /* Evita que las columnas cambien de tamaño según el contenido */
+}
+
+.container-fluid {
+  max-width: 100%; /* Asegura que no se desborde en pantallas pequeñas */
+  padding: 15px;
+}
+
+.table {
+  width: 100%; /* Asegura que la tabla ocupe el 100% del contenedor */
+  table-layout: fixed; /* Esto asegura que las columnas se distribuyan equitativamente */
+}
+
+input {
+  width: 100%; /* Hace que los inputs dentro de la tabla ocupen el 100% del espacio de su celda */
+}
+
+.table-responsive {
+  overflow-x: hidden; /* Evita el scroll lateral */
+}
+
+.logo img {
+  width: 100%;
+  height: auto;
+  max-width: 180px; /* Ajustar el tamaño máximo del logo para pantallas grandes */
+}
+
+.logo-mini {
+  display: none; /* Ocultar logo mini en pantallas grandes */
+}
+
+@media (max-width: 991.98px) {
+  .logo-large {
+    display: none; /* Ocultar logo grande en pantallas pequeñas */
+  }
+  .logo-mini {
+    display: block; /* Mostrar logo mini en pantallas pequeñas */
+  }
+}
+
+  .collapse.show {
+    display: block !important;
+  }
+

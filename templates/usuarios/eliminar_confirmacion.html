@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %} Confirmar Eliminación {% endblock %}
+
+{% block content %}
+<!-- Añadimos el panel-header-sm para consistencia visual -->
+<div class="panel-header panel-header-sm"></div>
+
+<div class="container mt-5 mb-5 text-center">
+    <!-- Título estilizado -->
+    <div class="confirmation-container p-4 shadow-sm rounded">
+        <h2 class="styled-title">¿Estás seguro?</h2>
+        <p class="styled-subtitle">Deseas eliminar al usuario <strong>"{{ usuario.first_name }} {{ usuario.last_name }}"</strong></p>
+
+        <!-- Formulario de confirmación -->
+        <form method="POST" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-lg px-4">Eliminar</button>
+            <a href="{% url 'ver_usuarios' %}" class="btn btn-secondary btn-lg px-4">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

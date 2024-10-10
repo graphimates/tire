@@ -1,0 +1,101 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Vehiculo
+from usuarios.models import Usuario
+from .forms import VehiculoForm
+from neumatico.models import Neumatico 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.cache import never_cache  # Importamos el decorador para deshabilitar la caché
+import json  # Asegúrate de importar json
+
+# Función para verificar si el usuario es administrador
+def is_admin(user):
+    return user.is_superuser
+
+# Vista para añadir un vehículo a un usuario específico
+@login_required
+@user_passes_test(is_admin)
+def crear_vehiculo(request, user_id):
+    usuario = get_object_or_404(Usuario, id=user_id)
+    if request.method == 'POST':
+        form = VehiculoForm(request.POST)
+        if form.is_valid():
+            vehiculo = form.save(commit=False)
+            vehiculo.usuario = usuario
+            vehiculo.save()
+            
+            # Ahora, crear los neumáticos relacionados
+            for posicion in range(1, vehiculo.cantidad_neumaticos + 1):
+                Neumatico.objects.create(
+                    vehiculo=vehiculo,
+                    posicion=posicion,
+                    modelo='',
+                    marca='',
+                    diseño='',
+                    dot='',
+                    presion=0.0,
+                    huella=0.0,
+                    renovable=False
+                )
+            
+            # Actualizar la flota
+            usuario.flota += 1
+            usuario.save()
+            return redirect('ver_usuarios')
+    else:
+        form = VehiculoForm()
+    
+    return render(request, 'vehiculos/crear_vehiculo.html', {'form': form, 'usuario': usuario})
+
+@login_required
+@never_cache
+def reporte_vehiculos(request):
+    vehiculos_con_neumaticos = []
+
+    # Filtrar por empresa
+    search_empresa = request.GET.get('search_empresa', '')
+    order_by = request.GET.get('order_by', 'desc')
+
+    if request.user.is_superuser:
+        # Obtener todas las empresas y pasarlas al template para el autocompletar
+        empresas = Usuario.objects.values_list('empresa', flat=True).distinct()
+        vehiculos = Vehiculo.objects.all()
+
+        if search_empresa:
+            vehiculos = vehiculos.filter(usuario__empresa__icontains=search_empresa)
+
+    else:
+        vehiculos = Vehiculo.objects.filter(usuario=request.user)
+        empresas = []
+
+    # Ordenar los vehículos por fecha de inspección
+    if order_by == 'asc':
+        vehiculos = vehiculos.order_by('ultima_inspeccion')
+    else:
+        vehiculos = vehiculos.order_by('-ultima_inspeccion')
+
+    for vehiculo in vehiculos:
+        neumaticos_por_posicion = {}
+        for i in range(1, vehiculo.cantidad_neumaticos + 1):
+            neumatico = vehiculo.neumaticos.filter(posicion=i).first()
+            neumaticos_por_posicion[i] = neumatico
+        
+        vehiculos_con_neumaticos.append({
+            'vehiculo': vehiculo,
+            'neumaticos_por_posicion': neumaticos_por_posicion,
+            'rango_posiciones': range(1, vehiculo.cantidad_neumaticos + 1)
+        })
+
+    return render(request, 'vehiculos/reporte_vehiculos.html', {
+        'vehiculos_con_neumaticos': vehiculos_con_neumaticos,
+        'empresas_json': json.dumps(list(empresas)),  # Pasar las empresas como JSON para autocompletar
+    })
+
+
+@never_cache
+@login_required
+@user_passes_test(is_admin)
+def borrar_vehiculo(request, vehiculo_id):
+    vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
+    vehiculo.delete()
+    return redirect('reporte_vehiculos')
+

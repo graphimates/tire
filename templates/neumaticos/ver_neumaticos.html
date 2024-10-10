@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Neumáticos{% endblock %}
+
+{% block content %}
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2 class="text-white mb-4" style="font-weight: 700;">Reporte de Neumáticos</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container">
+        <!-- Filtros de búsqueda -->
+        <form id="filtros-form" method="GET" action="" class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Filtros de Búsqueda</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Filtro por operatividad -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Mostrar por operatividad:</label>
+                        <div class="form-check">
+                            <input type="radio" name="operatividad" id="operativo" value="operativo" class="form-check-input filtro-radio" {% if operatividad == 'operativo' %}checked{% endif %}>
+                            <label for="operativo" class="form-check-label">Operativo</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="operatividad" id="fuera_de_uso" value="fuera_de_uso" class="form-check-input filtro-radio" {% if operatividad == 'fuera_de_uso' %}checked{% endif %}>
+                            <label for="fuera_de_uso" class="form-check-label">Fuera de uso</label>
+                        </div>
+                        <!-- Botón para quitar filtro -->
+                        <button type="button" class="btn btn-link btn-reset" data-filtro="operatividad">Quitar filtro</button>
+                    </div>
+
+                    <!-- Filtro por huella -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Filtrar por huella:</label>
+                        <div class="form-check">
+                            <input type="radio" name="huella" id="huella_0_3" value="0_3" class="form-check-input filtro-radio" {% if huella == '0_3' %}checked{% endif %}>
+                            <label for="huella_0_3" class="form-check-label">0 a ≤ 3 mm</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="huella" id="huella_3_6" value="3_6" class="form-check-input filtro-radio" {% if huella == '3_6' %}checked{% endif %}>
+                            <label for="huella_3_6" class="form-check-label">> 3 a ≤ 6 mm</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="huella" id="huella_6_mas" value="6_mas" class="form-check-input filtro-radio" {% if huella == '6_mas' %}checked{% endif %}>
+                            <label for="huella_6_mas" class="form-check-label">> 6 mm</label>
+                        </div>
+                        <!-- Botón para quitar filtro -->
+                        <button type="button" class="btn btn-link btn-reset" data-filtro="huella">Quitar filtro</button>
+                    </div>
+
+                    <!-- Filtro por renovabilidad -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Renovabilidad:</label>
+                        <div class="form-check">
+                            <input type="radio" name="renovable" id="renovable_si" value="si" class="form-check-input filtro-radio" {% if renovable == 'si' %}checked{% endif %}>
+                            <label for="renovable_si" class="form-check-label">Renovable</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="renovable" id="renovable_no" value="no" class="form-check-input filtro-radio" {% if renovable == 'no' %}checked{% endif %}>
+                            <label for="renovable_no" class="form-check-label">No renovable</label>
+                        </div>
+                        <!-- Botón para quitar filtro -->
+                        <button type="button" class="btn btn-link btn-reset" data-filtro="renovable">Quitar filtro</button>
+                    </div>
+                </div>
+
+                <!-- Filtro por orden -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="ordenar" class="form-label">Ordenar por:</label>
+                        <select name="ordenar" class="form-select filtro-select">
+                            <option value="reciente" {% if ordenar == 'reciente' %}selected{% endif %}>Más reciente</option>
+                            <option value="antigua" {% if ordenar == 'antigua' %}selected{% endif %}>Más antigua</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Tabla de neumáticos -->
+        <div class="table-responsive shadow-sm">
+            <table class="table table-striped table-hover">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th>Posición</th>
+                        <th>Vehículo</th>
+                        <th>Modelo (Vehículo)</th>
+                        <th>Modelo (Neumático)</th>
+                        <th>DOT</th>
+                        <th>Presión</th>
+                        <th>Huella</th>
+                        <th>Averías</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for neumatico in neumaticos %}
+                    <tr>
+                        <td>{{ neumatico.posicion }}</td>
+                        <td>{{ neumatico.vehiculo.placa }}</td>
+                        <td>{{ neumatico.vehiculo.modelo }}</td>
+                        <td>{{ neumatico.modelo }}</td>
+                        <td>{{ neumatico.dot }}</td>
+                        <td>{{ neumatico.presion }}</td>
+                        <td>{{ neumatico.huella }}</td>
+                        <td>
+                            {% if neumatico.averias.exists %}
+                                <ul>
+                                {% for averia in neumatico.averias.all %}
+                                    <li>{{ averia.nombre }} ({{ averia.get_estado_neumatico_display }})</li>
+                                {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span class="text-muted">Sin averías</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mensaje si no hay neumáticos -->
+        {% if not neumaticos %}
+            <p class="text-center text-muted mt-4">No hay neumáticos disponibles para los filtros aplicados.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Función para permitir destildar radios
+document.addEventListener('DOMContentLoaded', function() {
+    let lastChecked = null;
+    const radios = document.querySelectorAll('.filtro-radio');
+
+    radios.forEach(function(radio) {
+        radio.addEventListener('click', function() {
+            if (lastChecked === this) {
+                this.checked = false;  // Destildar el radio si es el mismo
+                lastChecked = null;  // Reiniciar la variable de control
+            } else {
+                lastChecked = this;
+            }
+            // Enviar el formulario automáticamente
+            document.getElementById('filtros-form').submit();
+        });
+    });
+
+    // Enviar el formulario cuando se cambie un select
+    const selects = document.querySelectorAll('.filtro-select');
+    selects.forEach(function(select) {
+        select.addEventListener('change', function() {
+            document.getElementById('filtros-form').submit();
+        });
+    });
+
+    // Función para quitar el filtro
+    const resetButtons = document.querySelectorAll('.btn-reset');
+    resetButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const filtro = this.getAttribute('data-filtro');
+            const radiosToReset = document.querySelectorAll(`input[name="${filtro}"]`);
+            radiosToReset.forEach(function(radio) {
+                radio.checked = false;  // Destildar todas las opciones del filtro
+            });
+            // Enviar el formulario automáticamente
+            document.getElementById('filtros-form').submit();
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!-- templates/averias/crear_averia.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="panel-header panel-header-sm"></div>  <!-- Panel Header Pequeño -->
+
+<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+    <h2 class="text-primary">{{ titulo }}</h2>
+    <form method="POST" class="row g-3 mt-4">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="col-md-4">
+            <label for="id_nombre" class="form-label text-primary">Nombre de la Avería</label>
+            {{ form.nombre }}
+        </div>
+
+        <div class="col-md-4">
+            <label for="id_servicio_requerido" class="form-label text-primary">Servicio Requerido</label>
+            {{ form.servicio_requerido }}
+        </div>
+
+        <div class="col-md-4">
+            <label for="id_codigo" class="form-label text-primary">Código de la Avería</label>
+            {{ form.codigo }}
+        </div>
+
+        <div class="col-md-4">
+            <label for="id_estado" class="form-label text-primary">Estado de la Avería</label>
+            {{ form.estado }}
+        </div>
+
+        <div class="col-12 text-center mt-4">
+            <button type="submit" class="btn btn-success btn-lg">Guardar Avería</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

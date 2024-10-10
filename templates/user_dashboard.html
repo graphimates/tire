@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Panel de Usuario
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4">Bienvenido, {{ user.first_name }} {{ user.last_name }}</h1>
+        <p class="lead">Este es tu panel de usuario. Aquí podrás ver información sobre tu cuenta y tus vehículos.</p>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h3 class="text-primary"><i class="fas fa-car mr-2"></i>Tu Flota:</h3>
+        <div class="card mt-3">
+          <div class="card-body">
+            {% if user.vehiculos.all %}
+              <ul class="list-group">
+                {% for vehiculo in user.vehiculos.all %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ vehiculo.modelo }} 
+                    <span class="badge badge-primary badge-pill">{{ vehiculo.cantidad_neumaticos }} neumáticos</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-muted">No tienes vehículos asignados.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

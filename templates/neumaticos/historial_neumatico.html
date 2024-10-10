@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Inspecciones{% endblock %}
+
+{% block content %}
+<!-- Panel Header con el título -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2 class="text-white mb-4" style="font-weight: 700;">Historial de Inspecciones - Vehículo: {{ vehiculo.placa }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenido Principal -->
+<div class="content d-flex justify-content-center">
+    <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 900px;">
+
+        {% if historial %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class=" text-primary">
+                    <tr>
+                        <th>Fecha de Inspección</th>
+                        <th>Posición</th>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Presión</th>
+                        <th>Huella</th>
+                        <th>DOT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inspec in historial %}
+                    <tr>
+                        <td>{{ inspec.fecha_inspeccion|date:"d/m/Y H:i" }}</td>
+                        <td>{{ inspec.posicion }}</td>
+                        <td>{{ inspec.modelo }}</td>
+                        <td>{{ inspec.marca }}</td>
+                        <td>{{ inspec.presion }}</td>
+                        <td>{{ inspec.huella }}</td>
+                        <td>{{ inspec.dot }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No hay inspecciones registradas para este vehículo.</p>
+        {% endif %}
+        
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+<!-- neumaticos/cargar_inspecciones.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary">Carga de Inspecciones</h2>
+
+    <!-- Formulario para subir el archivo CSV -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="csv_file" class="btn btn-secondary">Subir archivo CSV</label>
+            <input type="file" name="csv_file" id="csv_file" class="form-control" style="display: none;" onchange="displayFileName()">
+            <span id="file-name" style="margin-left: 10px;"></span>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Subir</button>
+    </form>
+
+    {% if errores %}
+    <!-- Mostrar errores -->
+    <div class="alert alert-danger mt-4">
+        <h4>Errores encontrados:</h4>
+        <ul>
+            {% for error in errores %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if inspecciones_agrupadas %}
+    <!-- Mostrar previsualización -->
+    <h4 class="mt-5">Previsualización de Inspecciones:</h4>
+
+    <!-- Recorremos los grupos de inspecciones por cliente y placa -->
+    {% for key, inspecciones in inspecciones_agrupadas.items %}
+        <h5>Cliente: {{ key.0 }} - Vehículo: {{ key.1 }}</h5>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Posición</th>
+                    <th>Medida</th>
+                    <th>Marca</th>
+                    <th>Diseño</th>
+                    <th>DOT</th>
+                    <th>Presión</th>
+                    <th>Huella</th>
+                    <th>Avería</th>
+                    <th>Modelo</th>
+                    <th>Renovable</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in inspecciones %}
+                <tr>
+                    <td>{{ fila.posicion }}</td>
+                    <td>{{ fila.medida }}</td>
+                    <td>{{ fila.marca }}</td>
+                    <td>{{ fila.diseño }}</td>
+                    <td>{{ fila.dot }}</td>
+                    <td>{{ fila.presion }}</td>
+                    <td>{{ fila.huella }}</td>
+                    <td>
+                        {% for codigo in fila.averias %}
+                            {{ codigo }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Sin averías
+                        {% endfor %}
+                    </td>
+                    
+                    <td>{{ fila.modelo }}</td>
+                    <td>{{ fila.renovable|yesno:"Sí,No" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+
+    <!-- Botón de Confirmar -->
+    <form method="POST" action="{% url 'confirmar_inspecciones' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success mt-3">Confirmar Subida</button>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    function displayFileName() {
+        const input = document.getElementById('csv_file');
+        const fileName = input.files[0].name;
+        document.getElementById('file-name').textContent = fileName;
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Gestionar Medidas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary">Gestionar Medidas de Neumáticos</h2>
+
+    <a href="{% url 'crear_medida' %}" class="btn btn-primary mb-3">Añadir Nueva Medida</a>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Medida</th>
+                <th>Precio Estimado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for medida in medidas %}
+            <tr>
+                <td>{{ medida.medida }}</td>
+                <td>${{ medida.precio_estimado }}</td>
+                <td>
+                    <a href="{% url 'editar_medida' medida.id %}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="{% url 'eliminar_medida' medida.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar esta medida?');">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+

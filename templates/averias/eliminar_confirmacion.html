@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %} Confirmar Eliminación {% endblock %}
+
+{% block content %}
+<div class="panel-header panel-header-sm"></div> <!-- Panel Header Pequeño -->
+
+<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
+    <h2 class="text-primary">¿Estás seguro que deseas eliminar la avería "{{ averia.nombre }}"?</h2>
+    <form method="POST" class="mt-4 text-center">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-lg">Eliminar</button>
+        <a href="{% url 'ver_averias' %}" class="btn btn-secondary btn-lg ml-3">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

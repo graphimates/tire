@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Reporte de Vehículos{% endblock %}
+
+{% block content %}
+<div class="panel-header panel-header-sm"></div>
+
+<div class="container-fluid mt-5 mb-5">
+    <h2 class="report-title">Reporte de Vehículos</h2>
+
+    <!-- Filtros de búsqueda y orden -->
+    <form method="GET" class="mb-4">
+        <div class="row">
+            <!-- Filtro de búsqueda por empresa con autocompletado -->
+            <div class="col-md-6">
+                <label for="search_empresa">Buscar por empresa:</label>
+                <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Ingrese el nombre de la empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
+                <div class="dropdown-menu" id="autocomplete-results" style="max-width: 100%;"></div>
+            </div>
+
+            <!-- Filtro de orden por fecha de inspección -->
+            <div class="col-md-4">
+                <label for="order_by">Ordenar por última inspección:</label>
+                <select id="order_by" name="order_by" class="form-control">
+                    <option value="asc" {% if request.GET.order_by == 'asc' %}selected{% endif %}>Ascendente</option>
+                    <option value="desc" {% if request.GET.order_by == 'desc' %}selected{% endif %}>Descendente</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="accordion" id="vehiculosAccordion">
+        {% if vehiculos_con_neumaticos %}
+            {% for item in vehiculos_con_neumaticos %}
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ item.vehiculo.id }}">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ item.vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ item.vehiculo.id }}">
+                            {{ item.vehiculo.placa }} : {{ item.vehiculo.usuario.first_name }} {{ item.vehiculo.usuario.last_name }}
+                        </button>
+                    </h2>
+                    <div>
+                        {% if item.vehiculo.ultima_inspeccion %}
+                            <span><strong>Última Inspección:</strong> {{ item.vehiculo.ultima_inspeccion|date:"d/m/Y H:i:s" }}</span>
+                        {% else %}
+                            <span><strong>Última Inspección:</strong> Sin registro</span>
+                        {% endif %}
+                        {% if user.is_superuser %}
+                            <a href="{% url 'borrar_vehiculo' item.vehiculo.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este vehículo?');">Borrar</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="collapse{{ item.vehiculo.id }}" class="collapse" aria-labelledby="heading{{ item.vehiculo.id }}" data-parent="#vehiculosAccordion">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Esquema del vehículo (Columna izquierda) -->
+                            <div class="col-md-3">
+                                <h4>Esquema del Vehículo</h4>
+                                <div class="neumatico-esquema" style="position: relative;">
+                                    <img src="/media/tipo-vehiculos/{{ item.vehiculo.tipo }}.png" alt="Esquema {{ item.vehiculo.tipo }}" class="img-fluid">
+                                </div>
+                            </div>
+
+                            <!-- Tabla de neumáticos (Columna derecha) -->
+                            <div class="col-md-9">
+                                <h4>Neumáticos del Vehículo</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Posición</th>
+                                                <th>Modelo</th>
+                                                <th>Marca</th>
+                                                <th>Medida</th>
+                                                <th>Presión</th>
+                                                <th>Huella</th>
+                                                <th>DOT</th>
+                                                <th>Averías</th>
+                                                <th>Diseño</th>
+                                                <th>Renovable</th>
+                                                {% if user.is_superuser %}
+                                                <th>Acción</th>
+                                                {% endif %}
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {% for posicion in item.rango_posiciones %}
+                                            <tr>
+                                                <td>{{ posicion }}</td>
+                                                {% if item.neumaticos_por_posicion|get_item:posicion %}
+                                                {% with neumatico=item.neumaticos_por_posicion|get_item:posicion %}
+                                                <td>{{ neumatico.modelo|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.marca|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.medida.medida|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.presion|default_if_none:"0.0" }}</td>
+                                                <td>{{ neumatico.huella|default_if_none:"0.0" }}</td>
+                                                <td>{{ neumatico.dot|default_if_none:"" }}</td>
+                                                <td>
+                                                    {% for averia in neumatico.averias.all %}
+                                                        {{ averia.nombre }}
+                                                    {% empty %}
+                                                        Sin averías
+                                                    {% endfor %}
+                                                </td>
+                                                <td>{{ neumatico.diseño|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>
+                                                {% if user.is_superuser %}
+                                                <td>
+                                                    <a href="{% url 'editar_neumatico' item.vehiculo.id posicion %}" class="btn btn-warning btn-sm">Editar</a>
+                                                </td>
+                                                {% endif %}
+                                                {% endwith %}
+                                                {% else %}
+                                                <td colspan="{% if user.is_superuser %}10{% else %}9{% endif %}">Neumático no registrado</td>
+                                                {% endif %}
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No tienes vehículos registrados.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Script de autocompletado -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const empresaInput = document.getElementById('empresa_autocomplete');
+        const autocompleteResults = document.getElementById('autocomplete-results');
+        const empresas = {{ empresas_json|safe }};  // Empresas cargadas desde el servidor en formato JSON
+
+        empresaInput.addEventListener('input', function() {
+            const input = this.value.toLowerCase();
+            let filteredEmpresas = empresas.filter(empresa => empresa.toLowerCase().includes(input));
+
+            autocompleteResults.innerHTML = '';  // Limpiar los resultados anteriores
+            if (filteredEmpresas.length > 0) {
+                filteredEmpresas.forEach(function(empresa) {
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.classList.add('dropdown-item');
+                    suggestionItem.textContent = empresa;
+
+                    // Hacer clic en una sugerencia para autocompletar
+                    suggestionItem.addEventListener('click', function() {
+                        empresaInput.value = empresa;
+                        autocompleteResults.innerHTML = '';  // Limpiar las sugerencias después de seleccionar
+                    });
+
+                    autocompleteResults.appendChild(suggestionItem);
+                });
+                autocompleteResults.classList.add('show');
+            } else {
+                autocompleteResults.classList.remove('show');
+            }
+        });
+
+        // Cerrar la lista si el usuario hace clic fuera de las sugerencias
+        document.addEventListener('click', function(event) {
+            if (!empresaInput.contains(event.target) && !autocompleteResults.contains(event.target)) {
+                autocompleteResults.classList.remove('show');
+            }
+        });
+    });
+</script>
+{% endblock %}

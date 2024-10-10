@@ -1,0 +1,99 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>{% block title %}Neumáticos{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" crossorigin="anonymous">
+ 
+    
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/now-ui-dashboard.css' %}" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="{% static 'assets/css/custom.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    
+    <!-- Incluir el header -->
+    {% include "partials/header.html" %}
+    
+    <div class="wrapper">
+      {% block sidebar %}
+        <!-- Verifica si el usuario está autenticado -->
+        {% if user.is_authenticated %}
+          <!-- Incluir el archivo navbar.html -->
+          {% include "partials/navbar.html" %}
+        {% endif %}
+      {% endblock %}
+      
+      <div class="{% if not user.is_authenticated %}login-panel{% else %}main-panel{% endif %} sidebar-adjust">
+        <!-- Content Section -->
+        <div class="content">
+          {% block content %}
+          {% endblock %}
+        </div>
+        
+        <!-- Footer -->
+        {% include "partials/footer.html" %}
+      </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const dropdownToggle = document.getElementById('adminUserToggle');
+        const adminUserOptions = document.getElementById('adminUserOptions');
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const mainPanel = document.querySelector('.main-panel');
+
+        // Verifica si los elementos existen antes de asignar eventos
+        if (dropdownToggle && adminUserOptions) {
+          // Mantener expandido el submenú si la página actual pertenece a la sección 'Administrador de Usuarios'
+          if (window.location.pathname.includes('ver_usuarios') || window.location.pathname.includes('crear_usuario')) {
+            adminUserOptions.classList.add('show');
+          }
+
+          // Agrega un evento para expandir el sidebar cuando se hace clic en 'Administrador de Usuarios'
+          dropdownToggle.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            // Si el sidebar está colapsado, expándelo
+            if (sidebar.classList.contains('collapsed')) {
+              sidebar.classList.remove('collapsed');
+              mainPanel.classList.remove('sidebar-collapsed');
+            }
+
+            // Desplegar el menú de opciones de administrador
+            adminUserOptions.classList.toggle('show');
+          });
+        }
+        
+        // Función para colapsar el sidebar con el botón de colapso
+        if (toggleSidebar) {
+          toggleSidebar.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            mainPanel.classList.toggle('sidebar-collapsed');
+
+            // Asegurarse de que los submenús no estén abiertos cuando se colapsa el sidebar
+            if (sidebar.classList.contains('collapsed')) {
+              const subMenus = document.querySelectorAll('.collapse.show');
+              subMenus.forEach(subMenu => subMenu.classList.remove('show'));
+            }
+          });
+        }
+      });
+    </script>
+    
+  </body>
+</html>
