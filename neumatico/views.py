@@ -103,7 +103,7 @@ def editar_neumatico(request, vehiculo_id, posicion):
         form = NeumaticoForm(request.POST, instance=neumatico)
         if form.is_valid():
             try:
-                # Solo guardamos en el historial si el neumático ya ha sido inspeccionado previamente
+                # Guardar el historial solo si el neumático ya tiene una fecha de inspección anterior
                 if neumatico.fecha_inspeccion:
                     HistorialInspeccion.objects.create(
                         vehiculo=vehiculo,
@@ -122,12 +122,16 @@ def editar_neumatico(request, vehiculo_id, posicion):
 
                 # Ahora guardamos los cambios del formulario
                 neumatico = form.save(commit=False)
-                neumatico.fecha_inspeccion = timezone.now()  # Asignar fecha de inspección
+                
+                # Si no se seleccionó fecha, asignar la fecha actual
+                if not neumatico.fecha_inspeccion:
+                    neumatico.fecha_inspeccion = timezone.now()
+
                 neumatico.save()
                 form.save_m2m()  # Guardar las relaciones ManyToMany
 
                 # Actualizar la fecha de última inspección del vehículo
-                vehiculo.ultima_inspeccion = timezone.now()
+                vehiculo.ultima_inspeccion = neumatico.fecha_inspeccion
                 vehiculo.save()
 
                 return redirect('reporte_vehiculos')
@@ -137,8 +141,6 @@ def editar_neumatico(request, vehiculo_id, posicion):
         form = NeumaticoForm(instance=neumatico)
 
     return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico})
-
-
 
 
 

@@ -101,3 +101,18 @@ def borrar_vehiculo(request, vehiculo_id):
     vehiculo.delete()
     return redirect('reporte_vehiculos')
 
+@login_required
+@user_passes_test(is_admin)
+def editar_fecha_inspeccion(request, vehiculo_id):
+    vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
+
+    if request.method == 'POST':
+        nueva_fecha = request.POST.get('fecha_inspeccion')
+        if nueva_fecha:
+            # Actualizar la fecha de inspección de todos los neumáticos actuales
+            vehiculo.ultima_inspeccion = nueva_fecha
+            vehiculo.neumaticos.update(fecha_inspeccion=nueva_fecha)  # Actualizar los neumáticos actuales
+            vehiculo.save()
+            return redirect('reporte_vehiculos')
+
+    return redirect('reporte_vehiculos')

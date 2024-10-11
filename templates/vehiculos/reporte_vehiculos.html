@@ -57,11 +57,22 @@
                     </h2>
                     <div>
                         {% if item.vehiculo.ultima_inspeccion %}
-                            <span><strong>Última Inspección:</strong> {{ item.vehiculo.ultima_inspeccion|date:"d/m/Y H:i:s" }}</span>
+                            <span><strong>Última Inspección:</strong> {{ item.vehiculo.ultima_inspeccion|date:"d/m/Y " }}</span>
                         {% else %}
                             <span><strong>Última Inspección:</strong> Sin registro</span>
                         {% endif %}
                         {% if user.is_superuser %}
+                            <!-- Botón para editar la fecha de inspección -->
+                            <button class="btn btn-secondary btn-sm" onclick="toggleFechaForm({{ item.vehiculo.id }})">Editar Fecha</button>
+
+                            <!-- Formulario para seleccionar nueva fecha -->
+                            <form method="POST" action="{% url 'editar_fecha_inspeccion' item.vehiculo.id %}" class="form-fecha-inspeccion mt-2" id="formFecha{{ item.vehiculo.id }}" style="display: none;">
+                                {% csrf_token %}
+                                <input type="date" name="fecha_inspeccion" class="form-control" required>
+                                <button type="submit" class="btn btn-success btn-sm mt-2">Confirmar</button>
+                            </form>
+
+                            <!-- Botón para borrar el vehículo -->
                             <a href="{% url 'borrar_vehiculo' item.vehiculo.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este vehículo?');">Borrar</a>
                         {% endif %}
                     </div>
@@ -148,44 +159,10 @@
     </div>
 </div>
 
-<!-- Script de autocompletado -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const empresaInput = document.getElementById('empresa_autocomplete');
-        const autocompleteResults = document.getElementById('autocomplete-results');
-        const empresas = {{ empresas_json|safe }};  // Empresas cargadas desde el servidor en formato JSON
-
-        empresaInput.addEventListener('input', function() {
-            const input = this.value.toLowerCase();
-            let filteredEmpresas = empresas.filter(empresa => empresa.toLowerCase().includes(input));
-
-            autocompleteResults.innerHTML = '';  // Limpiar los resultados anteriores
-            if (filteredEmpresas.length > 0) {
-                filteredEmpresas.forEach(function(empresa) {
-                    const suggestionItem = document.createElement('div');
-                    suggestionItem.classList.add('dropdown-item');
-                    suggestionItem.textContent = empresa;
-
-                    // Hacer clic en una sugerencia para autocompletar
-                    suggestionItem.addEventListener('click', function() {
-                        empresaInput.value = empresa;
-                        autocompleteResults.innerHTML = '';  // Limpiar las sugerencias después de seleccionar
-                    });
-
-                    autocompleteResults.appendChild(suggestionItem);
-                });
-                autocompleteResults.classList.add('show');
-            } else {
-                autocompleteResults.classList.remove('show');
-            }
-        });
-
-        // Cerrar la lista si el usuario hace clic fuera de las sugerencias
-        document.addEventListener('click', function(event) {
-            if (!empresaInput.contains(event.target) && !autocompleteResults.contains(event.target)) {
-                autocompleteResults.classList.remove('show');
-            }
-        });
-    });
+    function toggleFechaForm(vehiculoId) {
+        var form = document.getElementById('formFecha' + vehiculoId);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
 </script>
 {% endblock %}

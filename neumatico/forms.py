@@ -5,7 +5,7 @@ from .models import Neumatico, MedidaNeumatico
 class NeumaticoForm(forms.ModelForm):
     class Meta:
         model = Neumatico
-        fields = ['modelo', 'marca', 'medida', 'presion', 'huella', 'dot', 'averias', 'diseño', 'renovable']
+        fields = ['modelo', 'marca', 'medida', 'presion', 'huella', 'dot', 'averias', 'diseño', 'renovable', 'fecha_inspeccion']
         widgets = {
             'modelo': forms.Select(attrs={'class': 'form-control'}),
             'marca': forms.TextInput(attrs={'class': 'form-control'}),
@@ -16,6 +16,7 @@ class NeumaticoForm(forms.ModelForm):
             'averias': forms.CheckboxSelectMultiple(),
             'diseño': forms.TextInput(attrs={'class': 'form-control'}),
             'renovable': forms.CheckboxInput(),
+            'fecha_inspeccion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -23,6 +24,7 @@ class NeumaticoForm(forms.ModelForm):
         self.fields['averias'].required = False
         self.fields['renovable'].initial = False
         self.fields['dot'].required = True
+        self.fields['fecha_inspeccion'].required = False  # No es obligatorio seleccionar una fecha
 
     def clean(self):
         cleaned_data = super().clean()
