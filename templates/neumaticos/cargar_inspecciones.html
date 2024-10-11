@@ -49,6 +49,7 @@
                     <th>Avería</th>
                     <th>Modelo</th>
                     <th>Renovable</th>
+                    <th>Fecha Inspección</th> <!-- Nueva columna para la fecha -->
                 </tr>
             </thead>
             <tbody>
@@ -68,9 +69,9 @@
                             Sin averías
                         {% endfor %}
                     </td>
-                    
                     <td>{{ fila.modelo }}</td>
                     <td>{{ fila.renovable|yesno:"Sí,No" }}</td>
+                    <td>{{ fila.fecha_inspeccion }}</td> <!-- Mostrar la fecha de inspección -->
                 </tr>
                 {% endfor %}
             </tbody>

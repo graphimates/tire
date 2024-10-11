@@ -14,12 +14,12 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import ValidationError
 import json  # Asegúrate de importar json
+from django.utils import timezone
+from datetime import datetime
 
 # Función para verificar si el usuario es administrador
 def is_admin(user):
     return user.is_superuser
-
-
 
 
 # Vista para gestionar medidas
@@ -261,6 +261,18 @@ def historico_datos(request, user_id=None):
 
 # neumatico/views.py
 
+
+import csv
+import io
+from datetime import datetime
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render, get_object_or_404, redirect
+from vehiculos.models import Vehiculo
+from neumatico.models import Neumatico, MedidaNeumatico, HistorialInspeccion
+from usuarios.models import Usuario
+from averias.models import Averia
+
 @login_required
 @user_passes_test(is_admin)
 def cargar_inspecciones(request):
@@ -274,14 +286,22 @@ def cargar_inspecciones(request):
         inspecciones_agrupadas = {}
 
         for row in reader:
+            # Inicializamos las variables
+            cliente_email = row.get('cliente', '').strip()
+            placa = row.get('placa', '').strip()
+            posicion_str = row.get('posicion', '').strip()
+            medida_str = row.get('medida', '').strip()
+            dot = row.get('dot', '').strip()
+            presion_str = row.get('presion', '').strip()
+            huella_str = row.get('huella', '').strip()
+            modelo = row.get('modelo', '').strip().lower()
+            averias_str = row.get('averia', '').strip()
+            renovable = row.get('renovable', '').strip().lower() == 'true'
+
             # Flag to indicate if there was an error in this inspection
             hay_error_en_inspeccion = False
 
             # Validación y recolección de datos
-            cliente_email = row.get('cliente', '').strip()
-            placa = row.get('placa', '').strip()
-            posicion_str = row.get('posicion', '').strip()
-
             if not cliente_email:
                 errores.append('El campo "cliente" es obligatorio.')
                 hay_error_en_inspeccion = True
@@ -329,7 +349,7 @@ def cargar_inspecciones(request):
                 errores.append(f"La posición {posicion} está duplicada para el vehículo con placa {placa}.")
                 continue  # Skip processing this row
 
-            medida_str = row.get('medida', '').strip()
+            # Validar la medida
             if not medida_str:
                 errores.append(f"Falta la medida para un neumático en la posición {posicion} del vehículo con placa {placa}.")
                 continue  # Skip processing this row
@@ -340,15 +360,14 @@ def cargar_inspecciones(request):
                 errores.append(f"La medida {medida_str} no está registrada.")
                 continue  # Skip processing this row
 
-            # Validar otros campos
-            presion_str = row.get('presion', '').strip()
+            # Validar presión
             try:
                 presion = float(presion_str)
             except ValueError:
                 errores.append(f"La presión en la posición {posicion} del vehículo con placa {placa} no es un número válido.")
                 continue  # Skip processing this row
 
-            huella_str = row.get('huella', '').strip()
+            # Validar huella
             try:
                 huella = float(huella_str)
                 if huella < 0:
@@ -359,22 +378,18 @@ def cargar_inspecciones(request):
                 continue  # Skip processing this row
 
             # Validar campo 'dot' (no puede estar vacío)
-            dot = row.get('dot', '').strip()
             if not dot:
                 errores.append(f"El campo 'dot' es obligatorio para el neumático en posición {posicion} del vehículo con placa {placa}.")
                 continue  # Skip processing this row
 
             # Validar campo 'modelo' (debe ser una de las opciones válidas)
-            modelo = row.get('modelo', '').strip().lower()
             modelos_validos = ['direccional', 'traccion', 'all position']
             if modelo not in modelos_validos:
                 errores.append(f"El modelo '{modelo}' no es válido para el neumático en posición {posicion} del vehículo con placa {placa}. Opciones válidas: Direccional, Tracción, All Position.")
-                continue  # Skip processing this row
+                continue  # Skip processing este row
 
             # Validar y procesar las averías
-            averias_str = row.get('averia', '').strip()
             averias = []
-            invalid_averias = []
             if averias_str:
                 averia_codigos = [codigo.strip() for codigo in averias_str.split(',')]
                 for codigo in averia_codigos:
@@ -382,19 +397,27 @@ def cargar_inspecciones(request):
                         averia = Averia.objects.get(codigo=codigo)
                         averias.append(averia)
                     except Averia.DoesNotExist:
-                        errores.append(f"La avería con código {codigo} no está registrada para el neumático en posición {posicion} del vehículo con placa {placa}.")
-                        invalid_averias.append(codigo)
-                # Si todas las averías son inválidas, puedes decidir si quieres continuar o no
-                # En este caso, continuamos con las averías válidas
+                        errores.append(f"La avería con código {codigo} no está registrada.")
+                # Continuamos con las averías válidas
 
             # Validar 'renovable' según las averías válidas
-            renovable = row.get('renovable', '').strip().lower() == 'true'
             if averias:
                 if any(averia.estado == 'no_operativo' for averia in averias) and renovable:
                     errores.append(f"El neumático en posición {posicion} del vehículo con placa {placa} no puede ser renovable si tiene una avería 'No operativo'.")
-                    # No marcamos hay_error_en_inspeccion como True para continuar procesando
+                    renovable = False
 
-            # Recolectar datos
+            # Fecha de inspección
+            fecha_inspeccion_str = row.get('fecha', '').strip()
+            if fecha_inspeccion_str:
+                try:
+                    fecha_inspeccion = datetime.strptime(fecha_inspeccion_str, '%d/%m/%Y')
+                except ValueError:
+                    errores.append(f"La fecha '{fecha_inspeccion_str}' no tiene un formato válido (se espera dd/mm/yyyy).")
+                    continue
+            else:
+                fecha_inspeccion = timezone.now()
+
+            # Recolectar los datos para inspecciones pendientes
             inspeccion = {
                 'cliente': cliente_email,
                 'placa': placa,
@@ -405,13 +428,14 @@ def cargar_inspecciones(request):
                 'dot': dot,
                 'presion': presion,
                 'huella': huella,
-                'averias': [averia.codigo for averia in averias],  # Guardamos los códigos de avería válidos
+                'averias': [averia.codigo for averia in averias],  # Averías válidas
                 'renovable': renovable,
                 'modelo': modelo,
+                'fecha_inspeccion': fecha_inspeccion.strftime('%d/%m/%Y'),  # Convertimos la fecha a string
             }
             inspecciones_pendientes.append(inspeccion)
 
-            # Agrupar para la previsualización
+            # Agrupar para previsualización
             key = (cliente_email, placa)
             if key not in inspecciones_agrupadas:
                 inspecciones_agrupadas[key] = []
@@ -428,9 +452,9 @@ def cargar_inspecciones(request):
     return render(request, 'neumaticos/cargar_inspecciones.html')
 
 
-
-
 # neumatico/views.py
+
+from datetime import datetime
 
 @login_required
 @user_passes_test(is_admin)
@@ -449,13 +473,13 @@ def confirmar_inspecciones(request):
                 vehiculo = Vehiculo.objects.get(placa=placa, usuario=cliente)
             except (Usuario.DoesNotExist, Vehiculo.DoesNotExist):
                 errores.append(f"Cliente o vehículo no encontrado: Cliente {cliente_email}, Placa {placa}.")
-                continue  # Skip processing this inspection
+                continue  # Saltar esta inspección
 
             try:
                 medida = MedidaNeumatico.objects.get(medida=inspeccion['medida'])
             except MedidaNeumatico.DoesNotExist:
                 errores.append(f"La medida {inspeccion['medida']} no está registrada.")
-                continue  # Skip processing this inspection
+                continue  # Saltar esta inspección
 
             # Procesar averías
             averias_codigos = inspeccion.get('averias', [])
@@ -467,7 +491,7 @@ def confirmar_inspecciones(request):
                         averias.append(averia)
                     except Averia.DoesNotExist:
                         errores.append(f"La avería con código {codigo} no está registrada para el neumático en posición {inspeccion['posicion']} del vehículo con placa {inspeccion['placa']}.")
-                # Continuamos con las averías válidas
+                # Continuar con las averías válidas
 
             renovable = inspeccion['renovable']
 
@@ -475,7 +499,16 @@ def confirmar_inspecciones(request):
             if averias:
                 if any(averia.estado == 'no_operativo' for averia in averias) and renovable:
                     errores.append(f"El neumático en posición {posicion} del vehículo con placa {placa} no puede ser renovable si tiene una avería 'No operativo'.")
-                    # No marcamos hay_error_en_inspeccion como True para continuar procesando
+                    renovable = False
+
+            # Convertir la fecha al formato correcto
+            fecha_inspeccion_str = inspeccion['fecha_inspeccion']
+            try:
+                # Convertir la fecha de DD/MM/YYYY a YYYY-MM-DD
+                fecha_inspeccion = datetime.strptime(fecha_inspeccion_str, '%d/%m/%Y').date()
+            except ValueError:
+                errores.append(f"La fecha '{fecha_inspeccion_str}' no tiene un formato válido (se espera DD/MM/YYYY).")
+                continue  # Saltar esta inspección si la fecha no es válida
 
             # Procesar el neumático
             try:
@@ -505,7 +538,7 @@ def confirmar_inspecciones(request):
                 neumatico.huella = inspeccion['huella']
                 neumatico.medida = medida
                 neumatico.renovable = renovable
-                neumatico.fecha_inspeccion = timezone.now()
+                neumatico.fecha_inspeccion = fecha_inspeccion  # Asignar la fecha correctamente formateada
                 neumatico.save()
                 # Actualizar averías
                 neumatico.averias.set(averias)
@@ -523,13 +556,13 @@ def confirmar_inspecciones(request):
                     huella=inspeccion['huella'],
                     medida=medida,
                     renovable=renovable,
-                    fecha_inspeccion=timezone.now(),
+                    fecha_inspeccion=fecha_inspeccion,  # Asignar la fecha correctamente formateada
                 )
                 neumatico.averias.set(averias)
                 neumatico.save()
 
             # Actualizar la última inspección del vehículo
-            vehiculo.ultima_inspeccion = timezone.now()
+            vehiculo.ultima_inspeccion = fecha_inspeccion
             vehiculo.save()
 
         if errores:
@@ -541,6 +574,9 @@ def confirmar_inspecciones(request):
         return redirect('reporte_vehiculos')
 
     return redirect('cargar_inspecciones')
+
+
+
 
 
 
