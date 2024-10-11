@@ -13,10 +13,21 @@
     <form method="GET" class="mb-4">
         <div class="row">
             <!-- Filtro de búsqueda por empresa con autocompletado -->
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label for="search_empresa">Buscar por empresa:</label>
                 <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Ingrese el nombre de la empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
                 <div class="dropdown-menu" id="autocomplete-results" style="max-width: 100%;"></div>
+            </div>
+
+            <!-- Filtro por criticidad -->
+            <div class="col-md-4">
+                <label for="criticidad">Filtrar por criticidad:</label>
+                <select id="criticidad" name="criticidad" class="form-control">
+                    <option value="">Todas</option>
+                    <option value="bajo" {% if request.GET.criticidad == 'bajo' %}selected{% endif %}>Bajo</option>
+                    <option value="moderado" {% if request.GET.criticidad == 'moderado' %}selected{% endif %}>Moderado</option>
+                    <option value="alto" {% if request.GET.criticidad == 'alto' %}selected{% endif %}>Alto</option>
+                </select>
             </div>
 
             <!-- Filtro de orden por fecha de inspección -->
@@ -75,15 +86,14 @@
                                         <thead>
                                             <tr>
                                                 <th>Posición</th>
-                                                <th>Modelo</th>
-                                                <th>Marca</th>
                                                 <th>Medida</th>
+                                                <th>Marca</th>
+                                                <th>Diseño</th>
+                                                <th>Modelo</th>
+                                                <th>DOT</th>
                                                 <th>Presión</th>
                                                 <th>Huella</th>
-                                                <th>DOT</th>
                                                 <th>Averías</th>
-                                                <th>Diseño</th>
-                                                <th>Renovable</th>
                                                 {% if user.is_superuser %}
                                                 <th>Acción</th>
                                                 {% endif %}
@@ -96,12 +106,13 @@
                                                 <td>{{ posicion }}</td>
                                                 {% if item.neumaticos_por_posicion|get_item:posicion %}
                                                 {% with neumatico=item.neumaticos_por_posicion|get_item:posicion %}
-                                                <td>{{ neumatico.modelo|default_if_none:"" }}</td>
-                                                <td>{{ neumatico.marca|default_if_none:"" }}</td>
                                                 <td>{{ neumatico.medida.medida|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.marca|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.diseño|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.modelo|default_if_none:"" }}</td>
+                                                <td>{{ neumatico.dot|default_if_none:"" }}</td>
                                                 <td>{{ neumatico.presion|default_if_none:"0.0" }}</td>
                                                 <td>{{ neumatico.huella|default_if_none:"0.0" }}</td>
-                                                <td>{{ neumatico.dot|default_if_none:"" }}</td>
                                                 <td>
                                                     {% for averia in neumatico.averias.all %}
                                                         {{ averia.nombre }}
@@ -109,7 +120,6 @@
                                                         Sin averías
                                                     {% endfor %}
                                                 </td>
-                                                <td>{{ neumatico.diseño|default_if_none:"" }}</td>
                                                 <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>
                                                 {% if user.is_superuser %}
                                                 <td>

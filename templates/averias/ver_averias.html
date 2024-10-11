@@ -16,7 +16,8 @@
                     <th scope="col">Código</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Servicio Requerido</th>
-                    <th scope="col">Estado</th> <!-- Nueva columna para el estado -->
+                    <th scope="col">Estado</th> <!-- Columna para el estado -->
+                    <th scope="col">Criticidad</th> <!-- Nueva columna para la criticidad -->
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
@@ -28,6 +29,7 @@
                     <td>{{ averia.nombre }}</td>
                     <td>{{ averia.get_servicio_requerido_display }}</td>
                     <td>{{ averia.get_estado_display }}</td> <!-- Mostrar el estado -->
+                    <td>{{ averia.get_criticidad_display }}</td> <!-- Mostrar la criticidad -->
                     <td>
                         <a href="{% url 'editar_averia' averia.id %}" class="btn btn-warning btn-sm">Editar</a>
                         <a href="{% url 'eliminar_averia' averia.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro que deseas eliminar esta avería?');">Eliminar</a>

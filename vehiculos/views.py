@@ -54,14 +54,17 @@ def reporte_vehiculos(request):
     # Filtrar por empresa
     search_empresa = request.GET.get('search_empresa', '')
     order_by = request.GET.get('order_by', 'desc')
+    criticidad = request.GET.get('criticidad', '')
 
     if request.user.is_superuser:
-        # Obtener todas las empresas y pasarlas al template para el autocompletar
         empresas = Usuario.objects.values_list('empresa', flat=True).distinct()
         vehiculos = Vehiculo.objects.all()
 
         if search_empresa:
             vehiculos = vehiculos.filter(usuario__empresa__icontains=search_empresa)
+
+        if criticidad:
+            vehiculos = vehiculos.filter(neumaticos__averias__criticidad=criticidad).distinct()
 
     else:
         vehiculos = Vehiculo.objects.filter(usuario=request.user)
@@ -87,9 +90,8 @@ def reporte_vehiculos(request):
 
     return render(request, 'vehiculos/reporte_vehiculos.html', {
         'vehiculos_con_neumaticos': vehiculos_con_neumaticos,
-        'empresas_json': json.dumps(list(empresas)),  # Pasar las empresas como JSON para autocompletar
+        'empresas_json': json.dumps(list(empresas)),
     })
-
 
 @never_cache
 @login_required

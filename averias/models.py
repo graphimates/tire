@@ -16,10 +16,17 @@ class Averia(models.Model):
         ('rotacion', 'Rotación'),
     ]
 
+    CRITICIDAD_OPCIONES = [
+        ('bajo', 'Bajo'),
+        ('moderado', 'Moderado'),
+        ('alto', 'Alto'),
+    ]
+
     nombre = models.CharField(max_length=100)
     codigo = models.CharField(max_length=10, unique=True)
     servicio_requerido = models.CharField(max_length=20, choices=SERVICIOS_REPARACION)
-    estado = models.CharField(max_length=20, choices=ESTADO_OPCIONES, default='no_operativo')  # Cambia el valor por defecto
+    estado = models.CharField(max_length=20, choices=ESTADO_OPCIONES, default='no_operativo')
+    criticidad = models.CharField(max_length=20, choices=CRITICIDAD_OPCIONES, default='bajo')  # Nuevo campo
 
     def __str__(self):
         return f"{self.nombre} ({self.codigo}) - {self.get_servicio_requerido_display()}"
