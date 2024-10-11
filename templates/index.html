@@ -152,58 +152,13 @@
         </div>
     </div>
 
-    <!-- Tabla de neumáticos no operativos -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <h4 class="text-danger">Neumáticos No Operativos</h4>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead class=" text-primary">
-                        <tr>
-                            <th>Vehículo</th>
-                            <th>Posición</th>
-                            <th>Marca</th>
-                            <th>Huella</th>
-                            <th>Presión</th>
-                            <th>Averías</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for neumatico in neumaticos_no_operativos %}
-                        <tr>
-                            <td>{{ neumatico.vehiculo.placa }}</td>
-                            <td>{{ neumatico.posicion }}</td>
-                            <td>{{ neumatico.marca }}</td>
-                            <td>{{ neumatico.huella }}</td>
-                            <td>{{ neumatico.presion }}</td>
-                            <td>
-                                {% if neumatico.averias.exists %}
-                                    {% for averia in neumatico.averias.all %}
-                                        {{ averia.codigo }}{% if not forloop.last %}, {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    Sin averías
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6">No hay neumáticos no operativos.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- Tabla de requerimientos de servicio -->
     <div class="card mt-4">
         <div class="card-body">
             <h4 class="text-secondary">Requerimiento de Servicios por Vehículos</h4>
             <div class="table-responsive">
                 <table class="table">
-                    <thead class=" text-primary">
+                    <thead class="text-primary">
                         <tr>
                             <th>Alineación</th>
                             <th>Balanceo</th>
@@ -214,61 +169,93 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{{ servicios_por_vehiculo.alineacion }}</td>
-                            <td>{{ servicios_por_vehiculo.balanceo }}</td>
-                            <td>{{ servicios_por_vehiculo.rotacion }}</td>
-                            <td>{{ servicios_por_vehiculo.montura }}</td>
-                            <td>{{ servicios_por_vehiculo.calibracion }}</td>
+                            <!-- Alineación -->
+                            <td>
+                                {{ servicios_por_vehiculo.alineacion|length }}
+                                <span class="toggle-arrow" onclick="togglePlacas('alineacion')">&#9662;</span>
+                                <div id="placas-alineacion" class="placas-list" style="display: none;">
+                                    {% for placa in servicios_por_vehiculo.alineacion %}
+                                        <div>Placa: {{ placa }}</div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Balanceo -->
+                            <td>
+                                {{ servicios_por_vehiculo.balanceo|length }}
+                                <span class="toggle-arrow" onclick="togglePlacas('balanceo')">&#9662;</span>
+                                <div id="placas-balanceo" class="placas-list" style="display: none;">
+                                    {% for placa in servicios_por_vehiculo.balanceo %}
+                                        <div>Placa: {{ placa }}</div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Rotación -->
+                            <td>
+                                {{ servicios_por_vehiculo.rotacion|length }}
+                                <span class="toggle-arrow" onclick="togglePlacas('rotacion')">&#9662;</span>
+                                <div id="placas-rotacion" class="placas-list" style="display: none;">
+                                    {% for placa in servicios_por_vehiculo.rotacion %}
+                                        <div>Placa: {{ placa }}</div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Montura -->
+                            <td>
+                                {{ servicios_por_vehiculo.montura|length }}
+                                <span class="toggle-arrow" onclick="togglePlacas('montura')">&#9662;</span>
+                                <div id="placas-montura" class="placas-list" style="display: none;">
+                                    {% for placa in servicios_por_vehiculo.montura %}
+                                        <div>Placa: {{ placa }}</div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Calibración -->
+                            <td>
+                                {{ servicios_por_vehiculo.calibracion|length }}
+                                <span class="toggle-arrow" onclick="togglePlacas('calibracion')">&#9662;</span>
+                                <div id="placas-calibracion" class="placas-list" style="display: none;">
+                                    {% for placa in servicios_por_vehiculo.calibracion %}
+                                        <div>Placa: {{ placa }}</div>
+                                    {% endfor %}
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
     {% else %}
     <p class="text-muted">No se han encontrado usuarios o no hay datos disponibles para mostrar.</p>
     {% endif %}
 </div>
+<style>
+    .toggle-arrow {
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 5px;
+    }
 
-<!-- Agregar el script de autocompletar -->
+    .placas-list {
+        margin-top: 5px;
+        background-color: #f5b7b1;
+        padding: 5px;
+        border-radius: 5px;
+        color: #333;
+    }
+
+    .placas-list div {
+        font-size: 12px;
+        padding: 2px 0;
+    }
+</style>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const empresaInput = document.getElementById('empresa_autocomplete');
-        const autocompleteResults = document.getElementById('autocomplete-results');
-        const empresas = {% autoescape off %}{{ empresas_json|safe }}{% endautoescape %};
-
-        empresaInput.addEventListener('input', function() {
-            const input = this.value.toLowerCase();
-            let filteredEmpresas = empresas.filter(empresa => empresa.toLowerCase().includes(input));
-
-            autocompleteResults.innerHTML = '';  // Limpiar los resultados anteriores
-            if (filteredEmpresas.length > 0) {
-                filteredEmpresas.forEach(function(empresa) {
-                    const suggestionItem = document.createElement('div');
-                    suggestionItem.classList.add('dropdown-item');
-                    suggestionItem.textContent = empresa;
-
-                    // Hacer clic en una sugerencia para autocompletar
-                    suggestionItem.addEventListener('click', function() {
-                        empresaInput.value = empresa;
-                        autocompleteResults.innerHTML = '';  // Limpiar las sugerencias después de seleccionar
-                    });
-
-                    autocompleteResults.appendChild(suggestionItem);
-                });
-                autocompleteResults.classList.add('show');
-            } else {
-                autpython manage.py runserver 0.0.0.0:8080
-                ocompleteResults.classList.remove('show');
-            }
-        });
-
-        // Cerrar la lista si el usuario hace clic fuera de las sugerencias
-        document.addEventListener('click', function(event) {
-            if (!empresaInput.contains(event.target) && !autocompleteResults.contains(event.target)) {
-                autocompleteResults.classList.remove('show');
-            }
-        });
-    });
+    function togglePlacas(servicio) {
+        var placasDiv = document.getElementById('placas-' + servicio);
+        var isVisible = placasDiv.style.display === 'block';
+        placasDiv.style.display = isVisible ? 'none' : 'block';
+    }
 </script>
 {% endblock %}

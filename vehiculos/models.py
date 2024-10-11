@@ -3,7 +3,7 @@ from usuarios.models import Usuario
 
 class Vehiculo(models.Model):
     TIPOS_VEHICULOS = [
-        ('2x2', 'Vehículo 2x2'),
+        ('4x2LT', 'Vehículo 4x2LT'),
         ('4x2', 'Vehículo 4x2'),
         ('4x2L', 'Vehículo 4x2L'),
         ('6x2', 'Vehículo 6x2'),
@@ -27,7 +27,7 @@ class Vehiculo(models.Model):
     def cantidad_neumaticos(self):
         # Definir la cantidad de neumáticos según el tipo de vehículo
         cantidad_por_tipo = {
-            '2x2': 4,
+            '4x2LT': 4,
             '4x2': 6,
             '4x2L': 6,
             '6x2': 10,

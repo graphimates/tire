@@ -7,8 +7,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from averias.models import Averia
 import json
-from django.http import JsonResponse
-from django.db.models import Q
 
 # Vista para el login
 def login_view(request):
@@ -80,13 +78,13 @@ def index(request):
     neumaticos_operativos = []
     neumaticos_no_operativos = []
 
-    # Inicializar el contador de servicios
+    # Inicializar el contador de servicios por vehículo
     servicios_por_vehiculo = {
-        'alineacion': 0,
-        'balanceo': 0,
-        'rotacion': 0,
-        'montura': 0,
-        'calibracion': 0,
+        'alineacion': set(),  # Usaremos sets para evitar contar el mismo vehículo varias veces
+        'balanceo': set(),
+        'rotacion': set(),
+        'montura': set(),
+        'calibracion': set(),
     }
 
     # Recorrer todos los neumáticos seleccionados
@@ -96,10 +94,10 @@ def index(request):
         # Verificar si tiene una avería de estado 'no_operativo'
         tiene_averia_no_operativo = neumatico.averias.filter(estado='no_operativo').exists()
 
-        # Sumar cada servicio requerido por las averías
+        # Sumar cada servicio requerido por las averías a nivel de vehículo
         for averia in neumatico.averias.all():
             if averia.servicio_requerido in servicios_por_vehiculo:
-                servicios_por_vehiculo[averia.servicio_requerido] += 1
+                servicios_por_vehiculo[averia.servicio_requerido].add(neumatico.vehiculo.placa)
 
         if not tiene_averia_no_operativo and neumatico.huella > 0:
             # Es operativo
@@ -117,6 +115,9 @@ def index(request):
             # Es no operativo si tiene una avería no operativa o huella = 0
             no_operativos_count += 1
             neumaticos_no_operativos.append(neumatico)
+
+    # Convertir los sets de placas a su cantidad de vehículos únicos
+    servicios_contados = {servicio: len(placas) for servicio, placas in servicios_por_vehiculo.items()}
 
     # Obtener todas las empresas para el autocompletado y la lista desplegable (solo para superusuarios)
     empresas = Usuario.objects.values_list('empresa', flat=True).distinct().exclude(is_superuser=True) if request.user.is_superuser else []
@@ -141,6 +142,8 @@ def index(request):
     }
 
     return render(request, 'index.html', context)
+
+
 
 # Vista para usuarios normales (user_dashboard)
 @login_required

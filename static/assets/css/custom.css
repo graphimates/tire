@@ -473,3 +473,22 @@ input {
     display: block !important;
   }
 
+  
+  .toggle-arrow {
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+.placas-list {
+    margin-top: 5px;
+    background-color: #f5b7b1;
+    padding: 5px;
+    border-radius: 5px;
+    color: #333;
+}
+
+.placas-list div {
+    font-size: 12px;
+    padding: 2px 0;
+}

@@ -1,21 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Neumatico, HistorialInspeccion, MedidaNeumatico
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import ValidationError
+from django.template.loader import render_to_string
+from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
+from datetime import datetime
+import csv
+import io
+import json  # Asegúrate de importar json
+from collections import Counter
+import copy
+from .models import Neumatico, MedidaNeumatico, HistorialInspeccion
 from vehiculos.models import Vehiculo
 from usuarios.models import Usuario
 from averias.models import Averia
 from .forms import NeumaticoForm, MedidaForm
-from django.utils import timezone
-from collections import Counter
-from django.contrib.auth.decorators import login_required, user_passes_test
-import csv
-import io
-import copy
-from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse
-from django.core.exceptions import ValidationError
-import json  # Asegúrate de importar json
-from django.utils import timezone
-from datetime import datetime
+
 
 # Función para verificar si el usuario es administrador
 def is_admin(user):
@@ -83,13 +83,6 @@ def eliminar_medida(request, medida_id):
 
 # neumatico/views.py (modificada)
 
-
-
-
-
-
-# vehiculos/views.py
-
 @login_required
 @user_passes_test(is_admin)
 def editar_neumatico(request, vehiculo_id, posicion):
@@ -104,7 +97,7 @@ def editar_neumatico(request, vehiculo_id, posicion):
         if form.is_valid():
             try:
                 # Guardar el historial solo si el neumático ya tiene una fecha de inspección anterior
-                if neumatico.fecha_inspeccion:
+                if old_neumatico.fecha_inspeccion:
                     HistorialInspeccion.objects.create(
                         vehiculo=vehiculo,
                         posicion=old_neumatico.posicion,
@@ -141,9 +134,6 @@ def editar_neumatico(request, vehiculo_id, posicion):
         form = NeumaticoForm(instance=neumatico)
 
     return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico})
-
-
-
 
 
 # Vista para ver neumáticos
@@ -201,8 +191,25 @@ def ver_neumaticos(request):
     })
 
 
+from django.db.models import Count
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 @login_required
 def historico_datos(request, user_id=None):
+    from datetime import timedelta
+
+    # Función auxiliar corregida
+    def obtener_indice_mes(fecha):
+        """Función para obtener el índice del mes basado en la fecha de inspección.
+        Considera los últimos 6 meses desde la fecha actual."""
+        if fecha:
+            hoy = timezone.now().date()
+            delta_meses = (hoy.year - fecha.year) * 12 + (hoy.month - fecha.month)
+            # Aceptar solo los últimos 6 meses
+            if 0 <= delta_meses < 6:
+                return 5 - delta_meses
+        return None
+
     # Obtener el usuario seleccionado o el actual
     selected_user_id = request.GET.get('usuario_id', user_id)
     if request.user.is_superuser:
@@ -210,37 +217,72 @@ def historico_datos(request, user_id=None):
     else:
         selected_user = request.user
 
-    # Obtener todos los neumáticos del usuario seleccionado (incluyendo los de la última inspección)
-    neumaticos = Neumatico.objects.filter(vehiculo__usuario=selected_user)
-    
-    # Inicializar un contador de averías
-    averias_counter = Counter()
+    # Obtener los neumáticos actuales y el historial de inspecciones del usuario seleccionado
+    neumaticos_actuales = Neumatico.objects.filter(vehiculo__usuario=selected_user)
+    historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=selected_user)
 
-    # Recorrer los neumáticos y contar las averías de la última inspección
-    for neumatico in neumaticos:
+    # Inicializar los contadores para los neumáticos
+    operativos_data = 0
+    renovables_data = 0
+    desperdicio_data = 0
+
+    # Preparar datos para la nueva gráfica (últimos 6 meses)
+    hoy = timezone.now().date()
+    meses_labels = [(hoy - timedelta(days=30*i)).strftime('%B') for i in range(6)][::-1]  # Últimos 6 meses
+    operativos_mes = [0] * 6
+    renovables_mes = [0] * 6
+    desperdicio_mes = [0] * 6
+
+    # Contar los neumáticos actuales por su estado y mes de inspección
+    for neumatico in neumaticos_actuales:
+        indice_mes = obtener_indice_mes(neumatico.fecha_inspeccion)
+        if indice_mes is not None:
+            if neumatico.renovable:
+                renovables_data += 1
+                renovables_mes[indice_mes] += 1
+            elif neumatico.averias.filter(estado='no_operativo').exists():
+                desperdicio_data += 1
+                desperdicio_mes[indice_mes] += 1
+            else:
+                operativos_data += 1
+                operativos_mes[indice_mes] += 1
+
+    # Contar los neumáticos en el historial por su estado y mes
+    for inspeccion in historial_inspecciones:
+        indice_mes = obtener_indice_mes(inspeccion.fecha_inspeccion)
+        if indice_mes is not None:
+            if inspeccion.renovable:
+                renovables_data += 1
+                renovables_mes[indice_mes] += 1
+            elif inspeccion.averia and inspeccion.averia.estado == 'no_operativo':
+                desperdicio_data += 1
+                desperdicio_mes[indice_mes] += 1
+            else:
+                operativos_data += 1
+                operativos_mes[indice_mes] += 1
+
+    # Etiquetas para la gráfica
+    cauchos_labels = ['Operativos', 'Renovables', 'Desperdicio']
+
+    # Datos de la gráfica
+    datos_grafica = [operativos_data, renovables_data, desperdicio_data]
+
+    # Preparar los datos de averías para la otra gráfica
+    averias_counter = Counter()
+    for neumatico in neumaticos_actuales:
         for averia in neumatico.averias.all():
             averias_counter[averia.nombre] += 1
-    
-    # Recorrer el historial de inspecciones y contar las averías
-    historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=selected_user)
     for inspeccion in historial_inspecciones:
         if inspeccion.averia:
             averias_counter[inspeccion.averia.nombre] += 1
-    
-    # Obtener las averías más frecuentes y ordenarlas de mayor a menor
+
     averias_ordenadas = sorted(averias_counter.items(), key=lambda x: x[1], reverse=True)
-
-    # Preparar los datos para la gráfica
-    labels = [item[0] for item in averias_ordenadas]  # Nombres de las averías
-    data_barras = [item[1] for item in averias_ordenadas]  # Frecuencias de las averías
-
-    # Calcular el total de averías
+    labels = [item[0] for item in averias_ordenadas]
+    data_barras = [item[1] for item in averias_ordenadas]
     total_averias = sum(data_barras)
-
-    # Convertir a porcentaje
     data_barras_porcentaje = [(cantidad / total_averias) * 100 for cantidad in data_barras]
 
-    # Calcular el porcentaje acumulativo para la línea
+    # Porcentaje acumulado de averías
     porcentaje_acumulado = []
     suma_acumulada = 0
     for cantidad in data_barras:
@@ -249,37 +291,49 @@ def historico_datos(request, user_id=None):
 
     context = {
         'labels': labels,
-        'data_barras': data_barras_porcentaje,  # Enviar los porcentajes en lugar de los valores absolutos
+        'data_barras': data_barras_porcentaje,
         'porcentaje_acumulado': porcentaje_acumulado,
         'usuarios': Usuario.objects.all(),
         'selected_user': selected_user,
-        'averias_counter': dict(averias_counter)  # Convertir el Counter a un diccionario para pasarlo al template
+        'averias_counter': dict(averias_counter),
+        'operativos_data': operativos_data,
+        'renovables_data': renovables_data,
+        'desperdicio_data': desperdicio_data,
+        'cauchos_labels': cauchos_labels,
+        'datos_grafica': datos_grafica,
+        'meses_labels': meses_labels,
+        'operativos_mes': operativos_mes,
+        'renovables_mes': renovables_mes,
+        'desperdicio_mes': desperdicio_mes,
     }
-    
+
     return render(request, 'neumaticos/historico_datos.html', context)
+
 
 
 # neumatico/views.py
 
 
-import csv
-import io
-from datetime import datetime
-from django.utils import timezone
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, get_object_or_404, redirect
-from vehiculos.models import Vehiculo
-from neumatico.models import Neumatico, MedidaNeumatico, HistorialInspeccion
-from usuarios.models import Usuario
-from averias.models import Averia
+def is_admin(user):
+    return user.is_superuser
 
 @login_required
 @user_passes_test(is_admin)
 def cargar_inspecciones(request):
     if request.method == 'POST' and request.FILES.get('csv_file'):
         csv_file = request.FILES['csv_file']
-        decoded_file = csv_file.read().decode('utf-8-sig')
-        reader = csv.DictReader(io.StringIO(decoded_file), delimiter=';')
+
+        # Verificar que el archivo es un CSV
+        if not csv_file.name.endswith('.csv'):
+            context = {'errores': ['Por favor, suba un archivo CSV válido.']}
+            return render(request, 'neumaticos/cargar_inspecciones.html', context)
+
+        try:
+            decoded_file = csv_file.read().decode('utf-8-sig')
+            reader = csv.DictReader(io.StringIO(decoded_file), delimiter=';')
+        except Exception as e:
+            context = {'errores': [f'Error al procesar el archivo CSV: {str(e)}']}
+            return render(request, 'neumaticos/cargar_inspecciones.html', context)
 
         errores = []
         inspecciones_pendientes = []
@@ -298,7 +352,7 @@ def cargar_inspecciones(request):
             averias_str = row.get('averia', '').strip()
             renovable = row.get('renovable', '').strip().lower() == 'true'
 
-            # Flag to indicate if there was an error in this inspection
+            # Flag para identificar errores en la inspección
             hay_error_en_inspeccion = False
 
             # Validación y recolección de datos
@@ -323,7 +377,7 @@ def cargar_inspecciones(request):
                     hay_error_en_inspeccion = True
 
             if hay_error_en_inspeccion:
-                continue  # Skip processing this row
+                continue  # Saltar el procesamiento de esta fila
 
             cantidad_neumaticos = vehiculo.cantidad_neumaticos
 
@@ -341,52 +395,46 @@ def cargar_inspecciones(request):
                     hay_error_en_inspeccion = True
 
             if hay_error_en_inspeccion:
-                continue  # Skip processing this row
-
-            # Verificar duplicados en la misma posición y vehículo
-            key_duplicate = (cliente_email, placa, posicion)
-            if key_duplicate in [(ins['cliente'], ins['placa'], ins['posicion']) for ins in inspecciones_pendientes]:
-                errores.append(f"La posición {posicion} está duplicada para el vehículo con placa {placa}.")
-                continue  # Skip processing this row
+                continue  # Saltar el procesamiento de esta fila
 
             # Validar la medida
             if not medida_str:
                 errores.append(f"Falta la medida para un neumático en la posición {posicion} del vehículo con placa {placa}.")
-                continue  # Skip processing this row
+                continue
 
             try:
                 medida = MedidaNeumatico.objects.get(medida=medida_str)
             except MedidaNeumatico.DoesNotExist:
                 errores.append(f"La medida {medida_str} no está registrada.")
-                continue  # Skip processing this row
+                continue
 
             # Validar presión
             try:
                 presion = float(presion_str)
             except ValueError:
                 errores.append(f"La presión en la posición {posicion} del vehículo con placa {placa} no es un número válido.")
-                continue  # Skip processing this row
+                continue
 
             # Validar huella
             try:
                 huella = float(huella_str)
                 if huella < 0:
                     errores.append(f"La huella no puede ser menor a 0 en la posición {posicion} del vehículo con placa {placa}.")
-                    continue  # Skip processing this row
+                    continue
             except ValueError:
                 errores.append(f"La huella en la posición {posicion} del vehículo con placa {placa} no es un número válido.")
-                continue  # Skip processing this row
+                continue
 
             # Validar campo 'dot' (no puede estar vacío)
             if not dot:
                 errores.append(f"El campo 'dot' es obligatorio para el neumático en posición {posicion} del vehículo con placa {placa}.")
-                continue  # Skip processing this row
+                continue
 
-            # Validar campo 'modelo' (debe ser una de las opciones válidas)
+            # Validar campo 'modelo'
             modelos_validos = ['direccional', 'traccion', 'all position']
             if modelo not in modelos_validos:
                 errores.append(f"El modelo '{modelo}' no es válido para el neumático en posición {posicion} del vehículo con placa {placa}. Opciones válidas: Direccional, Tracción, All Position.")
-                continue  # Skip processing este row
+                continue
 
             # Validar y procesar las averías
             averias = []
@@ -431,7 +479,7 @@ def cargar_inspecciones(request):
                 'averias': [averia.codigo for averia in averias],  # Averías válidas
                 'renovable': renovable,
                 'modelo': modelo,
-                'fecha_inspeccion': fecha_inspeccion.strftime('%d/%m/%Y'),  # Convertimos la fecha a string
+                'fecha_inspeccion': fecha_inspeccion.strftime('%d/%m/%Y'),
             }
             inspecciones_pendientes.append(inspeccion)
 
@@ -454,7 +502,6 @@ def cargar_inspecciones(request):
 
 # neumatico/views.py
 
-from datetime import datetime
 
 @login_required
 @user_passes_test(is_admin)
@@ -574,9 +621,6 @@ def confirmar_inspecciones(request):
         return redirect('reporte_vehiculos')
 
     return redirect('cargar_inspecciones')
-
-
-
 
 
 

@@ -61,6 +61,12 @@
                         {% else %}
                             <span><strong>Última Inspección:</strong> Sin registro</span>
                         {% endif %}
+
+                        <!-- Verificación de averías para mostrar el ícono de advertencia -->
+                        {% if item.tiene_averias %}
+                            <span style="color: red;">&#x26A0; Avertencia: Tiene averías</span>
+                        {% endif %}
+
                         {% if user.is_superuser %}
                             <!-- Botón para editar la fecha de inspección -->
                             <button class="btn btn-secondary btn-sm" onclick="toggleFechaForm({{ item.vehiculo.id }})">Editar Fecha</button>

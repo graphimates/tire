@@ -78,20 +78,28 @@ def reporte_vehiculos(request):
 
     for vehiculo in vehiculos:
         neumaticos_por_posicion = {}
+        tiene_averias = False
+
         for i in range(1, vehiculo.cantidad_neumaticos + 1):
             neumatico = vehiculo.neumaticos.filter(posicion=i).first()
             neumaticos_por_posicion[i] = neumatico
-        
+
+            # Verificar si algún neumático tiene averías
+            if neumatico and neumatico.averias.exists():
+                tiene_averias = True
+
         vehiculos_con_neumaticos.append({
             'vehiculo': vehiculo,
             'neumaticos_por_posicion': neumaticos_por_posicion,
-            'rango_posiciones': range(1, vehiculo.cantidad_neumaticos + 1)
+            'rango_posiciones': range(1, vehiculo.cantidad_neumaticos + 1),
+            'tiene_averias': tiene_averias  # Añadir la variable tiene_averias
         })
 
     return render(request, 'vehiculos/reporte_vehiculos.html', {
         'vehiculos_con_neumaticos': vehiculos_con_neumaticos,
         'empresas_json': json.dumps(list(empresas)),
     })
+
 
 @never_cache
 @login_required

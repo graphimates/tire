@@ -3,18 +3,16 @@
 {% block title %}Histórico de Datos{% endblock %}
 
 {% block content %}
-<!-- Panel Header con el título -->
 <div class="panel-header panel-header-sm">
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
-                <h2 class="text-white mb-4" style="font-weight: 700;">Histórico de Averías</h2>
+                <h2 class="text-white mb-4" style="font-weight: 700;">Histórico de Averías y Estado de Cauchos</h2>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Contenido Principal -->
 <div class="content d-flex justify-content-center">
     <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 900px;">
 
@@ -40,6 +38,14 @@
             </div>
         </div>
 
+        <!-- Nueva Gráfica Relación de Cauchos (Tres barras por mes) -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4>Relación de cauchos operativos, renovables, desperdicio (Últimos 6 meses)</h4>
+                <canvas id="cauchosMesChart"></canvas>
+            </div>
+        </div>
+
         <!-- Conteo de Averías -->
         <h4 class="mt-5">Conteo de Averías</h4>
         <ul class="list-group">
@@ -56,13 +62,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('historicoChart').getContext('2d');
-
+    const ctx1 = document.getElementById('historicoChart').getContext('2d');
     const labels = {{ labels|safe }};
     const dataBarras = {{ data_barras|safe }};
     const dataLinea = {{ porcentaje_acumulado|safe }};
 
-    const chart = new Chart(ctx, {
+    const chart1 = new Chart(ctx1, {
         type: 'bar',
         data: {
             labels: labels,
@@ -100,9 +105,9 @@
                     ticks: {
                         beginAtZero: true,
                         callback: function(value) {
-                            return value + '%';  // Mostrar porcentaje en el eje Y izquierdo
+                            return value + '%';  
                         },
-                        max: 100  // Limitar el máximo a 100%
+                        max: 100  
                     },
                     title: {
                         display: true,
@@ -115,9 +120,9 @@
                     ticks: {
                         beginAtZero: true,
                         callback: function(value) {
-                            return value + '%';  // Mostrar porcentaje acumulado en el eje Y derecho
+                            return value + '%';  
                         },
-                        max: 100  // Limitar el máximo a 100%
+                        max: 100  
                     },
                     grid: {
                         drawOnChartArea: false
@@ -130,5 +135,51 @@
             }
         }
     });
+
+    // Nueva gráfica de relación de cauchos por mes
+    const ctx2 = document.getElementById('cauchosMesChart').getContext('2d');
+    const mesesLabels = {{ meses_labels|safe }};
+    const operativosMesData = {{ operativos_mes|safe }};
+    const renovablesMesData = {{ renovables_mes|safe }};
+    const desperdicioMesData = {{ desperdicio_mes|safe }};
+
+    const chart2 = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: mesesLabels,
+            datasets: [
+                {
+                    label: 'Operativos',
+                    data: operativosMesData,
+                    backgroundColor: '#2ecc71',
+                    borderColor: '#27ae60',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Renovables',
+                    data: renovablesMesData,
+                    backgroundColor: '#f1c40f',
+                    borderColor: '#f39c12',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Desperdicio',
+                    data: desperdicioMesData,
+                    backgroundColor: '#e74c3c',
+                    borderColor: '#c0392b',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 </script>
+
 {% endblock %}
