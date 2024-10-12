@@ -492,3 +492,134 @@ input {
     font-size: 12px;
     padding: 2px 0;
 }
+
+/* Estilo para todos los panel-header */
+.panel-header {
+  position: relative;
+  background-image: url('/media/panel/tire.jpg'); /* Ruta a la imagen */
+  background-size: cover;
+  background-position: center;
+  height: 100%; /* Asegura que el header cubra la altura */
+  z-index: 1;
+}
+
+/* Overlay oscuro para mejorar legibilidad */
+.panel-header::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Overlay semitransparente */
+  z-index: 1; /* El overlay debe estar encima del fondo */
+}
+
+/* Asegurarse de que el contenido esté encima del fondo y el overlay */
+.panel-header .container {
+  position: relative;
+  z-index: 2; /* Contenido encima de todo */
+}
+
+/* Estilo del título */
+.panel-header h2 {
+  z-index: 2;
+  position: relative;
+  color: white; /* Asegura que el texto sea visible */
+  font-weight: 700;
+}
+
+/* Estilo para todos los panel-header */
+.panel-header {
+  position: relative;
+  background-image: url('/media/panel/tire.jpg'); /* Ruta a la imagen */
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  z-index: 1;
+}
+
+.panel-header::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Overlay semitransparente */
+  z-index: 1;
+}
+
+.panel-header .container {
+  position: relative;
+  z-index: 2;
+}
+
+.header-title {
+  z-index: 2;
+  position: relative;
+  color: white;
+  font-weight: 700;
+}
+
+/* Estilos para las tablas */
+.content-box {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 10px;
+}
+
+/* Estilos de las tablas de huella */
+.huella-rojo {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.huella-amarillo {
+  background-color: #f1c40f;
+  color: black;
+}
+
+.huella-verde {
+  background-color: #2ecc71;
+  color: white;
+}
+
+/* Estilo para las flechas de alternar en las tablas */
+.toggle-arrow {
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 5px;
+}
+
+.placas-list {
+  margin-top: 5px;
+  background-color: #f5b7b1;
+  padding: 5px;
+  border-radius: 5px;
+  color: #333;
+}
+
+.placas-list div {
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+#autocomplete-results {
+  position: absolute;
+  background-color: white;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  z-index: 1000;
+}
+
+#autocomplete-results .dropdown-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+#autocomplete-results .dropdown-item:hover {
+  background-color: #f0f0f0;
+}

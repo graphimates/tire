@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from averias.models import Averia
 import json
+from django.http import JsonResponse
 
 # Vista para el login
 def login_view(request):
@@ -142,6 +143,21 @@ def index(request):
     }
 
     return render(request, 'index.html', context)
+
+# Vista para obtener sugerencias de empresas basadas en la búsqueda
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from usuarios.models import Usuario
+
+@login_required
+def empresa_autocomplete(request):
+    if request.is_ajax():
+        query = request.GET.get('term', '')  # Obtén el término que está buscando el usuario
+        # Filtra las empresas que coinciden con el término
+        empresas = Usuario.objects.filter(empresa__icontains=query).exclude(is_superuser=True).values_list('empresa', flat=True).distinct()
+        results = list(empresas)
+        return JsonResponse(results, safe=False)
+    return JsonResponse([], safe=False)
 
 
 
