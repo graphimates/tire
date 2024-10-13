@@ -606,20 +606,165 @@ input {
 }
 
 #autocomplete-results {
-  position: absolute;
-  background-color: white;
-  width: 100%;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #ddd;
+  background-color: white;
+  border: 1px solid #ccc;
+  position: absolute;
   z-index: 1000;
+  width: 100%;
 }
 
-#autocomplete-results .dropdown-item {
-  padding: 8px;
+.dropdown-item {
+  padding: 8px 16px;
   cursor: pointer;
 }
 
-#autocomplete-results .dropdown-item:hover {
+.dropdown-item:hover {
   background-color: #f0f0f0;
+}
+
+/* General Styles */
+.panel-header-sm {
+  padding: 2rem;
+}
+
+.content-box {
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+.header-title {
+  font-weight: 700;
+  color: #fff;
+}
+
+.card {
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  border-collapse: collapse;
+}
+
+.table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.table-hover tbody tr:hover {
+  color: #212529;
+  background-color: rgba(0, 0, 0, 0.075);
+}
+
+.text-primary {
+  color: #007bff !important;
+}
+
+.h4, h4 {
+  font-size: 1.5rem;
+}
+
+.huella-rojo {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.huella-amarillo {
+  background-color: #f1c40f;
+  color: black;
+}
+
+.huella-verde {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.dropdown-item:hover {
+  background-color: #f1c40f;
+  cursor: pointer;
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+  .container {
+      padding-left: 15px;
+      padding-right: 15px;
+  }
+
+  .header-title {
+      font-size: 1.5rem;
+  }
+
+  .card-body {
+      padding: 1rem;
+  }
+}
+
+
+/* Estilos generales de los contenedores */
+.bg-white {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Ajustes generales para las tarjetas y tablas */
+.card {
+  margin-bottom: 1.5rem;
+}
+
+/* Ajuste para la barra de bienvenida */
+.header-title {
+  font-weight: bold;
+  color: #333;
+  font-size: 24px;
+}
+
+/* Responsive design para pantallas pequeñas */
+@media (max-width: 768px) {
+  .responsive-header {
+      font-size: 12px;
+  }
+
+  .header-title {
+      font-size: 20px;
+  }
+}
+
+/* Efecto hover para las tarjetas del resumen */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Efecto hover para las barras de huella */
+.bar-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bar-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto hover para los números de Requerimiento de Servicios */
+.num-hover {
+  transition: transform 0.2s ease;
+}
+
+.num-hover:hover {
+  transform: scale(1.1);
 }

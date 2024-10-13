@@ -3,39 +3,37 @@
 {% block title %}Página Principal{% endblock %}
 
 {% block content %}
+<!-- Título Principal con Bienvenida -->
 <div class="panel-header panel-header-sm">
     <div class="container">
         <div class="row">
-            <!-- Título dentro de la cabecera -->
-            <div class="col-md-12 text-center">
-                <h2 class="header-title">Resumen de Neumáticos</h2>
+            <div class="col-12 text-center">
+                <h2 class="header-title">Bienvenido {{ user.empresa }} - Resumen de Neumáticos</h2>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container mt-5 mb-5 shadow-lg rounded content-box">
+<!-- Sección de Búsqueda y Filtro -->
+<div class="mt-5 mb-5 shadow-lg rounded content-box">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             {% if user.is_superuser %}
-            <!-- Filtro de búsqueda de usuarios por autocompletar (visible solo para el admin) -->
+            <!-- Búsqueda por Empresa -->
             <form method="GET" action="" class="d-flex align-items-center mb-4">
-                <div class="input-group position-relative">
+                <div class="input-group">
                     <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Buscar por empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
-                    <div class="dropdown-menu" id="autocomplete-results" style="display: none;"></div>
-                </div>
-                
-                <div class="input-group-append">
                     <button class="btn btn-primary" type="submit">
                         <i class="fas fa-search"></i> Buscar
                     </button>
                 </div>
+                <div class="dropdown-menu" id="autocomplete-results" style="position: absolute; z-index: 1000;"></div>
             </form>
 
-            <!-- Lista desplegable de las empresas (visible solo para el admin) -->
+            <!-- Selección de Empresa -->
             <form method="GET" action="" class="mb-4">
                 <label for="empresa-dropdown" class="form-label">Seleccionar empresa:</label>
-                <select id="empresa-dropdown" name="selected_empresa" class="form-control" onchange="this.form.submit()">
+                <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()">
                     <option value="">Seleccionar empresa...</option>
                     <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
                     {% for empresa in empresas %}
@@ -46,50 +44,47 @@
             {% endif %}
         </div>
     </div>
+</div>
 
-    {% if selected_user or selected_empresa %}
-    <h4 class="text-primary mt-4">
-        Mostrando datos de: 
-        {% if selected_empresa == 'todas' %}
-            Todas las empresas
-        {% elif selected_empresa %}
-            {{ selected_empresa }}
-        {% else %}
-            {{ selected_user.first_name }} {{ selected_user.last_name }} ({{ selected_user.email }})
-        {% endif %}
-    </h4>
-
-    <!-- Diseño de las tablas -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead class=" text-primary">
-                        <tr>
-                            <th>Total de Neumáticos</th>
-                            <th>Operativos</th>
-                            <th>No Operativos</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ total_neumaticos }}</td>
-                            <td>{{ operativos }}</td>
-                            <td>{{ no_operativos }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+<!-- Sección de Tarjetas Resumen (con hover) -->
+<div class="row mt-4">
+    <!-- Tarjeta Total Neumáticos -->
+    <div class="col-md-4">
+        <div class="card text-center bg-white card-hover">
+            <div class="card-body">
+                <h5 class="card-title">Total de Neumáticos</h5>
+                <p class="display-4">{{ total_neumaticos }}</p>
             </div>
         </div>
     </div>
+    <!-- Tarjeta Operativos -->
+    <div class="col-md-4">
+        <div class="card text-center border-success bg-white card-hover">
+            <div class="card-body">
+                <h5 class="card-title text-success">Operativos</h5>
+                <p class="display-4 text-success">{{ operativos }}</p>
+            </div>
+        </div>
+    </div>
+    <!-- Tarjeta No Operativos -->
+    <div class="col-md-4">
+        <div class="card text-center border-danger bg-white card-hover">
+            <div class="card-body">
+                <h5 class="card-title text-danger">No Operativos</h5>
+                <p class="display-4 text-danger">{{ no_operativos }}</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Tabla de huellas -->
-    <div class="card mt-4">
+<!-- Tabla de Huellas (con hover en las barras) -->
+<div class="mt-4">
+    <div class="card bg-white">
         <div class="card-body">
             <h4 class="text-secondary">Huella de los Neumáticos Operativos</h4>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead class=" text-primary">
+            <div class="table-responsive-sm">
+                <table class="table table-bordered">
+                    <thead class="table-light">
                         <tr>
                             <th>Huella 0 a ≤3 mm</th>
                             <th>Huella >3 a ≤6 mm</th>
@@ -98,68 +93,25 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="huella-rojo">{{ huella_0_3 }}</td>
-                            <td class="huella-amarillo">{{ huella_3_6 }}</td>
-                            <td class="huella-verde">{{ huella_6_mas }}</td>
+                            <td class="text-center text-white bg-danger bar-hover">{{ huella_0_3 }}</td>
+                            <td class="text-center text-dark bg-warning bar-hover">{{ huella_3_6 }}</td>
+                            <td class="text-center text-white bg-success bar-hover">{{ huella_6_mas }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Tabla de neumáticos operativos -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <h4 class="text-success">Neumáticos Operativos</h4>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead class=" text-primary">
-                        <tr>
-                            <th>Vehículo</th>
-                            <th>Posición</th>
-                            <th>Marca</th>
-                            <th>Huella</th>
-                            <th>Presión</th>
-                            <th>Averías</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for neumatico in neumaticos_operativos %}
-                        <tr>
-                            <td>{{ neumatico.vehiculo.placa }}</td>
-                            <td>{{ neumatico.posicion }}</td>
-                            <td>{{ neumatico.marca }}</td>
-                            <td>{{ neumatico.huella }}</td>
-                            <td>{{ neumatico.presion }}</td>
-                            <td>
-                                {% if neumatico.averias.exists %}
-                                    {% for averia in neumatico.averias.all %}
-                                        {{ averia.codigo }}{% if not forloop.last %}, {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    Sin averías
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6">No hay neumáticos operativos.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabla de requerimientos de servicio -->
-    <div class="card mt-4">
+<!-- Tabla de Requerimientos de Servicio con Placas (hover solo en números y botón de despliegue) -->
+<div class="mt-4 mb-5">
+    <div class="card bg-white">
         <div class="card-body">
             <h4 class="text-secondary">Requerimiento de Servicios por Vehículos</h4>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead class="text-primary">
+            <div class="table-responsive-sm">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
                         <tr>
                             <th>Alineación</th>
                             <th>Balanceo</th>
@@ -172,51 +124,61 @@
                         <tr>
                             <!-- Alineación -->
                             <td>
-                                {{ servicios_por_vehiculo.alineacion|length }}
-                                <span class="toggle-arrow" onclick="togglePlacas('alineacion')">&#9662;</span>
-                                <div id="placas-alineacion" class="placas-list" style="display: none;">
+                                <span class="num-hover">{{ servicios_por_vehiculo.alineacion|length }}</span>
+                                <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-alineacion">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="placas-alineacion" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.alineacion %}
-                                        <div>Placa: {{ placa }}</div>
+                                        <div> {{ placa }}</div>
                                     {% endfor %}
                                 </div>
                             </td>
                             <!-- Balanceo -->
                             <td>
-                                {{ servicios_por_vehiculo.balanceo|length }}
-                                <span class="toggle-arrow" onclick="togglePlacas('balanceo')">&#9662;</span>
-                                <div id="placas-balanceo" class="placas-list" style="display: none;">
+                                <span class="num-hover">{{ servicios_por_vehiculo.balanceo|length }}</span>
+                                <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-balanceo">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="placas-balanceo" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.balanceo %}
-                                        <div>Placa: {{ placa }}</div>
+                                        <div>{{ placa }}</div>
                                     {% endfor %}
                                 </div>
                             </td>
                             <!-- Rotación -->
                             <td>
-                                {{ servicios_por_vehiculo.rotacion|length }}
-                                <span class="toggle-arrow" onclick="togglePlacas('rotacion')">&#9662;</span>
-                                <div id="placas-rotacion" class="placas-list" style="display: none;">
+                                <span class="num-hover">{{ servicios_por_vehiculo.rotacion|length }}</span>
+                                <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-rotacion">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="placas-rotacion" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.rotacion %}
-                                        <div>Placa: {{ placa }}</div>
+                                        <div>{{ placa }}</div>
                                     {% endfor %}
                                 </div>
                             </td>
                             <!-- Montura -->
                             <td>
-                                {{ servicios_por_vehiculo.montura|length }}
-                                <span class="toggle-arrow" onclick="togglePlacas('montura')">&#9662;</span>
-                                <div id="placas-montura" class="placas-list" style="display: none;">
+                                <span class="num-hover">{{ servicios_por_vehiculo.montura|length }}</span>
+                                <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-montura">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="placas-montura" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.montura %}
-                                        <div>Placa: {{ placa }}</div>
+                                        <div>{{ placa }}</div>
                                     {% endfor %}
                                 </div>
                             </td>
                             <!-- Calibración -->
                             <td>
-                                {{ servicios_por_vehiculo.calibracion|length }}
-                                <span class="toggle-arrow" onclick="togglePlacas('calibracion')">&#9662;</span>
-                                <div id="placas-calibracion" class="placas-list" style="display: none;">
+                                <span class="num-hover">{{ servicios_por_vehiculo.calibracion|length }}</span>
+                                <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-calibracion">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="placas-calibracion" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.calibracion %}
-                                        <div>Placa: {{ placa }}</div>
+                                        <div>{{ placa }}</div>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -226,77 +188,29 @@
             </div>
         </div>
     </div>
-
-    {% else %}
-    <p class="text-muted">No se han encontrado usuarios o no hay datos disponibles para mostrar.</p>
-    {% endif %}
 </div>
 
+<!-- JavaScript para el Toggle de las Placas -->
 <script>
-    function togglePlacas(servicio) {
-        var placasDiv = document.getElementById('placas-' + servicio);
-        var isVisible = placasDiv.style.display === 'block';
-        placasDiv.style.display = isVisible ? 'none' : 'block';
-    }
-</script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Selecciona todos los botones de colapso
+        const toggleButtons = document.querySelectorAll('.toggle-btn');
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const empresaInput = document.getElementById('empresa_autocomplete');
-        const autocompleteResults = document.getElementById('autocomplete-results');
-    
-        empresaInput.addEventListener('input', function() {
-            const input = this.value;
-    
-            if (input.length > 0) {
-                // Realiza la petición AJAX
-                fetch(`/autocomplete/empresa/?term=${input}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        autocompleteResults.innerHTML = '';  // Limpiar resultados anteriores
-    
-                        if (data.length > 0) {
-                            autocompleteResults.style.display = 'block';  // Mostrar los resultados
-                            data.forEach(function(empresa) {
-                                const suggestionItem = document.createElement('div');
-                                suggestionItem.classList.add('dropdown-item');
-                                suggestionItem.textContent = empresa;
-    
-                                // Autocompletar cuando se hace clic en la sugerencia
-                                suggestionItem.addEventListener('click', function() {
-                                    empresaInput.value = empresa;
-                                    autocompleteResults.innerHTML = '';  // Limpiar sugerencias
-                                    autocompleteResults.style.display = 'none';  // Ocultar el cuadro
-                                });
-    
-                                autocompleteResults.appendChild(suggestionItem);
-                            });
-                        } else {
-                            autocompleteResults.style.display = 'none';  // Ocultar si no hay resultados
-                        }
-                    });
-            } else {
-                autocompleteResults.style.display = 'none';  // Ocultar si el input está vacío
-            }
-        });
-    
-        // Cerrar el cuadro si se hace clic fuera del campo de búsqueda
-        document.addEventListener('click', function(event) {
-            if (!empresaInput.contains(event.target) && !autocompleteResults.contains(event.target)) {
-                autocompleteResults.style.display = 'none';
-            }
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Obtén el ID del contenido a mostrar u ocultar
+                const targetId = this.getAttribute('data-target');
+                const content = document.getElementById(targetId);
+
+                // Alternar la visibilidad del contenido
+                if (content.style.display === 'none' || content.style.display === '') {
+                    content.style.display = 'block';
+                } else {
+                    content.style.display = 'none';
+                }
+            });
         });
     });
-    
-        // Cerrar el cuadro si se hace clic fuera del campo de búsqueda
-        document.addEventListener('click', function(event) {
-            if (!empresaInput.contains(event.target) && !autocompleteResults.contains(event.target)) {
-                autocompleteResults.style.display = 'none';
-            }
-        });
-    });
-    
 </script>
-
 
 {% endblock %}

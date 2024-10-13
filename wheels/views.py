@@ -149,6 +149,20 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from usuarios.models import Usuario
 
+from django.http import JsonResponse
+
+# Vista para autocompletar empresas
+@login_required
+def autocomplete_empresas(request):
+    if request.is_ajax():
+        term = request.GET.get('term', '')
+        print(f"Buscando empresas que contengan: {term}")  # Agregar un log temporal para verificar
+        empresas = Usuario.objects.filter(empresa__icontains=term).exclude(is_superuser=True).values_list('empresa', flat=True).distinct()
+        empresas_list = list(empresas)
+        print(f"Empresas encontradas: {empresas_list}")  # Agregar un log temporal para verificar
+        return JsonResponse(empresas_list, safe=False)
+
+
 @login_required
 def empresa_autocomplete(request):
     if request.is_ajax():

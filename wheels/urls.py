@@ -18,7 +18,7 @@ urlpatterns = [
     path('usuarios/editar/<int:user_id>/', usuarios_views.editar_usuario, name='editar_usuario'),
     path('usuarios/eliminar/<int:user_id>/', usuarios_views.eliminar_usuario, name='eliminar_usuario'),
     path('usuarios/crear/', usuarios_views.crear_usuario, name='crear_usuario'),
-    path('autocomplete/empresa/', views.empresa_autocomplete, name='empresa_autocomplete'),
+    path('autocomplete/empresas/', views.autocomplete_empresas, name='autocomplete_empresas'),
 
     # Incluir las rutas de vehículos
     path('vehiculos/', include('vehiculos.urls')),  # Incluye las rutas de la app vehiculos
