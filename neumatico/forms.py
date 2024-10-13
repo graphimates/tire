@@ -15,7 +15,8 @@ class NeumaticoForm(forms.ModelForm):
             'dot': forms.TextInput(attrs={'class': 'form-control'}),
             'averias': forms.CheckboxSelectMultiple(),
             'diseño': forms.TextInput(attrs={'class': 'form-control'}),
-            'renovable': forms.CheckboxInput(),
+            # Estilo de interruptor (suiche) para 'renovable'
+            'renovable': forms.CheckboxInput(attrs={'class': 'custom-control-input', 'id': 'customSwitch1'}),
             'fecha_inspeccion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
 
@@ -30,7 +31,6 @@ class NeumaticoForm(forms.ModelForm):
         cleaned_data = super().clean()
         renovable = cleaned_data.get('renovable')
         averias = cleaned_data.get('averias')
-        
 
         if averias:
             if any(averia.estado == 'no_operativo' for averia in averias):
@@ -39,11 +39,9 @@ class NeumaticoForm(forms.ModelForm):
                 cleaned_data['renovable'] = False
 
         return cleaned_data
-    
-
-    
 
 
+# Formulario para MedidaNeumatico
 class MedidaForm(forms.ModelForm):
     class Meta:
         model = MedidaNeumatico

@@ -4,54 +4,65 @@
 {% block title %}Reporte de Vehículos{% endblock %}
 
 {% block content %}
-<div class="panel-header panel-header-sm"></div>
-
-<div class="container-fluid mt-5 mb-5">
-    <h2 class="report-title">Reporte de Vehículos</h2>
-
-    <!-- Filtros de búsqueda y orden -->
-    <form method="GET" class="mb-4">
+<!-- Panel Header -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
         <div class="row">
-            <!-- Filtro de búsqueda por empresa con autocompletado -->
-            <div class="col-md-4">
-                <label for="search_empresa">Buscar por empresa:</label>
-                <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Ingrese el nombre de la empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
-                <div class="dropdown-menu" id="autocomplete-results" style="max-width: 100%;"></div>
-            </div>
-
-            <!-- Filtro por criticidad -->
-            <div class="col-md-4">
-                <label for="criticidad">Filtrar por criticidad:</label>
-                <select id="criticidad" name="criticidad" class="form-control">
-                    <option value="">Todas</option>
-                    <option value="bajo" {% if request.GET.criticidad == 'bajo' %}selected{% endif %}>Bajo</option>
-                    <option value="moderado" {% if request.GET.criticidad == 'moderado' %}selected{% endif %}>Moderado</option>
-                    <option value="alto" {% if request.GET.criticidad == 'alto' %}selected{% endif %}>Alto</option>
-                </select>
-            </div>
-
-            <!-- Filtro de orden por fecha de inspección -->
-            <div class="col-md-4">
-                <label for="order_by">Ordenar por última inspección:</label>
-                <select id="order_by" name="order_by" class="form-control">
-                    <option value="asc" {% if request.GET.order_by == 'asc' %}selected{% endif %}>Ascendente</option>
-                    <option value="desc" {% if request.GET.order_by == 'desc' %}selected{% endif %}>Descendente</option>
-                </select>
-            </div>
-
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary">Filtrar</button>
+            <div class="col-12 text-center">
+                <h2 class="header-title">Bienvenido {{ user.empresa }} - Reporte de Vehículos</h2>
             </div>
         </div>
-    </form>
+    </div>
+</div>
+
+<div class="container-fluid mt-5 mb-5">
+    <!-- Filtros de búsqueda y orden -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="mb-4">
+                <div class="row">
+                    <!-- Filtro de búsqueda por empresa con autocompletado -->
+                    {% if user.is_superuser %}
+                    <div class="col-md-4 d-flex align-items-end">
+                        <label for="search_empresa">Buscar por empresa:</label>
+                        <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control me-2" placeholder="Ingrese el nombre de la empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i> <!-- Icono de lupa -->
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Filtro por criticidad -->
+                    <div class="col-md-4">
+                        <label for="criticidad">Filtrar por criticidad:</label>
+                        <select id="criticidad" name="criticidad" class="form-control" onchange="this.form.submit()">
+                            <option value="">Todas</option>
+                            <option value="bajo" {% if request.GET.criticidad == 'bajo' %}selected{% endif %}>Bajo</option>
+                            <option value="moderado" {% if request.GET.criticidad == 'moderado' %}selected{% endif %}>Moderado</option>
+                            <option value="alto" {% if request.GET.criticidad == 'alto' %}selected{% endif %}>Alto</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro de orden por fecha de inspección -->
+                    <div class="col-md-4">
+                        <label for="order_by">Ordenar por última inspección:</label>
+                        <select id="order_by" name="order_by" class="form-control" onchange="this.form.submit()">
+                            <option value="asc" {% if request.GET.order_by == 'asc' %}selected{% endif %}>Ascendente</option>
+                            <option value="desc" {% if request.GET.order_by == 'desc' %}selected{% endif %}>Descendente</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="accordion" id="vehiculosAccordion">
         {% if vehiculos_con_neumaticos %}
             {% for item in vehiculos_con_neumaticos %}
-            <div class="card mb-3">
+            <div class="card mb-3 card-hover">
                 <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ item.vehiculo.id }}">
                     <h2 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ item.vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ item.vehiculo.id }}">
+                        <button class="btn btn-link placa-btn" type="button" data-toggle="collapse" data-target="#collapse{{ item.vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ item.vehiculo.id }}">
                             {{ item.vehiculo.placa }} : {{ item.vehiculo.usuario.first_name }} {{ item.vehiculo.usuario.last_name }}
                         </button>
                     </h2>
@@ -62,9 +73,8 @@
                             <span><strong>Última Inspección:</strong> Sin registro</span>
                         {% endif %}
 
-                        <!-- Verificación de averías para mostrar el ícono de advertencia -->
                         {% if item.tiene_averias %}
-                            <span style="color: red;">&#x26A0; Avertencia: Tiene averías</span>
+                            <span style="color: red;">&#x26A0;🔴</span>
                         {% endif %}
 
                         {% if user.is_superuser %}
@@ -87,7 +97,7 @@
                 <div id="collapse{{ item.vehiculo.id }}" class="collapse" aria-labelledby="heading{{ item.vehiculo.id }}" data-parent="#vehiculosAccordion">
                     <div class="card-body">
                         <div class="row">
-                            <!-- Esquema del vehículo (Columna izquierda) -->
+                            <!-- Esquema del vehículo -->
                             <div class="col-md-3">
                                 <h4>Esquema del Vehículo</h4>
                                 <div class="neumatico-esquema" style="position: relative;">
@@ -95,12 +105,12 @@
                                 </div>
                             </div>
 
-                            <!-- Tabla de neumáticos (Columna derecha) -->
+                            <!-- Tabla de neumáticos -->
                             <div class="col-md-9">
                                 <h4>Neumáticos del Vehículo</h4>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead>
+                                <div class="table-responsive table-scroll">
+                                    <table class="table table-bordered table-hover table-adaptive">
+                                        <thead class="thead-light">
                                             <tr>
                                                 <th>Posición</th>
                                                 <th>Medida</th>
@@ -111,16 +121,25 @@
                                                 <th>Presión</th>
                                                 <th>Huella</th>
                                                 <th>Averías</th>
-                                                {% if user.is_superuser %}
                                                 <th>Acción</th>
-                                                {% endif %}
                                             </tr>
                                         </thead>
-
                                         <tbody>
                                             {% for posicion in item.rango_posiciones %}
                                             <tr>
-                                                <td>{{ posicion }}</td>
+                                                <td>
+                                                    {% if item.neumaticos_por_posicion|get_item:posicion %}
+                                                        {% with neumatico=item.neumaticos_por_posicion|get_item:posicion %}
+                                                        <!-- Botón redondo para la posición -->
+                                                        <button class="btn position-btn {% if neumatico.averias.exists %}btn-danger{% else %}btn-primary{% endif %}">
+                                                            {{ posicion }}
+                                                        </button>
+                                                        {% endwith %}
+                                                    {% else %}
+                                                        <button class="btn position-btn btn-secondary">{{ posicion }}</button>
+                                                    {% endif %}
+                                                </td>
+                                                <!-- Los demás campos de la tabla -->
                                                 {% if item.neumaticos_por_posicion|get_item:posicion %}
                                                 {% with neumatico=item.neumaticos_por_posicion|get_item:posicion %}
                                                 <td>{{ neumatico.medida.medida|default_if_none:"" }}</td>
@@ -132,17 +151,14 @@
                                                 <td>{{ neumatico.huella|default_if_none:"0.0" }}</td>
                                                 <td>
                                                     {% for averia in neumatico.averias.all %}
-                                                        {{ averia.nombre }}
+                                                    {{ averia.nombre }}
                                                     {% empty %}
-                                                        Sin averías
+                                                    Sin averías
                                                     {% endfor %}
                                                 </td>
-                                                <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>
-                                                {% if user.is_superuser %}
                                                 <td>
                                                     <a href="{% url 'editar_neumatico' item.vehiculo.id posicion %}" class="btn btn-warning btn-sm">Editar</a>
                                                 </td>
-                                                {% endif %}
                                                 {% endwith %}
                                                 {% else %}
                                                 <td colspan="{% if user.is_superuser %}10{% else %}9{% endif %}">Neumático no registrado</td>
@@ -150,9 +166,9 @@
                                             </tr>
                                             {% endfor %}
                                         </tbody>
-
                                     </table>
                                 </div>
+                                                                
                             </div>
                         </div>
                     </div>
@@ -171,4 +187,5 @@
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
     }
 </script>
+
 {% endblock %}

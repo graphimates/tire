@@ -81,7 +81,7 @@ def eliminar_medida(request, medida_id):
     return render(request, 'medidas/eliminar_medida.html', {'medida': medida})
 
 
-# neumatico/views.py (modificada)
+# neumatico/views.py
 
 @login_required
 @user_passes_test(is_admin)
@@ -90,13 +90,14 @@ def editar_neumatico(request, vehiculo_id, posicion):
     neumatico = get_object_or_404(Neumatico, vehiculo=vehiculo, posicion=posicion)
 
     if request.method == 'POST':
-        # Hacer una copia del estado actual del neumático antes de procesar el formulario
-        old_neumatico = copy.copy(neumatico)
+        # Imprimir los datos de POST para depuración
+        print("Datos recibidos en POST:", request.POST)
 
+        old_neumatico = copy.copy(neumatico)
         form = NeumaticoForm(request.POST, instance=neumatico)
+
         if form.is_valid():
             try:
-                # Guardar el historial solo si el neumático ya tiene una fecha de inspección anterior
                 if old_neumatico.fecha_inspeccion:
                     HistorialInspeccion.objects.create(
                         vehiculo=vehiculo,
@@ -113,28 +114,25 @@ def editar_neumatico(request, vehiculo_id, posicion):
                         averia=old_neumatico.averias.first() if old_neumatico.averias.exists() else None,
                     )
 
-                # Ahora guardamos los cambios del formulario
                 neumatico = form.save(commit=False)
-                
-                # Si no se seleccionó fecha, asignar la fecha actual
                 if not neumatico.fecha_inspeccion:
                     neumatico.fecha_inspeccion = timezone.now()
-
                 neumatico.save()
-                form.save_m2m()  # Guardar las relaciones ManyToMany
+                form.save_m2m()
 
-                # Actualizar la fecha de última inspección del vehículo
                 vehiculo.ultima_inspeccion = neumatico.fecha_inspeccion
                 vehiculo.save()
 
                 return redirect('reporte_vehiculos')
             except ValidationError as e:
                 form.add_error(None, e)
+        else:
+            # Imprimir errores de formulario para depuración
+            print("Errores del formulario:", form.errors)
     else:
         form = NeumaticoForm(instance=neumatico)
 
     return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico})
-
 
 # Vista para ver neumáticos
 @login_required

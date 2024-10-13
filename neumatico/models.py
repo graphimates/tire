@@ -1,3 +1,5 @@
+# neumatico/models.py
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from vehiculos.models import Vehiculo
@@ -5,7 +7,6 @@ from averias.models import Averia
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from django.utils import timezone
-
 
 # Medida de neumático con su precio estimado
 class MedidaNeumatico(models.Model):
@@ -20,7 +21,6 @@ class MedidaNeumatico(models.Model):
         for neumatico in self.neumatico_set.all():
             neumatico.precio_estimado = self.precio_estimado
             neumatico.save()
-
 
 # Neumático vinculado a un vehículo
 class Neumatico(models.Model):
@@ -57,7 +57,6 @@ class Neumatico(models.Model):
             self.precio_estimado = 0.0
 
     def save(self, *args, **kwargs):
-        # Eliminamos la asignación automática de fecha_inspeccion
         # Actualizar precio antes de guardar
         self.actualizar_precio()
 
@@ -70,8 +69,6 @@ class Neumatico(models.Model):
 
     def __str__(self):
         return f"Neumático en posición {self.posicion} del vehículo {self.vehiculo.placa}"
-
-# Señales y otros modelos permanecen igual
 
 # Historial de inspección del neumático
 class HistorialInspeccion(models.Model):
@@ -90,7 +87,6 @@ class HistorialInspeccion(models.Model):
 
     def __str__(self):
         return f"Inspección de {self.vehiculo.placa} - Neumático {self.posicion} - {self.fecha_inspeccion}"
-
 
 # Señal para actualizar el campo renovable basado en las averías
 @receiver(m2m_changed, sender=Neumatico.averias.through)
