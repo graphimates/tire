@@ -14,19 +14,19 @@
     </div>
 </div>
 
-<!-- Sección de Búsqueda y Filtro -->
+<!-- Sección de Búsqueda y Filtro, solo visible para superusuarios -->
+{% if user.is_superuser %}
 <div class="mt-5 mb-5 shadow-lg rounded content-box">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            {% if user.is_superuser %}
             <!-- Búsqueda por Empresa -->
             <form method="GET" action="" class="d-flex align-items-center mb-4">
-                <div class="input-group">
+                <div class="input-group" style="flex-grow: 1;">
                     <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Buscar por empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
-                    <button class="btn btn-primary" type="submit">
-                        <i class="fas fa-search"></i> Buscar
-                    </button>
                 </div>
+                <button class="btn btn-primary ms-2" type="submit" style="min-width: 100px;">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
                 <div class="dropdown-menu" id="autocomplete-results" style="position: absolute; z-index: 1000;"></div>
             </form>
 
@@ -41,10 +41,10 @@
                     {% endfor %}
                 </select>
             </form>
-            {% endif %}
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- Sección de Tarjetas Resumen (con hover) -->
 <div class="row mt-4">

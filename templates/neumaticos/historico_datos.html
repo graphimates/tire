@@ -3,51 +3,66 @@
 {% block title %}Histórico de Datos{% endblock %}
 
 {% block content %}
+<!-- Panel Header Pequeño con Estilo -->
 <div class="panel-header panel-header-sm">
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
-                <h2 class="text-white mb-4" style="font-weight: 700;">Histórico de Averías y Estado de Cauchos</h2>
+                <h2 class="header-title text-white">Histórico de Averías y Estado de Cauchos</h2>
             </div>
         </div>
     </div>
 </div>
 
-<div class="content d-flex justify-content-center">
-    <div class="container card shadow-lg rounded p-5" style="background-color: #f4f5f7; max-width: 900px;">
-
-        <!-- Filtro para seleccionar el usuario (solo visible para el admin) -->
+<!-- Contenedor Principal -->
+<div class="content">
+    <div class="container-fluid card shadow-lg rounded p-5 bg-white">
+        <!-- Filtro de Usuarios (solo para admin, sin mostrar el admin en el filtro) -->
         {% if request.user.is_superuser %}
         <form method="GET" id="userFilterForm" class="mb-4">
             <label for="usuario" class="form-label">Selecciona un usuario para ver su historial:</label>
             <select name="usuario_id" id="usuario" class="form-control" onchange="document.getElementById('userFilterForm').submit();">
-                <option value="{{ request.user.id }}">{{ request.user.get_full_name }} ({{ request.user.email }})</option>
+                <option value="todas" {% if not selected_user.id %}selected{% endif %}>Todas las empresas</option>
                 {% for usuario in usuarios %}
+                    {% if not usuario.is_superuser %}
                     <option value="{{ usuario.id }}" {% if selected_user.id == usuario.id %}selected{% endif %}>
                         {{ usuario.get_full_name }} ({{ usuario.email }})
                     </option>
+                    {% endif %}
                 {% endfor %}
             </select>
         </form>
+        {% else %}
+        <!-- Usuario no administrador solo ve su propio historial -->
+        <h4 class="text-dark">Historial de {{ request.user.get_full_name }}</h4>
         {% endif %}
-        
-        <!-- Gráfico Histórico de Averías -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <canvas id="historicoChart"></canvas>
-            </div>
-        </div>
 
-        <!-- Nueva Gráfica Relación de Cauchos (Tres barras por mes) -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h4>Relación de cauchos operativos, renovables, desperdicio (Últimos 6 meses)</h4>
-                <canvas id="cauchosMesChart"></canvas>
+        <!-- Gráficos dispuestos en columnas con botón de previsualización -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-dark">Histórico de Averías</h4>
+                        <canvas id="historicoChart"></canvas>
+                        <button class="btn btn-primary mt-3 preview-button" data-bs-toggle="modal" data-bs-target="#previewModal" data-chart="historicoChart">Previsualizar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nueva Gráfica Relación de Cauchos (Últimos 6 meses) con botón de previsualización -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-dark">Relación de Cauchos Operativos, Renovables, Desperdicio (Últimos 6 meses)</h4>
+                        <canvas id="cauchosMesChart"></canvas>
+                        <button class="btn btn-primary mt-3 preview-button" data-bs-toggle="modal" data-bs-target="#previewModal" data-chart="cauchosMesChart">Previsualizar</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Conteo de Averías -->
-        <h4 class="mt-5">Conteo de Averías</h4>
+        <h4 class="text-dark mt-5">Conteo de Averías</h4>
         <ul class="list-group">
             {% for averia, count in averias_counter.items %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -56,18 +71,34 @@
                 </li>
             {% endfor %}
         </ul>
-
     </div>
 </div>
 
+<!-- Modal de Previsualización -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">Previsualización de Gráficos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <canvas id="previewCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para las Gráficas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Definir los gráficos originales
     const ctx1 = document.getElementById('historicoChart').getContext('2d');
     const labels = {{ labels|safe }};
     const dataBarras = {{ data_barras|safe }};
     const dataLinea = {{ porcentaje_acumulado|safe }};
 
-    const chart1 = new Chart(ctx1, {
+    const historicoChart = new Chart(ctx1, {
         type: 'bar',
         data: {
             labels: labels,
@@ -105,9 +136,9 @@
                     ticks: {
                         beginAtZero: true,
                         callback: function(value) {
-                            return value + '%';  
+                            return value + '%';
                         },
-                        max: 100  
+                        max: 100
                     },
                     title: {
                         display: true,
@@ -120,9 +151,9 @@
                     ticks: {
                         beginAtZero: true,
                         callback: function(value) {
-                            return value + '%';  
+                            return value + '%';
                         },
-                        max: 100  
+                        max: 100
                     },
                     grid: {
                         drawOnChartArea: false
@@ -136,14 +167,13 @@
         }
     });
 
-    // Nueva gráfica de relación de cauchos por mes
     const ctx2 = document.getElementById('cauchosMesChart').getContext('2d');
     const mesesLabels = {{ meses_labels|safe }};
     const operativosMesData = {{ operativos_mes|safe }};
     const renovablesMesData = {{ renovables_mes|safe }};
     const desperdicioMesData = {{ desperdicio_mes|safe }};
 
-    const chart2 = new Chart(ctx2, {
+    const cauchosMesChart = new Chart(ctx2, {
         type: 'bar',
         data: {
             labels: mesesLabels,
@@ -179,6 +209,38 @@
                 }
             }
         }
+    });
+
+    // Función para previsualizar gráficos
+    const previewCanvas = document.getElementById('previewCanvas').getContext('2d');
+    let previewChart;
+
+    document.querySelectorAll('.preview-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const chartId = this.getAttribute('data-chart');
+            let chartData;
+
+            if (chartId === 'historicoChart') {
+                chartData = historicoChart.config.data;
+            } else if (chartId === 'cauchosMesChart') {
+                chartData = cauchosMesChart.config.data;
+            }
+
+            // Destruir el gráfico anterior si existe
+            if (previewChart) {
+                previewChart.destroy();
+            }
+
+            // Crear un nuevo gráfico en el modal con los datos del gráfico original
+            previewChart = new Chart(previewCanvas, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
     });
 </script>
 

@@ -26,14 +26,12 @@ html, body {
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Logo superior */
 .logo a {
   color: #fff;
   font-weight: bold;
   text-transform: uppercase;
 }
 
-/* Ajustar el ícono de neumático en lugar del ícono de hamburguesa */
 .navbar-toggler {
   padding: 0.5rem !important; /* Espacio alrededor del ícono */
   width: auto !important;
@@ -51,13 +49,11 @@ html, body {
   background-color: transparent !important;
 }
 
-/* Alinear el perfil del usuario en el header */
 .navbar .dropdown.ml-auto {
   display: flex;
   align-items: center;
 }
 
-/* Ajustar el espaciado y el tamaño del ícono del perfil */
 .navbar .dropdown img {
   width: 40px;
   height: 40px;
@@ -65,7 +61,6 @@ html, body {
   margin-right: 10px;
 }
 
-/* Ajustar el texto del nombre del usuario */
 .navbar .dropdown span {
   font-size: 16px;
   color: white;
@@ -86,7 +81,6 @@ html, body {
   color: white !important;
 }
 
-/* Separador dentro del menú desplegable */
 .dropdown-divider {
   border-color: rgba(255, 255, 255, 0.2) !important; /* Separador semitransparente */
 }
@@ -161,51 +155,28 @@ html, body {
 
 /* Ajustar tamaño de los íconos en sidebar colapsado */
 .sidebar.collapsed .nav-item a i {
-  font-size: 18px;
-}
-
-/* Estilo para el ícono activo cuando el sidebar está colapsado */
-.sidebar.collapsed .nav-item.active a {
-  background-color: transparent !important;  /* Sin fondo */
-  color: #fff !important;                    /* Mantener el color blanco del ícono */
-  border-radius: 50%;                        /* Mantener el borde redondeado alrededor del ícono */
-  padding: 0 !important;                     /* Eliminar cualquier padding adicional */
-  box-shadow: none !important;               /* Sin sombras */
-  border-left: none !important;              /* Sin borde izquierdo */
-  display: flex;                             /* Usar flexbox */
-  align-items: center;                       /* Mantener el ícono centrado verticalmente */
-  justify-content: center;                   /* Mantener el ícono centrado horizontalmente */
-  width: 70px;                               /* Ancho fijo */
-  height: 50px;                              /* Altura fija */
-  transition: none !important;               /* Evitar animaciones al cambiar de estado */
-}
-
-/* Ajustar el tamaño del ícono cuando el sidebar está colapsado */
-.sidebar.collapsed .nav-item.active a i {
-  font-size: 20px;                           /* Tamaño del ícono */
-  position: relative;                        /* Asegurar que no se mueva de su posición */
-  margin: 0;                                 /* Eliminar márgenes */
-  left: 0 !important;                        /* Evitar cualquier desplazamiento hacia la derecha */
+  font-size: 20px; /* Tamaño del ícono */
+  position: relative; /* Asegurar que no se mueva de su posición */
+  margin: 0; /* Eliminar márgenes */
+  left: 0 !important; /* Evitar desplazamiento */
 }
 
 /* Ajustar la alineación de los íconos cuando el sidebar está colapsado */
 .sidebar.collapsed .nav-item a {
-  justify-content: center;      /* Centrar los íconos dentro del contenedor */
-  align-items: center;          /* Asegurar que estén alineados verticalmente */
-  display: flex;                /* Usar flexbox para asegurar la alineación */
-  padding: 0 !important;        /* Eliminar el padding adicional */
-  width: 70px;                  /* Ancho fijo para todos los íconos */
-  height: 50px;                 /* Altura fija para todos los íconos */
-  transition: none !important;  /* Evitar animaciones en la alineación */
+  justify-content: center;      /* Centrar los íconos */
+  align-items: center;          /* Alinear verticalmente */
+  display: flex;                /* Usar flexbox */
+  padding: 0 !important;        /* Eliminar padding adicional */
+  width: 70px;                  /* Ancho fijo */
+  height: 50px;                 /* Altura fija */
+  transition: none !important;  /* Evitar animaciones */
 }
 
-
-
 /* Deshabilitar hover y focus en sidebar colapsado */
-.sidebar.collapsed .nav li:hover:not(.active)>a, 
-.sidebar.collapsed .nav li:focus:not(.active)>a, 
-.off-canvas-sidebar.collapsed .nav li:hover:not(.active)>a, 
-.off-canvas-sidebar.collapsed .nav li:focus:not(.active)>a {
+.sidebar.collapsed .nav li:hover:not(.active) > a, 
+.sidebar.collapsed .nav li:focus:not(.active) > a, 
+.off-canvas-sidebar.collapsed .nav li:hover:not(.active) > a, 
+.off-canvas-sidebar.collapsed .nav li:focus:not(.active) > a {
   background-color: transparent !important; /* Sin fondo en colapso */
 }
 
@@ -237,10 +208,7 @@ html, body {
 }
 
 /* Submenús en hover (sidebar colapsado) */
-.sidebar.collapsed ul.nav.flex-column {
-  display: none;
-}
-
+.sidebar.collapsed ul.nav.flex-column,
 .sidebar.collapsed:hover ul.nav.flex-column {
   display: none !important;
 }
@@ -265,8 +233,8 @@ html, body {
 }
 
 /* Evitar que el ícono activo cambie de color al colapsar */
-.sidebar[data-color="orange"] .nav li.active>a:not([data-toggle="collapse"]) i,
-.off-canvas-sidebar[data-color="orange"] .nav li.active>a:not([data-toggle="collapse"]) i {
+.sidebar[data-color="orange"] .nav li.active > a:not([data-toggle="collapse"]) i,
+.off-canvas-sidebar[data-color="orange"] .nav li.active > a:not([data-toggle="collapse"]) i {
   color: #fff !important; /* Mantener color blanco */
 }
 
@@ -275,12 +243,16 @@ html, body {
 .content {
   padding-top: 70px; /* Altura del header */
   margin-top: 0 !important;
-  padding: 20px;     /* Puedes ajustar esto según lo que necesites */
+  padding: 20px;     /* Ajustable según necesidad */
+  margin-bottom: 50px; /* Ajuste del margen inferior para evitar superposición */
 }
 
 /* Ajustar el contenedor principal */
 .container {
   margin-top: 0 !important; /* Sin margen superior */
+  padding-left: 15px;
+  padding-right: 15px;
+  max-width: 100%; /* Asegura que no se desborde en pantallas pequeñas */
 }
 
 /* Panel principal */
@@ -291,7 +263,6 @@ html, body {
   transition: all 0.2s ease-out;
 }
 
-/* Ajuste del panel principal cuando el sidebar está colapsado */
 .main-panel.sidebar-collapsed {
   margin-left: 70px;
   width: calc(100% - 70px);
@@ -315,11 +286,13 @@ html, body {
 }
 
 /*==================== Estilos de Formularios ====================*/
-/* Estilos personalizados para el formulario de Crear Usuario */
+/* Estilos personalizados para formularios y tarjetas */
 .card {
   border-radius: 10px;
-  background-color: #f4f5f7;
+  background-color: #ffffff !important;
   padding: 20px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card h2 {
@@ -328,19 +301,64 @@ html, body {
   color: #333;
 }
 
+.card-body {
+  padding: 1.5rem;
+}
+
 .form-label {
   font-weight: 600;
   color: #333;
 }
 
 .btn-primary {
-  background-color: #ff7a06;
-  border-color: #ff7a06;
+  background-color: #12bd3d;
+  border-color: #12bd3d;
+  color: white;
+  transition: background-color 0.2s ease-out, border-color 0.2s ease-out;
 }
 
 .btn-primary:hover {
   background-color: #e86d05;
   border-color: #e86d05;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-reset {
+  padding: 0.2rem;
+  font-size: 0.9rem;
+  color: #007bff;
+}
+
+.form-check-label {
+  font-weight: 400;
+  padding-left: 0 !important; /* Eliminar padding izquierdo */
+}
+
+/* Switch para Renovable */
+.custom-switch .custom-control-label::before {
+  background-color: #f96332;
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #4caf50;
+}
+
+/* Checkbox visibles */
+.form-check-input[type="checkbox"] {
+  position: static !important; /* Elimina el posicionamiento absoluto */
+  opacity: 1 !important; /* Asegura que el checkbox sea visible */
+  margin-top: 0 !important; /* Ajusta el margen */
+  margin-left: 0 !important; /* Ajusta el margen */
+  width: auto !important; /* Ajusta el tamaño */
 }
 
 /*==================== Estilos de Bootstrap Collapse ====================*/
@@ -361,7 +379,6 @@ html, body {
   .main-panel {
     margin-left: 0 !important;
     width: 100% !important;
-    transition: all 0.2s ease-out;
     flex: 1; /* El contenido principal toma todo el espacio */
   }
 }
@@ -398,12 +415,6 @@ html, body {
 }
 
 /*==================== Misceláneos ====================*/
-/* Evitar overflow horizontal */
-html, body {
-  overflow-x: hidden;
-}
-
-
 /* Submenú activo dentro de 'Administrador de Usuarios' */
 .nav-dropdown-items .nav-item.active a {
   background-color: #292929 !important; /* Fondo negro */
@@ -421,10 +432,10 @@ html, body {
   box-shadow: none !important;
 }
 
-/*==================== formularios responsive ====================*/
-
+/*==================== Formularios Responsive ====================*/
 .table-responsive {
-  overflow-x: auto; /* Esto mantendrá la tabla ajustada en pantallas pequeñas sin afectar grandes */
+  overflow-x: auto; /* Permite el scroll horizontal si la tabla es más ancha que el contenedor */
+  white-space: nowrap; /* Evita que el contenido se quiebre dentro de las celdas */
 }
 
 table {
@@ -432,222 +443,9 @@ table {
   table-layout: fixed; /* Evita que las columnas cambien de tamaño según el contenido */
 }
 
-.container-fluid {
-  max-width: 100%; /* Asegura que no se desborde en pantallas pequeñas */
-  padding: 15px;
-}
-
 .table {
   width: 100%; /* Asegura que la tabla ocupe el 100% del contenedor */
-  table-layout: fixed; /* Esto asegura que las columnas se distribuyan equitativamente */
-}
-
-
-
-.table-responsive {
-  overflow-x: hidden; /* Evita el scroll lateral */
-}
-
-.logo img {
-  width: 100%;
-  height: auto;
-  max-width: 180px; /* Ajustar el tamaño máximo del logo para pantallas grandes */
-}
-
-.logo-mini {
-  display: none; /* Ocultar logo mini en pantallas grandes */
-}
-
-@media (max-width: 991.98px) {
-  .logo-large {
-    display: none; /* Ocultar logo grande en pantallas pequeñas */
-  }
-  .logo-mini {
-    display: block; /* Mostrar logo mini en pantallas pequeñas */
-  }
-}
-
-  .collapse.show {
-    display: block !important;
-  }
-
-  
-  .toggle-arrow {
-    cursor: pointer;
-    font-size: 14px;
-    margin-left: 5px;
-}
-
-.placas-list {
-    margin-top: 5px;
-    background-color: #f5b7b1;
-    padding: 5px;
-    border-radius: 5px;
-    color: #333;
-}
-
-.placas-list div {
-    font-size: 12px;
-    padding: 2px 0;
-}
-
-/* Estilo para todos los panel-header */
-.panel-header {
-  position: relative;
-  background-image: url('/media/panel/tire.jpg'); /* Ruta a la imagen */
-  background-size: cover;
-  background-position: center;
-  height: 100%; /* Asegura que el header cubra la altura */
-  z-index: 1;
-}
-
-/* Overlay oscuro para mejorar legibilidad */
-.panel-header::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3); /* Overlay semitransparente */
-  z-index: 1; /* El overlay debe estar encima del fondo */
-}
-
-/* Asegurarse de que el contenido esté encima del fondo y el overlay */
-.panel-header .container {
-  position: relative;
-  z-index: 2; /* Contenido encima de todo */
-}
-
-/* Estilo del título */
-.panel-header h2 {
-  z-index: 2;
-  position: relative;
-  color: white; /* Asegura que el texto sea visible */
-  font-weight: 700;
-}
-
-/* Estilo para todos los panel-header */
-.panel-header {
-  position: relative;
-  background-image: url('/media/panel/tire.jpg'); /* Ruta a la imagen */
-  background-size: cover;
-  background-position: center;
-  height: 100%;
-  z-index: 1;
-}
-
-.panel-header::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3); /* Overlay semitransparente */
-  z-index: 1;
-}
-
-.panel-header .container {
-  position: relative;
-  z-index: 2;
-}
-
-.header-title {
-  z-index: 2;
-  position: relative;
-  color: white;
-  font-weight: 700;
-}
-
-/* Estilos para las tablas */
-.content-box {
-  background-color: #ffffff;
-  padding: 40px;
-  border-radius: 10px;
-}
-
-/* Estilos de las tablas de huella */
-.huella-rojo {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.huella-amarillo {
-  background-color: #f1c40f;
-  color: black;
-}
-
-.huella-verde {
-  background-color: #2ecc71;
-  color: white;
-}
-
-/* Estilo para las flechas de alternar en las tablas */
-.toggle-arrow {
-  cursor: pointer;
-  font-size: 14px;
-  margin-left: 5px;
-}
-
-.placas-list {
-  margin-top: 5px;
-  background-color: #f5b7b1;
-  padding: 5px;
-  border-radius: 5px;
-  color: #333;
-}
-
-.placas-list div {
-  font-size: 12px;
-  padding: 2px 0;
-}
-
-#autocomplete-results {
-  max-height: 200px;
-  overflow-y: auto;
-  background-color: white;
-  border: 1px solid #ccc;
-  position: absolute;
-  z-index: 1000;
-  width: 100%;
-}
-
-.dropdown-item {
-  padding: 8px 16px;
-  cursor: pointer;
-}
-
-.dropdown-item:hover {
-  background-color: #f0f0f0;
-}
-
-/* General Styles */
-.panel-header-sm {
-  padding: 2rem;
-}
-
-.content-box {
-  background-color: #ffffff;
-  padding: 20px;
-}
-
-.header-title {
-  font-weight: 700;
-  color: #fff;
-}
-
-.card {
-  margin-bottom: 1.5rem;
-  border-radius: 10px;
-}
-
-.card-body {
-  padding: 1.5rem;
-}
-
-.table {
-  width: 100%;
+  table-layout: fixed; /* Distribuye equitativamente las columnas */
   margin-bottom: 1rem;
   color: #212529;
   border-collapse: collapse;
@@ -658,8 +456,8 @@ table {
 }
 
 .table-hover tbody tr:hover {
+  background-color: #f1f1f1; /* Mejorando la legibilidad en hover */
   color: #212529;
-  background-color: rgba(0, 0, 0, 0.075);
 }
 
 .text-primary {
@@ -685,62 +483,183 @@ table {
   color: white;
 }
 
-.dropdown-item:hover {
-  background-color: #f1c40f;
+.dropdown-item {
+  padding: 8px 16px;
   cursor: pointer;
 }
 
-/* Responsive Styles */
-@media (max-width: 767px) {
-  .container {
-      padding-left: 15px;
-      padding-right: 15px;
+.dropdown-item:hover {
+  background-color: #f1c40f; /* Cambio al color amarillo en hover */
+}
+
+.filtro-radio, .filtro-select {
+  margin-bottom: 10px;
+}
+
+/* Responsive Styles para pantallas pequeñas */
+@media (max-width: 768px) {
+  .header-title, h2, h4 {
+    font-size: 18px; /* Ajusta tamaño de títulos */
+  }
+  
+  .table th, .table td {
+    font-size: 12px; /* Reduce tamaño de texto en tablas */
+    padding: 0.5rem; /* Reduce padding */
+  }
+
+  .position-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .responsive-header {
+    font-size: 12px;
   }
 
   .header-title {
-      font-size: 1.5rem;
+    font-size: 20px;
   }
 
   .card-body {
-      padding: 1rem;
+    padding: 1rem;
   }
 }
 
+@media (max-width: 576px) {
+  th, td {
+    font-size: 10px;
+  }
 
-/* Estilos generales de los contenedores */
-.bg-white {
+  .table th, .table td {
+    padding: 0.3rem;
+  }
+  
+  .header-title, h2, h4 {
+    font-size: 16px;
+  }
+  
+  .table th {
+    font-size: 8px;
+  }
+}
+
+/*==================== Misceláneos Adicionales ====================*/
+/* Logo */
+.logo img {
+  width: 100%;
+  height: auto;
+  max-width: 180px; /* Tamaño máximo del logo para pantallas grandes */
+}
+
+.logo-mini {
+  display: none; /* Ocultar logo mini en pantallas grandes */
+}
+
+@media (max-width: 991.98px) {
+  .logo-large {
+    display: none; /* Ocultar logo grande en pantallas pequeñas */
+  }
+  .logo-mini {
+    display: block; /* Mostrar logo mini en pantallas pequeñas */
+  }
+}
+
+/* Estilos para las tablas */
+.content-box {
   background-color: #ffffff;
+  padding: 40px;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
 }
 
-/* Ajustes generales para las tarjetas y tablas */
-.card {
-  margin-bottom: 1.5rem;
+.huella-rojo,
+.huella-amarillo,
+.huella-verde {
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin-right: 5px;
+  font-size: 14px;
 }
 
-/* Ajuste para la barra de bienvenida */
-.header-title {
-  font-weight: bold;
+/* Estilo para las flechas de alternar en las tablas */
+.toggle-arrow {
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 5px;
+}
+
+/* Lista de placas */
+.placas-list {
+  margin-top: 5px;
+  background-color: #f5b7b1;
+  padding: 5px;
+  border-radius: 5px;
   color: #333;
-  font-size: 24px;
 }
 
-/* Responsive design para pantallas pequeñas */
-@media (max-width: 768px) {
-  .responsive-header {
-      font-size: 12px;
-  }
-
-  .header-title {
-      font-size: 20px;
-  }
+.placas-list div {
+  font-size: 12px;
+  padding: 2px 0;
 }
 
-/* Efecto hover para las tarjetas del resumen */
+/* Estilo del título en panel-header */
+.panel-header {
+  position: relative;
+  background-image: url('/media/panel/tire.jpg'); /* Ruta a la imagen */
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Overlay oscuro para mejorar legibilidad */
+.panel-header::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Overlay semitransparente */
+  z-index: 1; /* El overlay debe estar encima del fondo */
+}
+
+.panel-header .container {
+  position: relative;
+  z-index: 2; /* Contenido encima de todo */
+}
+
+.header-title {
+  font-weight: 700;
+  color: white;
+  z-index: 2;
+  position: relative;
+}
+
+/* Estilos para botones y posiciones */
+.table .btn-sm {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.7rem;
+}
+
+.position-btn {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.position-btn:hover {
+  transform: scale(1.1);
+}
+
 .card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .card-hover:hover {
@@ -748,7 +667,6 @@ table {
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Efecto hover para las barras de huella */
 .bar-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -758,7 +676,6 @@ table {
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Efecto hover para los números de Requerimiento de Servicios */
 .num-hover {
   transition: transform 0.2s ease;
 }
@@ -767,153 +684,7 @@ table {
   transform: scale(1.1);
 }
 
-.card-hover {
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-
-/* Efecto para el botón de la placa cuando se hace hover sobre la tarjeta */
-.card-hover:hover .placa-btn {
-  transition: box-shadow 0.3s ease-in-out;
-  box-shadow: 0 0 10px 2px #f96332; /* Brillo leve en el botón */
-}
-
-/* Asegurarse que los filtros no tengan efecto de zoom */
-#empresa_autocomplete, #criticidad, #order_by {
-  transition: none;
-}
-
-
-/* Ajuste para los contenedores blancos */
-.card, .card-body, .accordion .card-header {
-  background-color: #ffffff !important;
-}
-
-/* Estilo responsivo para la tabla */
-.table-responsive {
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-/* Ajustar el tamaño de los textos en pantallas pequeñas */
-@media (max-width: 768px) {
-  th, td {
-      font-size: 12px;
-  }
-
-  .table th, .table td {
-      padding: 0.45rem;
-  }
-  
-  /* Ajustar tamaño de los títulos */
-  .header-title, h2, h4 {
-      font-size: 18px;
-  }
-  
-  .table th {
-      font-size: 10px;
-  }
-}
-
-@media (max-width: 576px) {
-  th, td {
-      font-size: 10px;
-  }
-
-  .table th, .table td {
-      padding: 0.3rem;
-  }
-  
-  /* Ajustar aún más los títulos */
-  .header-title, h2, h4 {
-      font-size: 16px;
-  }
-  
-  .table th {
-      font-size: 8px;
-  }
-}
-
-/* Mantener la tabla responsiva con scroll horizontal */
-.table-scroll {
-  overflow-x: auto; /* Permite el scroll horizontal si la tabla es más ancha que el contenedor */
-  white-space: nowrap; /* Evita que el contenido se quiebre dentro de las celdas */
-}
-
-/* Estilo para las tablas adaptativas */
-.table-adaptive {
-  width: 100%;
-  table-layout: auto; /* Permite que las columnas se ajusten según el contenido */
-}
-
-/* Ajuste de títulos y celdas para pantallas pequeñas */
-.table th, .table td {
-  padding: 0.75rem;
-  text-align: left;
-  vertical-align: middle;
-}
-
-/* Ajustar el tamaño de los títulos y celdas en pantallas pequeñas */
-@media (max-width: 576px) {
-  .table th, .table td {
-      font-size: 12px; /* Reduce el tamaño de texto en pantallas pequeñas */
-  }
-
-  /* Opcional: Si se quiere más espacio, reducir el padding */
-  .table th, .table td {
-      padding: 0.5rem;
-  }
-}
-
-/* Mejorando la legibilidad en hover */
-.table-hover tbody tr:hover {
-  background-color: #f1f1f1;
-}
-
-/* Estilo para botones */
-.table .btn-sm {
-  padding: 0.2rem 0.4rem;
-  font-size: 0.7rem;
-}
-
-/* Botones redondos para las posiciones */
-.position-btn {
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Colores para diferentes estados */
-.btn-primary {
-    background-color: #12bd3d;
-    color: white;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-
-/* Estilo para asegurar que se vea bien en pantallas pequeñas */
-@media (max-width: 576px) {
-    .position-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 12px;
-    }
-}
-
-/* Estilos para los badges de averías seleccionadas */
+/* Estilos para badges de averías seleccionadas */
 .badge-info {
   background-color: #5bc0de;
   padding: 8px 12px;
@@ -921,23 +692,167 @@ table {
   margin-right: 5px;
 }
 
-/* Switch para Renovable */
-.custom-switch .custom-control-label::before {
-  background-color: #f96332;
+/* Estilo para asegurar buena visualización en pantallas pequeñas */
+.table-scroll {
+  overflow-x: auto; /* Permite el scroll horizontal */
+  white-space: nowrap; /* Evita que el contenido se quiebre */
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
-  background-color: #4caf50;
+.table-adaptive {
+  width: 100%;
+  table-layout: auto; /* Ajuste según contenido */
 }
 
-
-/* Sobreescribe las propiedades para hacer visibles los checkboxes */
-.form-check-input[type="checkbox"] {
-  position: static !important; /* Elimina el posicionamiento absoluto */
-  opacity: 1 !important; /* Asegura que el checkbox sea visible */
-  margin-top: 0 !important; /* Ajusta el margen */
-  margin-left: 0 !important; /* Ajusta el margen */
-  width: auto !important; /* Ajusta el tamaño */
+/* Asegurar que los filtros no tengan efecto de zoom */
+#empresa_autocomplete, #criticidad, #order_by {
+  transition: none;
 }
 
+/* Ajustes generales para las tarjetas y tablas */
+.card, .accordion .card-header {
+  background-color: #ffffff !important;
+}
 
+/* General content styles */
+.content {
+  margin-top: 20px;
+}
+
+/* Estilo para tablas con stripe */
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+
+/* Efecto hover para tarjetas de resumen */
+.card-hover:hover .placa-btn {
+  box-shadow: 0 0 10px 2px #f96332; /* Brillo leve en el botón */
+}
+
+/* Efectos para evitar superposición y mejorar la legibilidad */
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+/*==================== Botones Redondos para Posiciones ====================*/
+.position-btn {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 576px) {
+  .position-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+}
+
+/*==================== Resumen de Ajustes Responsivos ====================*/
+/* Ajuste para la barra de bienvenida */
+/* Estilo para títulos en el header */
+.header-title {
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 24px;
+}
+
+/* Ajuste de la imagen de fondo para la página de login */
+.full-page.section-image {
+  background: url("/media/panel/login.png") no-repeat center center;
+  background-size: cover;
+  position: fixed; /* Mantener el fondo fijo */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Filtro y difuminado en la imagen de fondo */
+.full-page.section-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Filtro de color oscuro */
+  filter: blur(5px); /* Difuminado */
+  z-index: -1; /* Mantener el filtro detrás del contenido */
+}
+
+/* Estilo de la tarjeta */
+/* Ajuste de la tarjeta para hacerla transparente solo en la página de login */
+.login-page .card-login {
+  background: rgba(255, 255, 255, 0.1) !important; /* Fondo blanco con transparencia */
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Sombra alrededor del contenedor */
+  backdrop-filter: blur(10px); /* Desenfoque */
+  -webkit-backdrop-filter: blur(10px); /* Desenfoque para Safari */
+}
+
+/* Estilo de los campos de entrada dentro de la página de login */
+.login-page .input-group {
+  border-radius: 50px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.login-page .input-group-prepend .input-group-text {
+  background: transparent;
+  border: none;
+  color: #fff;
+}
+
+.login-page .form-control {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+}
+
+.login-page .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7); /* Placeholder en blanco translúcido */
+}
+
+/* Botón solo para la página de login */
+.login-page .btn-primary {
+  background-color: #FF7F50;
+  border: none;
+  border-radius: 50px;
+  padding: 15px 0;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+/* Estilo de enlaces en el footer solo en la página de login */
+.login-page .footer-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.login-page .footer-link:hover {
+  color: #FF7F50;
+  text-decoration: none;
+}
+
+/* Estilo de los enlaces dentro del footer solo en la página de login */
+.login-page h6 a {
+  color: white;
+  font-weight: 700;
+}
+
+/* Ajuste del logo en la página de login */
+.login-page .logo-container img {
+  width: 100px; /* Ajustar tamaño del logo */
+  margin-bottom: 20px;
+}

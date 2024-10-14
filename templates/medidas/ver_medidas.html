@@ -3,32 +3,101 @@
 {% block title %}Gestionar Medidas{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-primary">Gestionar Medidas de Neumáticos</h2>
-
-    <a href="{% url 'crear_medida' %}" class="btn btn-primary mb-3">Añadir Nueva Medida</a>
-
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Medida</th>
-                <th>Precio Estimado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for medida in medidas %}
-            <tr>
-                <td>{{ medida.medida }}</td>
-                <td>${{ medida.precio_estimado }}</td>
-                <td>
-                    <a href="{% url 'editar_medida' medida.id %}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="{% url 'eliminar_medida' medida.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar esta medida?');">Eliminar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Panel Header con el título estilizado -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title text-white">Gestionar Medidas de Neumáticos</h2>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock %}
 
+<!-- Contenedor completo con tabla estilizada y scroll horizontal en pantallas pequeñas -->
+<div class="container-fluid mt-5">
+    <!-- Contenedor principal en color blanco con sombra -->
+    <div class="bg-white p-4 shadow-lg rounded zoom-card">
+        <!-- Botón para añadir nueva medida con un diseño más moderno -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-dark">Listado de Medidas</h4> <!-- Cambiado a text-dark para consistencia -->
+            <a href="{% url 'crear_medida' %}" class="btn btn-primary btn-lg zoom-card">Añadir Nueva Medida</a>
+        </div>
+
+        <!-- Tabla estilizada con hover y adaptativa -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" style="min-width: 1000px;">
+                <thead class="bg-light text-dark"> <!-- Cambiado a text-dark para que los títulos sean negros -->
+                    <tr>
+                        <th>Medida</th>
+                        <th>Precio Estimado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medida in medidas %}
+                    <tr>
+                        <td>{{ medida.medida }}</td>
+                        <td>${{ medida.precio_estimado }}</td>
+                        <td>
+                            <a href="{% url 'editar_medida' medida.id %}" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{% url 'eliminar_medida' medida.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar esta medida?');">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+    /* Efecto de zoom para las tarjetas y botones con hover */
+    .zoom-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .zoom-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Fondo blanco y sombras */
+    .bg-white {
+        background-color: #fff;
+        border-radius: 8px;
+    }
+
+    /* Botón estilizado */
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        font-size: 1rem;
+        padding: 0.5rem 1.25rem;
+    }
+
+    /* Tabla con hover */
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Scroll horizontal en tablas pequeñas */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    /* Ajuste de botones de acción */
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    /* Ajuste en el tamaño mínimo de la tabla para que no se rompa en pantallas pequeñas */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+</style>
+
+{% endblock %}

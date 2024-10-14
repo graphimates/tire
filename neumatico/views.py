@@ -188,10 +188,6 @@ def ver_neumaticos(request):
         'ordenar': ordenar
     })
 
-
-from django.db.models import Count
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 @login_required
 def historico_datos(request, user_id=None):
     from datetime import timedelta
@@ -210,14 +206,18 @@ def historico_datos(request, user_id=None):
 
     # Obtener el usuario seleccionado o el actual
     selected_user_id = request.GET.get('usuario_id', user_id)
-    if request.user.is_superuser:
+    if request.user.is_superuser and selected_user_id != "todas":
         selected_user = Usuario.objects.get(id=selected_user_id)
     else:
-        selected_user = request.user
+        selected_user = None if selected_user_id == "todas" else request.user
 
-    # Obtener los neumáticos actuales y el historial de inspecciones del usuario seleccionado
-    neumaticos_actuales = Neumatico.objects.filter(vehiculo__usuario=selected_user)
-    historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=selected_user)
+    # Obtener los neumáticos actuales y el historial de inspecciones del usuario seleccionado o de todos
+    if selected_user:
+        neumaticos_actuales = Neumatico.objects.filter(vehiculo__usuario=selected_user)
+        historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=selected_user)
+    else:
+        neumaticos_actuales = Neumatico.objects.all()
+        historial_inspecciones = HistorialInspeccion.objects.all()
 
     # Inicializar los contadores para los neumáticos
     operativos_data = 0
@@ -226,7 +226,7 @@ def historico_datos(request, user_id=None):
 
     # Preparar datos para la nueva gráfica (últimos 6 meses)
     hoy = timezone.now().date()
-    meses_labels = [(hoy - timedelta(days=30*i)).strftime('%B') for i in range(6)][::-1]  # Últimos 6 meses
+    meses_labels = [(hoy - timedelta(days=30 * i)).strftime('%B') for i in range(6)][::-1]  # Últimos 6 meses
     operativos_mes = [0] * 6
     renovables_mes = [0] * 6
     desperdicio_mes = [0] * 6
@@ -235,29 +235,29 @@ def historico_datos(request, user_id=None):
     for neumatico in neumaticos_actuales:
         indice_mes = obtener_indice_mes(neumatico.fecha_inspeccion)
         if indice_mes is not None:
-            if neumatico.renovable:
-                renovables_data += 1
-                renovables_mes[indice_mes] += 1
-            elif neumatico.averias.filter(estado='no_operativo').exists():
-                desperdicio_data += 1
-                desperdicio_mes[indice_mes] += 1
-            else:
+            if not neumatico.averias.filter(estado='no_operativo').exists():
                 operativos_data += 1
                 operativos_mes[indice_mes] += 1
+                if neumatico.renovable:
+                    renovables_data += 1
+                    renovables_mes[indice_mes] += 1
+            else:
+                desperdicio_data += 1
+                desperdicio_mes[indice_mes] += 1
 
     # Contar los neumáticos en el historial por su estado y mes
     for inspeccion in historial_inspecciones:
         indice_mes = obtener_indice_mes(inspeccion.fecha_inspeccion)
         if indice_mes is not None:
-            if inspeccion.renovable:
-                renovables_data += 1
-                renovables_mes[indice_mes] += 1
-            elif inspeccion.averia and inspeccion.averia.estado == 'no_operativo':
+            if inspeccion.averia and inspeccion.averia.estado == 'no_operativo':
                 desperdicio_data += 1
                 desperdicio_mes[indice_mes] += 1
             else:
                 operativos_data += 1
                 operativos_mes[indice_mes] += 1
+                if inspeccion.renovable:
+                    renovables_data += 1
+                    renovables_mes[indice_mes] += 1
 
     # Etiquetas para la gráfica
     cauchos_labels = ['Operativos', 'Renovables', 'Desperdicio']
@@ -278,20 +278,20 @@ def historico_datos(request, user_id=None):
     labels = [item[0] for item in averias_ordenadas]
     data_barras = [item[1] for item in averias_ordenadas]
     total_averias = sum(data_barras)
-    data_barras_porcentaje = [(cantidad / total_averias) * 100 for cantidad in data_barras]
+    data_barras_porcentaje = [(cantidad / total_averias) * 100 for cantidad in data_barras] if total_averias > 0 else []
 
     # Porcentaje acumulado de averías
     porcentaje_acumulado = []
     suma_acumulada = 0
     for cantidad in data_barras:
         suma_acumulada += cantidad
-        porcentaje_acumulado.append(round((suma_acumulada / total_averias) * 100, 2))
+        porcentaje_acumulado.append(round((suma_acumulada / total_averias) * 100, 2)) if total_averias > 0 else []
 
     context = {
         'labels': labels,
         'data_barras': data_barras_porcentaje,
         'porcentaje_acumulado': porcentaje_acumulado,
-        'usuarios': Usuario.objects.all(),
+        'usuarios': Usuario.objects.exclude(is_superuser=True),
         'selected_user': selected_user,
         'averias_counter': dict(averias_counter),
         'operativos_data': operativos_data,
@@ -308,13 +308,7 @@ def historico_datos(request, user_id=None):
     return render(request, 'neumaticos/historico_datos.html', context)
 
 
-
 # neumatico/views.py
-
-
-def is_admin(user):
-    return user.is_superuser
-
 @login_required
 @user_passes_test(is_admin)
 def cargar_inspecciones(request):

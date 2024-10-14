@@ -1,45 +1,64 @@
-<!-- templates/averias/crear_averia.html -->
 {% extends "base.html" %}
 
 {% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-<div class="panel-header panel-header-sm"></div>  <!-- Panel Header Pequeño -->
-
-<div class="container mt-5" style="background-color: #f4f5f7; padding: 30px; border-radius: 10px;">
-    <h2 class="text-primary">{{ titulo }}</h2>
-    <form method="POST" class="row g-3 mt-4">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-
-        <div class="col-md-4">
-            <label for="id_nombre" class="form-label text-primary">Nombre de la Avería</label>
-            {{ form.nombre }}
+<!-- Panel Header Pequeño -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title">{{ titulo }}</h2>
+            </div>
         </div>
+    </div>
+</div>
 
-        <div class="col-md-4">
-            <label for="id_servicio_requerido" class="form-label text-primary">Servicio Requerido</label>
-            {{ form.servicio_requerido }}
-        </div>
+<!-- Contenedor para el formulario con estilo -->
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <!-- Título dentro del formulario -->
+                    <h4 class="text-center mb-4">{{ titulo }}</h4>
+                    <form method="POST" class="row g-3">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
 
-        <div class="col-md-4">
-            <label for="id_codigo" class="form-label text-primary">Código de la Avería</label>
-            {{ form.codigo }}
-        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_nombre" class="form-label text-primary">Nombre de la Avería</label>
+                            {{ form.nombre }}
+                        </div>
 
-        <div class="col-md-4">
-            <label for="id_estado" class="form-label text-primary">Estado de la Avería</label>
-            {{ form.estado }}
-        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_servicio_requerido" class="form-label text-primary">Servicio Requerido</label>
+                            {{ form.servicio_requerido }}
+                        </div>
 
-        <div class="col-md-4">
-            <label for="id_criticidad" class="form-label text-primary">Criticidad</label>
-            {{ form.criticidad }}  <!-- Añadir criticidad -->
-        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_codigo" class="form-label text-primary">Código de la Avería</label>
+                            {{ form.codigo }}
+                        </div>
 
-        <div class="col-12 text-center mt-4">
-            <button type="submit" class="btn btn-success btn-lg">Guardar Avería</button>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_estado" class="form-label text-primary">Estado de la Avería</label>
+                            {{ form.estado }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="id_criticidad" class="form-label text-primary">Criticidad</label>
+                            {{ form.criticidad }}
+                        </div>
+
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">Guardar Avería</button>
+                            <a href="{% url 'ver_averias' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

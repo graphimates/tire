@@ -3,13 +3,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-orange">
   <div class="container-fluid">
     <!-- Navbar Toggler (Mobile) -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <img src="{% static 'assets/img/neumatico.png' %}" alt="Neumático" class="toggler-icon">
     </button>
 
     <!-- Navbar Collapse -->
     <div class="collapse navbar-collapse" id="navbarContent">
-      <ul class="navbar-nav mr-auto d-lg-none">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-lg-none">
         <!-- Inicio -->
         <li class="nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
           <a class="nav-link" href="{% url 'index' %}">
@@ -32,11 +32,13 @@
         </li>
 
         <!-- Histórico de Datos -->
+        {% if user.is_authenticated %}
         <li class="nav-item {% if request.resolver_match.url_name == 'historico_datos' %}active{% endif %}">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="{% url 'historico_datos' user_id=request.user.id %}">
             <i class="fa fa-database"></i> Histórico de Datos
           </a>
         </li>
+        {% endif %}
 
         <!-- Gestionar Averías -->
         <li class="nav-item {% if request.resolver_match.url_name == 'ver_averias' %}active{% endif %}">
@@ -48,13 +50,13 @@
         <!-- Administrador de Usuarios (solo para admin) -->
         {% if user.is_superuser %}
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="adminUserLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="adminUserLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-check"></i> Administrador de Usuarios
           </a>
-          <div class="dropdown-menu" aria-labelledby="adminUserLink">
-            <a class="dropdown-item" href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
-            <a class="dropdown-item" href="{% url 'crear_usuario' %}">Nuevo Usuario</a>
-          </div>
+          <ul class="dropdown-menu" aria-labelledby="adminUserLink">
+            <li><a class="dropdown-item" href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
+            <li><a class="dropdown-item" href="{% url 'crear_usuario' %}">Nuevo Usuario</a></li>
+          </ul>
         </li>
         {% endif %}
       </ul>
@@ -62,18 +64,19 @@
 
     <!-- Perfil del usuario siempre visible en el header -->
     {% if user.is_authenticated %}
-    <div class="dropdown ml-auto fixed-profile">
-      <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div class="profile-dropdown ms-auto fixed-profile">
+      <div class="profile-icon d-flex align-items-center text-white" id="userMenuToggle" style="cursor: pointer;">
         {% if user.profile_photo %}
         <img src="{{ user.profile_photo.url }}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
         {% else %}
         <img src="{% static 'assets/img/default-user.png' %}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
         {% endif %}
-        <span class="ml-2 d-none d-md-inline">{{ user.get_full_name }}</span>
-      </a>
-      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
+        <span class="ms-2 d-none d-md-inline">{{ user.get_full_name }}</span>
+        <i class="fa fa-caret-down ms-2"></i>
+      </div>
+      <div class="profile-menu" id="userMenu" style="display: none; position: absolute; right: 0; top: 60px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px; min-width: 150px;">
         <a class="dropdown-item" href="{% url 'perfil_usuario' %}">Perfil</a>
-        <div class="dropdown-divider"></div>
+        <hr class="dropdown-divider">
         <!-- Cerrar sesión con POST -->
         <form method="POST" action="{% url 'logout' %}">
           {% csrf_token %}
@@ -82,7 +85,7 @@
       </div>
     </div>
     {% else %}
-    <span class="navbar-text text-white ml-auto">Bienvenido</span>
+    <span class="navbar-text text-white ms-auto">Bienvenido</span>
     {% endif %}
   </div>
 </nav>

@@ -2,12 +2,34 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container">
-  <h2>Modificar Imagen de Perfil</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-primary">Actualizar Imagen</button>
-  </form>
+<!-- Añadimos el panel-header-sm para consistencia visual -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title">Modificar Imagen de Perfil</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary">Actualizar Imagen</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -3,14 +3,40 @@
 {% block title %}Editar Medida{% endblock %}
 
 {% block content %}
-<div class="panel-header panel-header-sm"></div>
+<!-- Panel Header con el Título estilizado -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title">Editar Medida: {{ medida.medida }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="container mt-5">
-    <h2 class="text-primary">Editar Medida: {{ medida.medida }}</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-    </form>
+<!-- Contenedor principal con estilo -->
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Tarjeta con sombra para el formulario -->
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h4 class="text-center mb-4">Formulario para Editar Medida</h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <!-- Renderizado del formulario -->
+                        {{ form.as_p }}
+                        
+                        <!-- Botón de acción centrado -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                            <a href="{% url 'ver_medidas' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

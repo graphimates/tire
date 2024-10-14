@@ -3,28 +3,38 @@
 {% block title %}Ver Usuarios{% endblock %}
 
 {% block content %}
+<!-- Panel Header -->
 <div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title">Gestión de Usuarios</h2>
+            </div>
+        </div>
+    </div>
 </div>
+
 <div class="content">
   <div class="row">
     <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
           <h4 class="card-title">Lista de Usuarios</h4>
         </div>
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead class="text-primary">
+          <!-- Contenedor que permite el scroll horizontal sin cambiar tamaño -->
+          <div class="table-responsive" style="overflow-x: auto; white-space: nowrap;">
+            <table class="table table-bordered table-hover" style="table-layout: fixed; width: 100%;">
+              <thead class="bg-light text-dark"> <!-- Cambiado a text-dark para que siempre sea negro -->
                 <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Nombre</th>
-                  <th scope="col">Apellido</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Empresa</th>
-                  <th scope="col">¿Es Admin?</th>
-                  <th scope="col">¿Activo?</th>
-                  <th scope="col">Acciones</th>
+                  <th style="width: 50px;">#</th>
+                  <th style="width: 150px;">Nombre</th>
+                  <th style="width: 150px;">Apellido</th>
+                  <th style="width: 250px;">Email</th>
+                  <th style="width: 200px;">Empresa</th>
+                  <th style="width: 100px;">¿Es Admin?</th>
+                  <th style="width: 100px;">¿Activo?</th>
+                  <th style="width: 200px;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -38,10 +48,18 @@
                   <td>{{ usuario.is_superuser|yesno:"Sí,No" }}</td>
                   <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
                   <td>
-                    <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm">Añadir Vehículo</a>  
-                    <a href="{% url 'descargar_informacion_usuario' usuario.id %}" class="btn btn-info btn-sm">Descargar</a> 
+                    <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm" title="Eliminar">
+                      <i class="fas fa-trash-alt"></i>
+                    </a>
+                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm" title="Añadir Vehículo">
+                      <i class="fas fa-car"></i>
+                    </a>
+                    <a href="{% url 'descargar_informacion_usuario' usuario.id %}" class="btn btn-secondary btn-sm" title="Descargar Información">
+                      <i class="fas fa-download"></i>
+                    </a>
                   </td>
                 </tr>
                 {% endfor %}
@@ -53,4 +71,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}

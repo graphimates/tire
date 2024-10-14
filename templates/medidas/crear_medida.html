@@ -3,15 +3,40 @@
 {% block title %}Añadir Nueva Medida{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-primary">Añadir Nueva Medida</h2>
+<!-- Panel Header con el Título estilizado -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title">Añadir Nueva Medida</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button type="submit" class="btn btn-success">Guardar Medida</button>
-    </form>
+<!-- Contenedor principal con estilo -->
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Tarjeta con sombra para el formulario -->
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h4 class="text-center mb-4">Formulario para Añadir Nueva Medida</h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <!-- Renderizado del formulario -->
+                        {{ form.as_p }}
+                        
+                        <!-- Botón de acción centrado -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success">Guardar Medida</button>
+                            <a href="{% url 'ver_medidas' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
-

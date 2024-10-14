@@ -15,11 +15,12 @@
 </div>
 
 <!-- Formulario de Edición -->
-<div class="container mt-5">
+<div class="content">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-md-8">
             <div class="card shadow-lg">
                 <div class="card-body">
+                    <!-- Título dentro del formulario -->
                     <h4 class="text-center mb-4">Modificar los detalles del neumático</h4>
                     <form method="post" id="editarNeumaticoForm">
                         {% csrf_token %}
@@ -29,116 +30,104 @@
                                 {{ form.non_field_errors }}
                             </div>
                         {% endif %}
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.modelo.id_for_label }}">Modelo</label>
+                                <label for="{{ form.modelo.id_for_label }}" class="form-label">Modelo</label>
                                 {{ form.modelo }}
                                 {% if form.modelo.errors %}
-                                    <div class="text-danger">
-                                        {{ form.modelo.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.modelo.errors.0 }}</div>
                                 {% endif %}
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.marca.id_for_label }}">Marca</label>
+                                <label for="{{ form.marca.id_for_label }}" class="form-label">Marca</label>
                                 {{ form.marca }}
                                 {% if form.marca.errors %}
-                                    <div class="text-danger">
-                                        {{ form.marca.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.marca.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.medida.id_for_label }}">Medida</label>
+                                <label for="{{ form.medida.id_for_label }}" class="form-label">Medida</label>
                                 {{ form.medida }}
                                 {% if form.medida.errors %}
-                                    <div class="text-danger">
-                                        {{ form.medida.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.medida.errors.0 }}</div>
                                 {% endif %}
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.presion.id_for_label }}">Presión</label>
+                                <label for="{{ form.presion.id_for_label }}" class="form-label">Presión</label>
                                 {{ form.presion }}
                                 {% if form.presion.errors %}
-                                    <div class="text-danger">
-                                        {{ form.presion.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.presion.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.huella.id_for_label }}">Huella</label>
+                                <label for="{{ form.huella.id_for_label }}" class="form-label">Huella</label>
                                 {{ form.huella }}
                                 {% if form.huella.errors %}
-                                    <div class="text-danger">
-                                        {{ form.huella.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.huella.errors.0 }}</div>
                                 {% endif %}
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.dot.id_for_label }}">DOT</label>
+                                <label for="{{ form.dot.id_for_label }}" class="form-label">DOT</label>
                                 {{ form.dot }}
                                 {% if form.dot.errors %}
-                                    <div class="text-danger">
-                                        {{ form.dot.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.dot.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.diseño.id_for_label }}">Diseño</label>
+                                <label for="{{ form.diseño.id_for_label }}" class="form-label">Diseño</label>
                                 {{ form.diseño }}
                                 {% if form.diseño.errors %}
-                                    <div class="text-danger">
-                                        {{ form.diseño.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.diseño.errors.0 }}</div>
                                 {% endif %}
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label>Renovable</label>
+                                <label class="form-label">Renovable</label>
                                 <div class="custom-control custom-switch">
                                     {{ form.renovable }}
                                     <label class="custom-control-label" for="{{ form.renovable.id_for_label }}"></label>
                                 </div>
-                                <!-- Mostrar el error de renovable si existe -->
                                 {% if form.renovable.errors %}
-                                    <div class="text-danger">
-                                        {{ form.renovable.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.renovable.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
+
                         <div class="row">
-                            <!-- Contenedor para Averías fuera de cualquier tarjeta -->
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.averias.id_for_label }}">Averías (máximo 3 seleccionables)</label>
+                                <label for="{{ form.averias.id_for_label }}" class="form-label">Averías (máximo 3 seleccionables)</label>
                                 <div class="form-group">
-                                    <!-- Lista de averías con checkboxes -->
                                     {{ form.averias }}
                                 </div>
                                 <small class="form-text text-muted">Selecciona hasta 3 averías.</small>
                                 <div id="error-averias" class="text-danger mt-2" style="display:none;">Máximo 3 averías permitidas.</div>
                                 {% if form.averias.errors %}
-                                    <div class="text-danger">
-                                        {{ form.averias.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.averias.errors.0 }}</div>
                                 {% endif %}
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha_inspeccion.id_for_label }}">Fecha de Inspección</label>
+                                <label for="{{ form.fecha_inspeccion.id_for_label }}" class="form-label">Fecha de Inspección</label>
                                 {{ form.fecha_inspeccion }}
                                 {% if form.fecha_inspeccion.errors %}
-                                    <div class="text-danger">
-                                        {{ form.fecha_inspeccion.errors.0 }}
-                                    </div>
+                                    <div class="text-danger">{{ form.fecha_inspeccion.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
+
                         <div class="text-center">
                             <button type="submit" class="btn btn-success">Guardar Cambios</button>
                             <a href="{% url 'reporte_vehiculos' %}" class="btn btn-secondary">Cancelar</a>
@@ -157,7 +146,6 @@
         const errorAverias = document.querySelector('#error-averias');
         const form = document.querySelector('#editarNeumaticoForm');
 
-        // Función para actualizar el contador y validar el número de selecciones
         const updateAveriasCount = () => {
             const selected = document.querySelectorAll('input[name="averias"]:checked').length;
             if (selected > 3) {
@@ -169,20 +157,18 @@
             }
         };
 
-        // Validación al cambiar cualquier checkbox
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function () {
                 const selected = document.querySelectorAll('input[name="averias"]:checked').length;
                 if (selected > 3) {
                     errorAverias.style.display = 'block';
-                    this.checked = false; // Desmarcar la casilla adicional
+                    this.checked = false;
                 } else {
                     errorAverias.style.display = 'none';
                 }
             });
         });
 
-        // Validación al enviar el formulario
         form.addEventListener('submit', function (e) {
             if (!updateAveriasCount()) {
                 e.preventDefault();

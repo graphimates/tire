@@ -3,39 +3,54 @@
 {% block title %}Añadir Vehículo{% endblock %}
 
 {% block content %}
-<!-- Añadimos el panel-header-sm para consistencia visual -->
-<div class="panel-header panel-header-sm"></div>
-
-<div class="container mt-5 mb-5">
-    <!-- Título estilizado -->
-    <div class="text-center mb-4">
-        <h2 class="styled-title">Añadir Vehículo</h2>
-        <p class="styled-subtitle">Para {{ usuario.first_name }} {{ usuario.last_name }}</p>
+<!-- Panel Header -->
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title">Añadir Vehículo</h2>
+            </div>
+        </div>
     </div>
+</div>
 
-    <!-- Contenedor estilizado para el formulario -->
-    <div class="form-container p-4 shadow-sm rounded">
-        <form method="POST" class="row g-3">
+<div class="content">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card shadow-lg">
+        <div class="card-body">
+          <!-- Título dentro del contenedor del formulario -->
+          <div class="text-center mb-4">
+              <h4 class="text-dark">Añadir Vehículo para {{ usuario.first_name }} {{ usuario.last_name }}</h4>
+          </div>
+
+          <form method="POST" class="row g-3">
             {% csrf_token %}
             {{ form.non_field_errors }}
-            
+
             <div class="col-md-6">
                 <label for="id_placa" class="form-label">Placa</label>
                 {{ form.placa.errors }}
                 {{ form.placa }}
-            </div>      
+            </div>
+
             <div class="col-md-6">
                 <label for="id_modelo" class="form-label">Modelo</label>
                 {{ form.modelo }}
             </div>
+
             <div class="col-md-6">
                 <label for="id_tipo" class="form-label">Tipo de Vehículo</label>
-                {{ form.tipo }}  <!-- Selección del tipo de vehículo -->
+                {{ form.tipo }}
             </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Guardar Vehículo</button>
+
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-success">Guardar Vehículo</button>
             </div>
-        </form>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

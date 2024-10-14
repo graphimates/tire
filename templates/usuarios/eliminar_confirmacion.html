@@ -1,14 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %} Confirmar Eliminación {% endblock %}
+{% block title %}Confirmar Eliminación{% endblock %}
 
 {% block content %}
 <!-- Añadimos el panel-header-sm para consistencia visual -->
-<div class="panel-header panel-header-sm"></div>
+<div class="panel-header panel-header-sm">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="header-title">Confirmar Eliminación</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container mt-5 mb-5 text-center">
-    <!-- Título estilizado -->
-    <div class="confirmation-container p-4 shadow-sm rounded">
+    <!-- Título estilizado dentro de un contenedor con sombra -->
+    <div class="confirmation-container p-4 shadow-sm rounded bg-white">
         <h2 class="styled-title">¿Estás seguro?</h2>
         <p class="styled-subtitle">Deseas eliminar al usuario <strong>"{{ usuario.first_name }} {{ usuario.last_name }}"</strong></p>
 
