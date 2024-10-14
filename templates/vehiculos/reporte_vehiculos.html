@@ -62,7 +62,7 @@
             <div class="card mb-3 card-hover">
                 <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ item.vehiculo.id }}">
                     <h2 class="mb-0">
-                        <button class="btn btn-link placa-btn" type="button" data-toggle="collapse" data-target="#collapse{{ item.vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ item.vehiculo.id }}">
+                        <button class="btn btn-link placa-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ item.vehiculo.id }}" aria-expanded="true" aria-controls="collapse{{ item.vehiculo.id }}">
                             {{ item.vehiculo.placa }} : {{ item.vehiculo.usuario.first_name }} {{ item.vehiculo.usuario.last_name }}
                         </button>
                     </h2>
@@ -94,7 +94,7 @@
                     </div>
                 </div>
 
-                <div id="collapse{{ item.vehiculo.id }}" class="collapse" aria-labelledby="heading{{ item.vehiculo.id }}" data-parent="#vehiculosAccordion">
+                <div id="collapse{{ item.vehiculo.id }}" class="collapse" aria-labelledby="heading{{ item.vehiculo.id }}" data-bs-parent="#vehiculosAccordion">
                     <div class="card-body">
                         <div class="row">
                             <!-- Esquema del vehículo -->
