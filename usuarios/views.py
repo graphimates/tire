@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Usuario
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import UsuarioForm
-from django.views.decorators.cache import never_cache  # Importamos el decorador para deshabilitar la caché
+from django.views.decorators.cache import never_cache
 from .forms import ModificarImagenForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -20,30 +20,30 @@ def is_admin(user):
 
 # Vista para mostrar los usuarios en una tabla
 @login_required
-@user_passes_test(is_admin)  # Solo administradores pueden acceder
-@never_cache  # Deshabilitar la caché
+@user_passes_test(is_admin)
+@never_cache
 def ver_usuarios(request):
     usuarios = Usuario.objects.all()  # Obtener todos los usuarios
     return render(request, 'usuarios/ver_usuarios.html', {'usuarios': usuarios})
 
 
 @login_required
-@user_passes_test(is_admin)  # Solo administradores pueden acceder
-@never_cache  # Deshabilitar la caché
+@user_passes_test(is_admin)
+@never_cache
 def eliminar_usuario(request, user_id):
     usuario = get_object_or_404(Usuario, id=user_id)
     if request.method == 'POST':
-        usuario.delete()  # Eliminar el usuario
-        return redirect('ver_usuarios')  # Redirigir de nuevo a la lista de usuarios
+        usuario.delete()
+        return redirect('ver_usuarios')
     return render(request, 'usuarios/eliminar_confirmacion.html', {'usuario': usuario})
 
 # Vista para el registro de usuario
 @login_required
-@user_passes_test(is_admin)  # Solo administradores pueden acceder
-@never_cache  # Deshabilitar la caché
+@user_passes_test(is_admin)
+@never_cache
 def crear_usuario(request):
     if request.method == 'POST':
-        form = UsuarioForm(request.POST, request.FILES)  # Agregar request.FILES
+        form = UsuarioForm(request.POST, request.FILES)  # Agregar request.FILES para cargar archivos
         if form.is_valid():
             empresa = form.cleaned_data.get('empresa')
             if Usuario.objects.filter(empresa=empresa).exists():
@@ -51,41 +51,47 @@ def crear_usuario(request):
             else:
                 usuario = form.save(commit=False)
                 usuario.set_password(form.cleaned_data['password'])  # Encriptar la contraseña
+                
+                # Verificar si no se subió una imagen y asignar una por defecto
+                if not usuario.profile_photo:
+                    usuario.profile_photo = 'profile_photos/default-profile.png'  # Imagen por defecto
+                
                 usuario.save()
                 return redirect('ver_usuarios')  # Redirigir a la lista de usuarios después de la creación
     else:
         form = UsuarioForm()
+    
     return render(request, 'usuarios/crear_usuario.html', {'form': form})
 
 
 @login_required
-@user_passes_test(is_admin)  # Solo administradores pueden acceder
-@never_cache  # Deshabilitar la caché
+@user_passes_test(is_admin)
+@never_cache
 def editar_usuario(request, user_id):
-    usuario = get_object_or_404(Usuario, id=user_id)  # Obtener el usuario por ID
+    usuario = get_object_or_404(Usuario, id=user_id)
     if request.method == 'POST':
-        form = UsuarioForm(request.POST, instance=usuario)  # Cargar el formulario con los datos existentes
+        form = UsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
             form.save()
-            return redirect('ver_usuarios')  # Redirigir a la lista de usuarios después de la edición
+            return redirect('ver_usuarios')
     else:
-        form = UsuarioForm(instance=usuario)  # Precargar el formulario con los datos del usuario
+        form = UsuarioForm(instance=usuario)
     return render(request, 'usuarios/crear_usuario.html', {'form': form, 'titulo': f'Editando al usuario {usuario.first_name}'})
 
-@never_cache  # Deshabilitar la caché
+@never_cache
 @login_required
 def modificar_imagen(request):
     if request.method == 'POST':
         form = ModificarImagenForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('perfil')  # Redirige a una página de perfil o donde prefieras
+            return redirect('perfil')
     else:
         form = ModificarImagenForm(instance=request.user)
     return render(request, 'usuarios/modificar_imagen.html', {'form': form})
 
 
-@never_cache  # Deshabilitar la caché
+@never_cache
 @login_required
 def perfil_usuario(request):
     usuario = request.user
@@ -99,7 +105,7 @@ def perfil_usuario(request):
     return render(request, 'usuarios/perfil_usuario.html', {'form': form})
 
 @login_required
-@user_passes_test(is_admin)  # Solo administradores pueden acceder
+@user_passes_test(is_admin)
 def ver_averias(request):
     averias = Averia.objects.all()
     return render(request, 'averias/ver_averias.html', {'averias': averias})
@@ -108,22 +114,15 @@ def ver_averias(request):
 @login_required
 @user_passes_test(is_admin)
 def descargar_informacion_usuario(request, user_id):
-    # Obtener el usuario seleccionado por el administrador
     usuario = get_object_or_404(Usuario, id=user_id)
-    
-    # Obtener los vehículos del usuario seleccionado
     vehiculos = Vehiculo.objects.filter(usuario=usuario)
-    
-    # Crear una respuesta HTTP con el archivo CSV
+
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{usuario.first_name}_{usuario.last_name}_inspecciones.csv"'
     
     writer = csv.writer(response)
-    
-    # Escribir el encabezado del CSV
     writer.writerow(['Placa Vehículo', 'Posición Neumático', 'Modelo', 'Marca', 'DOT', 'Presión', 'Huella', 'Fecha de Inspección', 'Averías', 'Renovable'])
     
-    # Escribir la información de la última inspección de cada neumático (NO en el historial)
     for vehiculo in vehiculos:
         neumaticos = Neumatico.objects.filter(vehiculo=vehiculo)
         for neumatico in neumaticos:
@@ -141,7 +140,6 @@ def descargar_informacion_usuario(request, user_id):
                 'Sí' if neumatico.renovable else 'No'
             ])
     
-    # Escribir el historial de inspecciones del usuario
     historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=usuario).order_by('-fecha_inspeccion')
     for inspeccion in historial_inspecciones:
         averia_nombre = inspeccion.averia.nombre if inspeccion.averia else 'Sin averías'

@@ -4,10 +4,10 @@ from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 import csv
 import io
-import json  # Asegúrate de importar json
+import json
 from collections import Counter
 import copy
 from .models import Neumatico, MedidaNeumatico, HistorialInspeccion
@@ -15,7 +15,6 @@ from vehiculos.models import Vehiculo
 from usuarios.models import Usuario
 from averias.models import Averia
 from .forms import NeumaticoForm, MedidaForm
-from datetime import datetime, timedelta
 
 
 # Función para verificar si el usuario es administrador
@@ -98,6 +97,7 @@ def eliminar_neumatico_temporal(request, vehiculo_id, posicion):
 
 # neumatico/views.py
 
+
 @login_required
 @user_passes_test(is_admin)
 def editar_neumatico(request, vehiculo_id, posicion):
@@ -118,10 +118,6 @@ def editar_neumatico(request, vehiculo_id, posicion):
         }
     )
 
-    # Si se creó un nuevo neumático, podríamos mostrar un mensaje de éxito opcional aquí
-    if created:
-        print(f"Neumático en posición {posicion} para el vehículo {vehiculo.placa} creado automáticamente.")
-
     if request.method == 'POST':
         form = NeumaticoForm(request.POST, instance=neumatico)
 
@@ -134,6 +130,7 @@ def editar_neumatico(request, vehiculo_id, posicion):
                         posicion=neumatico.posicion,
                         modelo=neumatico.modelo,
                         marca=neumatico.marca,
+                        diseño=neumatico.diseño,  # Incluimos el campo diseño
                         presion=neumatico.presion,
                         huella=neumatico.huella,
                         dot=neumatico.dot,
@@ -162,7 +159,6 @@ def editar_neumatico(request, vehiculo_id, posicion):
         form = NeumaticoForm(instance=neumatico)
 
     return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico, 'vehiculo': vehiculo})
-
 
 # Vista para ver neumáticos
 @login_required
@@ -226,13 +222,11 @@ def ver_neumaticos(request):
         'selected_empresa': selected_empresa
     })
 
-from django.db import models
+
 @login_required
 def historico_datos(request, user_id=None):
     from datetime import timedelta
-    from django.db.models import Avg
 
-    # Función auxiliar corregida
     def obtener_indice_mes(fecha):
         """Función para obtener el índice del mes basado en la fecha de inspección.
         Considera los últimos 6 meses desde la fecha actual."""
@@ -264,64 +258,66 @@ def historico_datos(request, user_id=None):
     renovables_data = 0
     desperdicio_data = 0
 
-    # Preparar datos para la nueva gráfica (últimos 6 meses)
+    # Preparar datos para la gráfica (últimos 6 meses)
     hoy = timezone.now().date()
     meses_labels = [(hoy - timedelta(days=30 * i)).strftime('%B') for i in range(6)][::-1]  # Últimos 6 meses
     operativos_mes = [0] * 6
     renovables_mes = [0] * 6
     desperdicio_mes = [0] * 6
+    perdida_mes = [0] * 6  # Lista para almacenar la pérdida mensual
 
-    # Contar los neumáticos actuales por su estado y mes de inspección
+    # Valores de Y según el tipo de neumático
+    y_values = {
+        'direccional': 15,
+        'tracción': 22,
+        'traccion': 22,  # Por si acaso
+        'all position': 18,
+    }
+
+    # Procesar neumáticos actuales
     for neumatico in neumaticos_actuales:
-        indice_mes = obtener_indice_mes(neumatico.fecha_inspeccion)
+        fecha_inspeccion = neumatico.fecha_inspeccion.date() if neumatico.fecha_inspeccion else None
+        indice_mes = obtener_indice_mes(fecha_inspeccion)
         if indice_mes is not None:
-            if not neumatico.averias.filter(estado='no_operativo').exists():
+            # Contar operativos, renovables y desperdicio
+            if neumatico.averias.filter(estado='no_operativo').exists():
+                desperdicio_data += 1
+                desperdicio_mes[indice_mes] += 1
+
+                # Cálculo de Pérdida
+                tipo_neumatico = neumatico.modelo.lower() if neumatico.modelo else ''
+                Y = y_values.get(tipo_neumatico)
+                if Y and neumatico.huella and neumatico.precio_estimado:
+                    perdida = (neumatico.huella * float(neumatico.precio_estimado)) / Y
+                    perdida_mes[indice_mes] += perdida
+            else:
                 operativos_data += 1
                 operativos_mes[indice_mes] += 1
                 if neumatico.renovable:
                     renovables_data += 1
                     renovables_mes[indice_mes] += 1
-            else:
-                desperdicio_data += 1
-                desperdicio_mes[indice_mes] += 1
 
-    # Contar los neumáticos en el historial por su estado y mes
+    # Procesar historial de inspecciones
     for inspeccion in historial_inspecciones:
-        indice_mes = obtener_indice_mes(inspeccion.fecha_inspeccion)
+        fecha_inspeccion = inspeccion.fecha_inspeccion.date() if inspeccion.fecha_inspeccion else None
+        indice_mes = obtener_indice_mes(fecha_inspeccion)
         if indice_mes is not None:
             if inspeccion.averia and inspeccion.averia.estado == 'no_operativo':
                 desperdicio_data += 1
                 desperdicio_mes[indice_mes] += 1
+
+                # Cálculo de Pérdida
+                tipo_neumatico = inspeccion.modelo.lower() if inspeccion.modelo else ''
+                Y = y_values.get(tipo_neumatico)
+                if Y and inspeccion.huella and inspeccion.precio_estimado:
+                    perdida = (inspeccion.huella * float(inspeccion.precio_estimado)) / Y
+                    perdida_mes[indice_mes] += perdida
             else:
                 operativos_data += 1
                 operativos_mes[indice_mes] += 1
                 if inspeccion.renovable:
                     renovables_data += 1
                     renovables_mes[indice_mes] += 1
-
-    # Cálculo de la estimación de pérdida por averías (últimos 6 meses)
-    estimacion_perdida_mes = [0] * 6
-    for inspeccion in historial_inspecciones:
-        if inspeccion.averia and inspeccion.averia.estado == 'no_operativo':
-            indice_mes = obtener_indice_mes(inspeccion.fecha_inspeccion)
-            if indice_mes is not None:
-                estimacion_perdida_mes[indice_mes] += inspeccion.precio_estimado
-
-    # Calcular el promedio del precio estimado para el usuario seleccionado
-    if selected_user:
-        promedio_precio = Neumatico.objects.filter(vehiculo__usuario=selected_user).aggregate(Avg('precio_estimado'))['precio_estimado__avg'] or 0
-    else:
-        promedio_precio = Neumatico.objects.aggregate(Avg('precio_estimado'))['precio_estimado__avg'] or 0
-
-    # Actualizar la estimación de pérdida para el mes actual
-    desperdicio_mes_actual = desperdicio_mes[5]  # Mes actual es el último en la lista
-    estimacion_perdida_mes[5] = desperdicio_mes_actual * promedio_precio
-
-    # Etiquetas para la gráfica
-    cauchos_labels = ['Operativos', 'Renovables', 'Desperdicio']
-
-    # Datos de la gráfica
-    datos_grafica = [operativos_data, renovables_data, desperdicio_data]
 
     # Preparar los datos de averías para la otra gráfica
     averias_counter = Counter()
@@ -355,16 +351,19 @@ def historico_datos(request, user_id=None):
         'operativos_data': operativos_data,
         'renovables_data': renovables_data,
         'desperdicio_data': desperdicio_data,
-        'cauchos_labels': cauchos_labels,
-        'datos_grafica': datos_grafica,
+        'cauchos_labels': ['Operativos', 'Renovables', 'Desperdicio'],
+        'datos_grafica': [operativos_data, renovables_data, desperdicio_data],
         'meses_labels': meses_labels,
         'operativos_mes': operativos_mes,
         'renovables_mes': renovables_mes,
         'desperdicio_mes': desperdicio_mes,
-        'estimacion_perdida_mes': estimacion_perdida_mes,
+        'perdida_mes': perdida_mes,  # Agregamos la pérdida por mes al contexto
     }
 
     return render(request, 'neumaticos/historico_datos.html', context)
+
+
+
 
 
 
@@ -528,6 +527,8 @@ def cargar_inspecciones(request):
     return render(request, 'neumaticos/cargar_inspecciones.html')
 
 
+# neumatico/views.py
+
 @login_required
 @user_passes_test(is_admin)
 def confirmar_inspecciones(request):
@@ -588,7 +589,7 @@ def confirmar_inspecciones(request):
                 defaults={
                     'modelo': inspeccion['modelo'],
                     'marca': inspeccion['marca'],
-                    'diseño': inspeccion['diseño'],
+                    'diseño': inspeccion['diseño'],  # Incluimos el diseño en los defaults
                     'dot': inspeccion['dot'],
                     'presion': inspeccion['presion'],
                     'huella': inspeccion['huella'],
@@ -606,6 +607,7 @@ def confirmar_inspecciones(request):
                         posicion=neumatico.posicion,
                         modelo=neumatico.modelo,
                         marca=neumatico.marca,
+                        diseño=neumatico.diseño,  # Incluimos el campo diseño
                         presion=neumatico.presion,
                         huella=neumatico.huella,
                         dot=neumatico.dot,
@@ -644,6 +646,7 @@ def confirmar_inspecciones(request):
         return redirect('reporte_vehiculos')
 
     return redirect('cargar_inspecciones')
+
 
 
 

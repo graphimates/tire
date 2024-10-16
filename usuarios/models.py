@@ -1,5 +1,3 @@
-# usuarios/models.py
-
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
@@ -25,29 +23,25 @@ class UsuarioManager(BaseUserManager):
         return self.create_user(email, first_name, last_name, empresa, password, **extra_fields)
 
 class Usuario(AbstractUser):
-    profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
-
-    username = None  # Desactivamos el campo username
-    email = models.EmailField(unique=True)
-    empresa = models.CharField(max_length=100)
-    flota = models.IntegerField(default=0)  # Cantidad de vehículos (flota) del usuario
     profile_photo = models.ImageField(
         upload_to='profile_photos/',
-        default='default-profile.png',
+        default='profile_photos/default-profile.png',  # Asegúrate de que esta sea la ruta correcta
         blank=True,
-        null=True  # Aseguramos que el campo puede ser nulo
+        null=True
     )
     
-    USERNAME_FIELD = 'email'  # Usamos el correo electrónico como identificador único
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'empresa']  # Campos requeridos adicionales
+    username = None
+    email = models.EmailField(unique=True)
+    empresa = models.CharField(max_length=100)
+    flota = models.IntegerField(default=0)
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'empresa']
 
-    objects = UsuarioManager()  # Manager personalizado para el modelo
+    objects = UsuarioManager()
 
     def get_full_name(self):
-        """Devuelve el nombre completo del usuario."""
         return f"{self.first_name} {self.last_name}"
 
     def __str__(self):
-        """Devuelve una representación del usuario con el correo."""
         return self.email
-

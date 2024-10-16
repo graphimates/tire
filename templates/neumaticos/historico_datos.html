@@ -7,21 +7,21 @@
 <div class="panel-header panel-header-sm">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-12 text-center">
-                <h1 class="header-title text-white mb-3" style="text-align: center;">Histórico de Averías y Estado de Neumáticos</h1>
+            <div class="col-12 text-center">
+                <h2 class="header-title text-white mb-3" style="text-align: center;">Histórico de Averías y Estado de Neumáticos</h2>
             </div>
         </div>
-        <!-- Filtro Seleccionar Usuario Centrando Debajo del Título -->
+        <!-- Filtro Seleccionar Empresa Centrando Debajo del Título -->
         {% if request.user.is_superuser %}
         <div class="row justify-content-center mt-2">
             <div class="col-md-4">
-                <form method="GET" action="" class="text-center">
-                    <label for="usuario" class="form-label text-white">Selecciona un usuario para ver su historial:</label>
-                    <select name="usuario_id" id="usuario" class="form-select" onchange="document.getElementById('userFilterForm').submit();">
-                        <option value="todas" {% if not selected_user.id %}selected{% endif %}>Todas las empresas</option>
+                <form method="GET" action="" class="d-flex justify-content-center align-items-center">
+                    <label for="empresa-dropdown" class="form-label text-white me-2">Seleccionar empresa:</label>
+                    <select id="empresa-dropdown" name="usuario_id" class="form-select" onchange="this.form.submit()">
+                        <option value="todas" {% if not selected_user %}selected{% endif %}>Todas las empresas</option>
                         {% for usuario in usuarios %}
                             {% if not usuario.is_superuser %}
-                            <option value="{{ usuario.id }}" {% if selected_user.id == usuario.id %}selected{% endif %}>
+                            <option value="{{ usuario.id }}" {% if selected_user and selected_user.id == usuario.id %}selected{% endif %}>
                                 {{ usuario.get_full_name }} ({{ usuario.email }})
                             </option>
                             {% endif %}
@@ -37,28 +37,9 @@
 <!-- Contenedor Principal -->
 <div class="content">
     <div class="container-fluid card shadow-lg rounded p-5 bg-white">
-        <!-- Filtro de Usuarios (solo para admin, sin mostrar el admin en el filtro) -->
-        {% if request.user.is_superuser %}
-        <form method="GET" id="userFilterForm" class="mb-4">
-            <label for="usuario" class="form-label">Selecciona un usuario para ver su historial:</label>
-            <select name="usuario_id" id="usuario" class="form-control" onchange="document.getElementById('userFilterForm').submit();">
-                <option value="todas" {% if not selected_user.id %}selected{% endif %}>Todas las empresas</option>
-                {% for usuario in usuarios %}
-                    {% if not usuario.is_superuser %}
-                    <option value="{{ usuario.id }}" {% if selected_user.id == usuario.id %}selected{% endif %}>
-                        {{ usuario.get_full_name }} ({{ usuario.email }})
-                    </option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        </form>
-        {% else %}
-        <!-- Usuario no administrador solo ve su propio historial -->
-        <h4 class="text-dark">Historial de {{ request.user.get_full_name }}</h4>
-        {% endif %}
-
         <!-- Gráficos dispuestos en columnas con botón de previsualización -->
         <div class="row">
+            <!-- Gráfica Histórica de Averías -->
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
@@ -69,13 +50,27 @@
                 </div>
             </div>
 
-            <!-- Nueva Gráfica Relación de Cauchos (Últimos 6 meses) con botón de previsualización -->
+            <!-- Gráfica Relación de Neumáticos (Últimos 6 meses) -->
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="text-dark">Relación de Neumáticos Operativos, Renovables, Desperdicio (Últimos 6 meses)</h4>
                         <canvas id="cauchosMesChart"></canvas>
                         <button class="btn btn-primary mt-3 preview-button" data-bs-toggle="modal" data-bs-target="#previewModal" data-chart="cauchosMesChart">Previsualizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nueva Gráfica de Pérdida por Mes -->
+        <div class="row">
+            <!-- Gráfica de Pérdida por Mes -->
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-dark">Pérdida por Mes</h4>
+                        <canvas id="perdidaMesChart"></canvas>
+                        <button class="btn btn-primary mt-3 preview-button" data-bs-toggle="modal" data-bs-target="#previewModal" data-chart="perdidaMesChart">Previsualizar</button>
                     </div>
                 </div>
             </div>
@@ -112,7 +107,7 @@
 <!-- Scripts para las Gráficas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Definir los gráficos originales
+    // Gráfica Histórica de Averías
     const ctx1 = document.getElementById('historicoChart').getContext('2d');
     const labels = {{ labels|safe }};
     const dataBarras = {{ data_barras|safe }};
@@ -187,6 +182,7 @@
         }
     });
 
+    // Gráfica Relación de Neumáticos por Mes
     const ctx2 = document.getElementById('cauchosMesChart').getContext('2d');
     const mesesLabels = {{ meses_labels|safe }};
     const operativosMesData = {{ operativos_mes|safe }};
@@ -225,7 +221,41 @@
             responsive: true,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Cantidad de Neumáticos'
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfica de Pérdida por Mes
+    const ctx3 = document.getElementById('perdidaMesChart').getContext('2d');
+    const perdidaMesData = {{ perdida_mes|safe }};
+
+    const perdidaMesChart = new Chart(ctx3, {
+        type: 'bar',  // Puedes cambiar 'bar' a 'line' si prefieres una gráfica de línea
+        data: {
+            labels: mesesLabels,
+            datasets: [{
+                label: 'Pérdida ($)',
+                data: perdidaMesData,
+                backgroundColor: '#e74c3c',
+                borderColor: '#c0392b',
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Pérdida en Dólares ($)'
+                    }
                 }
             }
         }
@@ -239,11 +269,21 @@
         button.addEventListener('click', function () {
             const chartId = this.getAttribute('data-chart');
             let chartData;
+            let chartType;
+            let chartOptions;
 
             if (chartId === 'historicoChart') {
                 chartData = historicoChart.config.data;
+                chartType = historicoChart.config.type;
+                chartOptions = historicoChart.config.options;
             } else if (chartId === 'cauchosMesChart') {
                 chartData = cauchosMesChart.config.data;
+                chartType = cauchosMesChart.config.type;
+                chartOptions = cauchosMesChart.config.options;
+            } else if (chartId === 'perdidaMesChart') {
+                chartData = perdidaMesChart.config.data;
+                chartType = perdidaMesChart.config.type;
+                chartOptions = perdidaMesChart.config.options;
             }
 
             // Destruir el gráfico anterior si existe
@@ -253,12 +293,9 @@
 
             // Crear un nuevo gráfico en el modal con los datos del gráfico original
             previewChart = new Chart(previewCanvas, {
-                type: 'bar',
+                type: chartType,
                 data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
+                options: chartOptions
             });
         });
     });

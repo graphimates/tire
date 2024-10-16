@@ -79,6 +79,7 @@ class HistorialInspeccion(models.Model):
     posicion = models.IntegerField()
     modelo = models.CharField(max_length=50)
     marca = models.CharField(max_length=50)
+    diseño = models.CharField(max_length=50, blank=True, null=True)  # Agregamos este campo
     dot = models.CharField(max_length=20)
     presion = models.FloatField()
     huella = models.FloatField()

@@ -3,7 +3,6 @@
 {% block title %}Crear Nuevo Usuario{% endblock %}
 
 {% block content %}
-<!-- Panel Header -->
 <div class="panel-header panel-header-sm">
     <div class="container">
         <div class="row">
@@ -67,22 +66,20 @@
               </div>
             </div>
 
-            <!-- Campo para la foto de perfil con ícono -->
             <div class="col-md-12">
               <div class="form-group">
                 <label for="id_profile_photo" class="form-label">
                   Foto de Perfil 
-                  <i class="fas fa-camera ml-2"></i> <!-- Ícono de cámara -->
+                  <i class="fas fa-camera ml-2"></i>
                 </label>
                 {{ form.profile_photo }}
               </div>
             </div>
-            
-            <!-- Radio buttons para determinar si es administrador -->
+
             <div class="col-12">
               <label for="id_is_superuser" class="form-label">¿Es administrador?</label>
               <div class="form-group">
-                {{ form.is_superuser }} <!-- Renderiza los botones de opción -->
+                {{ form.is_superuser }}
               </div>
             </div>
 
