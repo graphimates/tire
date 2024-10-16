@@ -7,11 +7,29 @@
 <!-- Panel Header -->
 <div class="panel-header panel-header-sm">
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-12 text-center">
-                <h2 class="header-title">Bienvenido {{ user.empresa }} - Reporte de Vehículos</h2>
+                <!-- Título centrado correctamente -->
+                <h1 class="header-title text-white mb-3" style="text-align: center;">Reporte de Vehículos</h1>
             </div>
         </div>
+        <!-- Filtro Seleccionar Empresa Centrando Debajo del Título -->
+        {% if user.is_superuser %}
+        <div class="row justify-content-center mt-2">
+            <div class="col-md-4">
+                <form method="GET" action="" class="text-center">
+                    <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
+                    <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()">
+                        <option value="">Seleccionar empresa...</option>
+                        <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
+                        {% for empresa in empresas %}
+                            <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -122,10 +140,8 @@
                                                 <th>Huella</th>
                                                 <th>Averías</th>
                                                 {% if user.is_superuser %}
-
                                                 <th>Acción</th>
                                                 {% endif %}
-
                                             </tr>
                                         </thead>
                                         <tbody>

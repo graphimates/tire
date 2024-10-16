@@ -6,11 +6,29 @@
 <!-- Título Principal con Bienvenida -->
 <div class="panel-header panel-header-sm">
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-12 text-center">
-                <h2 class="header-title">Bienvenido {{ user.empresa }} - Resumen de Neumáticos</h2>
+                <!-- Título centrado correctamente -->
+                <h1 class="header-title text-white mb-3" style="text-align: center;">Bienvenido {{ user.empresa }} - Resumen de Neumáticos</h1>
             </div>
         </div>
+        <!-- Filtro Seleccionar Empresa Centrando Debajo del Título -->
+        {% if user.is_superuser %}
+        <div class="row justify-content-center mt-2">
+            <div class="col-md-4">
+                <form method="GET" action="" class="text-center">
+                    <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
+                    <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()">
+                        <option value="">Seleccionar empresa...</option>
+                        <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
+                        {% for empresa in empresas %}
+                            <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -28,18 +46,6 @@
                     <i class="fas fa-search"></i> Buscar
                 </button>
                 <div class="dropdown-menu" id="autocomplete-results" style="position: absolute; z-index: 1000;"></div>
-            </form>
-
-            <!-- Selección de Empresa -->
-            <form method="GET" action="" class="mb-4">
-                <label for="empresa-dropdown" class="form-label">Seleccionar empresa:</label>
-                <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()">
-                    <option value="">Seleccionar empresa...</option>
-                    <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
-                    {% for empresa in empresas %}
-                        <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
-                    {% endfor %}
-                </select>
             </form>
         </div>
     </div>
@@ -122,7 +128,6 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <!-- Alineación -->
                             <td>
                                 <span class="num-hover">{{ servicios_por_vehiculo.alineacion|length }}</span>
                                 <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-alineacion">
@@ -130,11 +135,10 @@
                                 </button>
                                 <div id="placas-alineacion" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.alineacion %}
-                                        <div> {{ placa }}</div>
+                                        <div>{{ placa }}</div>
                                     {% endfor %}
                                 </div>
                             </td>
-                            <!-- Balanceo -->
                             <td>
                                 <span class="num-hover">{{ servicios_por_vehiculo.balanceo|length }}</span>
                                 <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-balanceo">
@@ -146,7 +150,6 @@
                                     {% endfor %}
                                 </div>
                             </td>
-                            <!-- Rotación -->
                             <td>
                                 <span class="num-hover">{{ servicios_por_vehiculo.rotacion|length }}</span>
                                 <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-rotacion">
@@ -158,7 +161,6 @@
                                     {% endfor %}
                                 </div>
                             </td>
-                            <!-- Montura -->
                             <td>
                                 <span class="num-hover">{{ servicios_por_vehiculo.montura|length }}</span>
                                 <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-montura">
@@ -170,7 +172,6 @@
                                     {% endfor %}
                                 </div>
                             </td>
-                            <!-- Calibración -->
                             <td>
                                 <span class="num-hover">{{ servicios_por_vehiculo.calibracion|length }}</span>
                                 <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-calibracion">
@@ -193,16 +194,12 @@
 <!-- JavaScript para el Toggle de las Placas -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Selecciona todos los botones de colapso
         const toggleButtons = document.querySelectorAll('.toggle-btn');
 
         toggleButtons.forEach(button => {
             button.addEventListener('click', function () {
-                // Obtén el ID del contenido a mostrar u ocultar
                 const targetId = this.getAttribute('data-target');
                 const content = document.getElementById(targetId);
-
-                // Alternar la visibilidad del contenido
                 if (content.style.display === 'none' || content.style.display === '') {
                     content.style.display = 'block';
                 } else {

@@ -6,11 +6,31 @@
 <!-- Panel Header Pequeño con Estilo -->
 <div class="panel-header panel-header-sm">
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-md-12 text-center">
-                <h2 class="header-title text-white">Histórico de Averías y Estado de Neumaticos</h2>
+                <h1 class="header-title text-white mb-3" style="text-align: center;">Histórico de Averías y Estado de Neumáticos</h1>
             </div>
         </div>
+        <!-- Filtro Seleccionar Usuario Centrando Debajo del Título -->
+        {% if request.user.is_superuser %}
+        <div class="row justify-content-center mt-2">
+            <div class="col-md-4">
+                <form method="GET" action="" class="text-center">
+                    <label for="usuario" class="form-label text-white">Selecciona un usuario para ver su historial:</label>
+                    <select name="usuario_id" id="usuario" class="form-select" onchange="document.getElementById('userFilterForm').submit();">
+                        <option value="todas" {% if not selected_user.id %}selected{% endif %}>Todas las empresas</option>
+                        {% for usuario in usuarios %}
+                            {% if not usuario.is_superuser %}
+                            <option value="{{ usuario.id }}" {% if selected_user.id == usuario.id %}selected{% endif %}>
+                                {{ usuario.get_full_name }} ({{ usuario.email }})
+                            </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -53,7 +73,7 @@
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="text-dark">Relación de Neumaticos Operativos, Renovables, Desperdicio (Últimos 6 meses)</h4>
+                        <h4 class="text-dark">Relación de Neumáticos Operativos, Renovables, Desperdicio (Últimos 6 meses)</h4>
                         <canvas id="cauchosMesChart"></canvas>
                         <button class="btn btn-primary mt-3 preview-button" data-bs-toggle="modal" data-bs-target="#previewModal" data-chart="cauchosMesChart">Previsualizar</button>
                     </div>
