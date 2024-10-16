@@ -11,8 +11,9 @@ urlpatterns = [
     path('historico_datos/<int:user_id>/', views.historico_datos, name='historico_datos'),
     path('cargar_inspecciones/', views.cargar_inspecciones, name='cargar_inspecciones'),
     path('confirmar_inspecciones/', views.confirmar_inspecciones, name='confirmar_inspecciones'),
-    
-     path('neumaticos/editar/<int:vehiculo_id>/<int:posicion>/', views.editar_neumatico, name='editar_neumatico'),
+    path('neumaticos/eliminar_temporal/<int:vehiculo_id>/<int:posicion>/', views.eliminar_neumatico_temporal, name='eliminar_neumatico_temporal'),
+
+    path('neumaticos/editar/<int:vehiculo_id>/<int:posicion>/', views.editar_neumatico, name='editar_neumatico'),
 
 
 ]

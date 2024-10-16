@@ -17,13 +17,27 @@
                 </div>
               </div>
               <div class="card-body">
+                {% if form.non_field_errors and request.method == 'POST' %}
+                  <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                      <p>{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
                 <div class="input-group no-border form-control-lg">
                   <span class="input-group-prepend">
                     <div class="input-group-text">
                       <i class="now-ui-icons users_circle-08"></i>
                     </div>
                   </span>
-                  <input type="email" class="form-control" id="email" name="email" placeholder="Correo Electrónico..." required>
+                  <input type="email" class="form-control" id="email" name="username" placeholder="Correo Electrónico..." required value="{{ form.username.value|default_if_none:'' }}">
+                  {% if form.username.errors %}
+                    <div class="text-danger small">
+                      {% for error in form.username.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 </div>
                 <div class="input-group no-border form-control-lg">
                   <span class="input-group-prepend">
@@ -32,13 +46,20 @@
                     </div>
                   </span>
                   <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña..." required>
+                  {% if form.password.errors %}
+                    <div class="text-danger small">
+                      {% for error in form.password.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 </div>
               </div>
               <div class="card-footer text-center">
                 <button type="submit" class="btn btn-primary btn-lg btn-block mb-3">Iniciar Sesión</button>
                 <div class="row">
                   <div class="col-6 text-left">
-                    <h6><a href="{% url 'password_reset' %}" class="link footer-link">Crear cuenta</a></h6>
+                    <h6><a href="{% url 'password_reset' %}" class="link footer-link">Olvide contraseña</a></h6>
                   </div>
                   <div class="col-6 text-right">
                     <h6><a href="mailto:graphimates@gmail.com" class="link footer-link">Necesitas ayuda?</a></h6>

@@ -15,6 +15,7 @@ from vehiculos.models import Vehiculo
 from usuarios.models import Usuario
 from averias.models import Averia
 from .forms import NeumaticoForm, MedidaForm
+from datetime import datetime, timedelta
 
 
 # Función para verificar si el usuario es administrador
@@ -81,58 +82,87 @@ def eliminar_medida(request, medida_id):
     return render(request, 'medidas/eliminar_medida.html', {'medida': medida})
 
 
+@login_required
+@user_passes_test(is_admin)
+def eliminar_neumatico_temporal(request, vehiculo_id, posicion):
+    # Intentar obtener el neumático temporal y eliminarlo
+    try:
+        neumatico = Neumatico.objects.get(vehiculo_id=vehiculo_id, posicion=posicion, temp=True)
+        neumatico.delete()
+        print(f"Neumático temporal en posición {posicion} eliminado.")
+    except Neumatico.DoesNotExist:
+        print(f"No se encontró un neumático temporal en la posición {posicion}.")
+
+    return HttpResponse(status=204)
+
+
 # neumatico/views.py
 
 @login_required
 @user_passes_test(is_admin)
 def editar_neumatico(request, vehiculo_id, posicion):
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
-    neumatico = get_object_or_404(Neumatico, vehiculo=vehiculo, posicion=posicion)
+
+    # Intentamos obtener el neumático en la posición específica
+    neumatico, created = Neumatico.objects.get_or_create(
+        vehiculo=vehiculo,
+        posicion=posicion,
+        defaults={
+            'modelo': '',
+            'marca': '',
+            'diseño': '',
+            'dot': '',
+            'presion': None,  # Permitir que el campo quede vacío
+            'huella': 0.0,  # Asignar huella por defecto como 0.0
+            'renovable': False
+        }
+    )
+
+    # Si se creó un nuevo neumático, podríamos mostrar un mensaje de éxito opcional aquí
+    if created:
+        print(f"Neumático en posición {posicion} para el vehículo {vehiculo.placa} creado automáticamente.")
 
     if request.method == 'POST':
-        # Imprimir los datos de POST para depuración
-        print("Datos recibidos en POST:", request.POST)
-
-        old_neumatico = copy.copy(neumatico)
         form = NeumaticoForm(request.POST, instance=neumatico)
 
         if form.is_valid():
             try:
-                if old_neumatico.fecha_inspeccion:
+                # Si el neumático ya tenía fecha de inspección, crear un historial
+                if neumatico.fecha_inspeccion:
                     HistorialInspeccion.objects.create(
                         vehiculo=vehiculo,
-                        posicion=old_neumatico.posicion,
-                        modelo=old_neumatico.modelo,
-                        marca=old_neumatico.marca,
-                        presion=old_neumatico.presion,
-                        huella=old_neumatico.huella,
-                        dot=old_neumatico.dot,
-                        fecha_inspeccion=old_neumatico.fecha_inspeccion,
-                        medida=old_neumatico.medida.medida if old_neumatico.medida else 'Desconocida',
-                        renovable=old_neumatico.renovable,
-                        precio_estimado=old_neumatico.precio_estimado,
-                        averia=old_neumatico.averias.first() if old_neumatico.averias.exists() else None,
+                        posicion=neumatico.posicion,
+                        modelo=neumatico.modelo,
+                        marca=neumatico.marca,
+                        presion=neumatico.presion,
+                        huella=neumatico.huella,
+                        dot=neumatico.dot,
+                        fecha_inspeccion=neumatico.fecha_inspeccion,
+                        medida=neumatico.medida.medida if neumatico.medida else 'Desconocida',
+                        renovable=neumatico.renovable,
+                        precio_estimado=neumatico.precio_estimado,
+                        averia=neumatico.averias.first() if neumatico.averias.exists() else None,
                     )
 
+                # Guardar los cambios en el neumático
                 neumatico = form.save(commit=False)
                 if not neumatico.fecha_inspeccion:
                     neumatico.fecha_inspeccion = timezone.now()
                 neumatico.save()
                 form.save_m2m()
 
+                # Actualizar la última fecha de inspección del vehículo
                 vehiculo.ultima_inspeccion = neumatico.fecha_inspeccion
                 vehiculo.save()
 
                 return redirect('reporte_vehiculos')
             except ValidationError as e:
                 form.add_error(None, e)
-        else:
-            # Imprimir errores de formulario para depuración
-            print("Errores del formulario:", form.errors)
     else:
         form = NeumaticoForm(instance=neumatico)
 
-    return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico})
+    return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico, 'vehiculo': vehiculo})
+
 
 # Vista para ver neumáticos
 @login_required
@@ -140,15 +170,27 @@ def ver_neumaticos(request):
     # Si el usuario es admin, puede ver todos los neumáticos
     if request.user.is_superuser:
         neumaticos = Neumatico.objects.select_related('vehiculo').all()
+        # Obtener todas las empresas disponibles (distintas) relacionadas con los vehículos
+        empresas = Vehiculo.objects.values_list('usuario__empresa', flat=True).distinct()
     else:
         # Los usuarios normales solo pueden ver los neumáticos de sus propios vehículos
         neumaticos = Neumatico.objects.filter(vehiculo__usuario=request.user)
+        empresas = []  # No mostrar empresas si no es superusuario
 
-    # Filtros de búsqueda y operatividad
+    # Obtener los valores de los filtros de la URL
     operatividad = request.GET.get('operatividad')
     huella = request.GET.get('huella')
     renovable = request.GET.get('renovable')
-    ordenar = request.GET.get('ordenar', 'reciente')
+    search_empresa = request.GET.get('search_empresa', '').strip()
+    selected_empresa = request.GET.get('selected_empresa', '')
+
+    # Filtrar por empresa si se ha seleccionado una empresa
+    if selected_empresa and selected_empresa != 'todas':
+        neumaticos = neumaticos.filter(vehiculo__usuario__empresa=selected_empresa)
+
+    # Filtrar por búsqueda de empresa si se ha ingresado un texto de búsqueda
+    if search_empresa:
+        neumaticos = neumaticos.filter(vehiculo__usuario__empresa__icontains=search_empresa)
 
     # Filtrar por operatividad
     if operatividad:
@@ -174,23 +216,21 @@ def ver_neumaticos(request):
         elif renovable == 'no':
             neumaticos = neumaticos.filter(renovable=False)
 
-    # Ordenar por la fecha de inspección
-    if ordenar == 'reciente':
-        neumaticos = neumaticos.order_by('-vehiculo__ultima_inspeccion')
-    elif ordenar == 'antigua':
-        neumaticos = neumaticos.order_by('vehiculo__ultima_inspeccion')
-
     return render(request, 'neumaticos/ver_neumaticos.html', {
         'neumaticos': neumaticos,
+        'empresas': empresas,
         'operatividad': operatividad,
         'huella': huella,
         'renovable': renovable,
-        'ordenar': ordenar
+        'search_empresa': search_empresa,
+        'selected_empresa': selected_empresa
     })
 
+from django.db import models
 @login_required
 def historico_datos(request, user_id=None):
     from datetime import timedelta
+    from django.db.models import Avg
 
     # Función auxiliar corregida
     def obtener_indice_mes(fecha):
@@ -259,6 +299,24 @@ def historico_datos(request, user_id=None):
                     renovables_data += 1
                     renovables_mes[indice_mes] += 1
 
+    # Cálculo de la estimación de pérdida por averías (últimos 6 meses)
+    estimacion_perdida_mes = [0] * 6
+    for inspeccion in historial_inspecciones:
+        if inspeccion.averia and inspeccion.averia.estado == 'no_operativo':
+            indice_mes = obtener_indice_mes(inspeccion.fecha_inspeccion)
+            if indice_mes is not None:
+                estimacion_perdida_mes[indice_mes] += inspeccion.precio_estimado
+
+    # Calcular el promedio del precio estimado para el usuario seleccionado
+    if selected_user:
+        promedio_precio = Neumatico.objects.filter(vehiculo__usuario=selected_user).aggregate(Avg('precio_estimado'))['precio_estimado__avg'] or 0
+    else:
+        promedio_precio = Neumatico.objects.aggregate(Avg('precio_estimado'))['precio_estimado__avg'] or 0
+
+    # Actualizar la estimación de pérdida para el mes actual
+    desperdicio_mes_actual = desperdicio_mes[5]  # Mes actual es el último en la lista
+    estimacion_perdida_mes[5] = desperdicio_mes_actual * promedio_precio
+
     # Etiquetas para la gráfica
     cauchos_labels = ['Operativos', 'Renovables', 'Desperdicio']
 
@@ -303,9 +361,11 @@ def historico_datos(request, user_id=None):
         'operativos_mes': operativos_mes,
         'renovables_mes': renovables_mes,
         'desperdicio_mes': desperdicio_mes,
+        'estimacion_perdida_mes': estimacion_perdida_mes,
     }
 
     return render(request, 'neumaticos/historico_datos.html', context)
+
 
 
 # neumatico/views.py
@@ -344,10 +404,9 @@ def cargar_inspecciones(request):
             averias_str = row.get('averia', '').strip()
             renovable = row.get('renovable', '').strip().lower() == 'true'
 
-            # Flag para identificar errores en la inspección
             hay_error_en_inspeccion = False
 
-            # Validación y recolección de datos
+            # Validación de cliente
             if not cliente_email:
                 errores.append('El campo "cliente" es obligatorio.')
                 hay_error_en_inspeccion = True
@@ -358,6 +417,7 @@ def cargar_inspecciones(request):
                     errores.append(f"El cliente con el correo {cliente_email} no existe.")
                     hay_error_en_inspeccion = True
 
+            # Validación de vehículo
             if not placa:
                 errores.append('El campo "placa" es obligatorio.')
                 hay_error_en_inspeccion = True
@@ -371,8 +431,8 @@ def cargar_inspecciones(request):
             if hay_error_en_inspeccion:
                 continue  # Saltar el procesamiento de esta fila
 
+            # Validación de posición
             cantidad_neumaticos = vehiculo.cantidad_neumaticos
-
             if not posicion_str:
                 errores.append(f"Falta la posición para un neumático del vehículo con placa {placa}.")
                 hay_error_en_inspeccion = True
@@ -400,14 +460,13 @@ def cargar_inspecciones(request):
                 errores.append(f"La medida {medida_str} no está registrada.")
                 continue
 
-            # Validar presión
+            # Validar presión y huella
             try:
                 presion = float(presion_str)
             except ValueError:
                 errores.append(f"La presión en la posición {posicion} del vehículo con placa {placa} no es un número válido.")
                 continue
 
-            # Validar huella
             try:
                 huella = float(huella_str)
                 if huella < 0:
@@ -415,17 +474,6 @@ def cargar_inspecciones(request):
                     continue
             except ValueError:
                 errores.append(f"La huella en la posición {posicion} del vehículo con placa {placa} no es un número válido.")
-                continue
-
-            # Validar campo 'dot' (no puede estar vacío)
-            if not dot:
-                errores.append(f"El campo 'dot' es obligatorio para el neumático en posición {posicion} del vehículo con placa {placa}.")
-                continue
-
-            # Validar campo 'modelo'
-            modelos_validos = ['direccional', 'traccion', 'all position']
-            if modelo not in modelos_validos:
-                errores.append(f"El modelo '{modelo}' no es válido para el neumático en posición {posicion} del vehículo con placa {placa}. Opciones válidas: Direccional, Tracción, All Position.")
                 continue
 
             # Validar y procesar las averías
@@ -438,24 +486,12 @@ def cargar_inspecciones(request):
                         averias.append(averia)
                     except Averia.DoesNotExist:
                         errores.append(f"La avería con código {codigo} no está registrada.")
-                # Continuamos con las averías válidas
 
-            # Validar 'renovable' según las averías válidas
+            # Validar 'renovable' según las averías
             if averias:
                 if any(averia.estado == 'no_operativo' for averia in averias) and renovable:
                     errores.append(f"El neumático en posición {posicion} del vehículo con placa {placa} no puede ser renovable si tiene una avería 'No operativo'.")
                     renovable = False
-
-            # Fecha de inspección
-            fecha_inspeccion_str = row.get('fecha', '').strip()
-            if fecha_inspeccion_str:
-                try:
-                    fecha_inspeccion = datetime.strptime(fecha_inspeccion_str, '%d/%m/%Y')
-                except ValueError:
-                    errores.append(f"La fecha '{fecha_inspeccion_str}' no tiene un formato válido (se espera dd/mm/yyyy).")
-                    continue
-            else:
-                fecha_inspeccion = timezone.now()
 
             # Recolectar los datos para inspecciones pendientes
             inspeccion = {
@@ -468,10 +504,10 @@ def cargar_inspecciones(request):
                 'dot': dot,
                 'presion': presion,
                 'huella': huella,
-                'averias': [averia.codigo for averia in averias],  # Averías válidas
+                'averias': [averia.codigo for averia in averias],
                 'renovable': renovable,
                 'modelo': modelo,
-                'fecha_inspeccion': fecha_inspeccion.strftime('%d/%m/%Y'),
+                'fecha_inspeccion': row.get('fecha', '').strip() or timezone.now().strftime('%d/%m/%Y'),
             }
             inspecciones_pendientes.append(inspeccion)
 
@@ -490,9 +526,6 @@ def cargar_inspecciones(request):
             return render(request, 'neumaticos/cargar_inspecciones.html', context)
 
     return render(request, 'neumaticos/cargar_inspecciones.html')
-
-
-# neumatico/views.py
 
 
 @login_required
@@ -543,15 +576,29 @@ def confirmar_inspecciones(request):
             # Convertir la fecha al formato correcto
             fecha_inspeccion_str = inspeccion['fecha_inspeccion']
             try:
-                # Convertir la fecha de DD/MM/YYYY a YYYY-MM-DD
                 fecha_inspeccion = datetime.strptime(fecha_inspeccion_str, '%d/%m/%Y').date()
             except ValueError:
                 errores.append(f"La fecha '{fecha_inspeccion_str}' no tiene un formato válido (se espera DD/MM/YYYY).")
                 continue  # Saltar esta inspección si la fecha no es válida
 
-            # Procesar el neumático
-            try:
-                neumatico = Neumatico.objects.get(vehiculo=vehiculo, posicion=posicion)
+            # Obtener o crear el neumático
+            neumatico, created = Neumatico.objects.get_or_create(
+                vehiculo=vehiculo,
+                posicion=posicion,
+                defaults={
+                    'modelo': inspeccion['modelo'],
+                    'marca': inspeccion['marca'],
+                    'diseño': inspeccion['diseño'],
+                    'dot': inspeccion['dot'],
+                    'presion': inspeccion['presion'],
+                    'huella': inspeccion['huella'],
+                    'medida': medida,
+                    'renovable': renovable,
+                    'fecha_inspeccion': fecha_inspeccion,
+                }
+            )
+
+            if not created:
                 # Guardar en el historial si ha sido inspeccionado antes
                 if neumatico.fecha_inspeccion:
                     HistorialInspeccion.objects.create(
@@ -577,28 +624,12 @@ def confirmar_inspecciones(request):
                 neumatico.huella = inspeccion['huella']
                 neumatico.medida = medida
                 neumatico.renovable = renovable
-                neumatico.fecha_inspeccion = fecha_inspeccion  # Asignar la fecha correctamente formateada
+                neumatico.fecha_inspeccion = fecha_inspeccion
                 neumatico.save()
-                # Actualizar averías
-                neumatico.averias.set(averias)
 
-            except Neumatico.DoesNotExist:
-                # Crear un nuevo neumático
-                neumatico = Neumatico.objects.create(
-                    vehiculo=vehiculo,
-                    posicion=posicion,
-                    modelo=inspeccion['modelo'],
-                    marca=inspeccion['marca'],
-                    diseño=inspeccion['diseño'],
-                    dot=inspeccion['dot'],
-                    presion=inspeccion['presion'],
-                    huella=inspeccion['huella'],
-                    medida=medida,
-                    renovable=renovable,
-                    fecha_inspeccion=fecha_inspeccion,  # Asignar la fecha correctamente formateada
-                )
-                neumatico.averias.set(averias)
-                neumatico.save()
+            # Establecer las averías (asegurándonos de que el neumático está guardado)
+            neumatico.averias.set(averias)
+            neumatico.save()
 
             # Actualizar la última inspección del vehículo
             vehiculo.ultima_inspeccion = fecha_inspeccion
@@ -613,6 +644,7 @@ def confirmar_inspecciones(request):
         return redirect('reporte_vehiculos')
 
     return redirect('cargar_inspecciones')
+
 
 
 

@@ -5,10 +5,24 @@
 {% block content %}
 <div class="panel-header panel-header-sm">
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-12 text-center">
-                <!-- Ajuste del tamaño del título a un estilo más grande -->
+                <!-- Título centrado -->
                 <h1 class="header-title text-white mb-4">Reporte de Neumáticos</h1>
+                
+                <!-- Filtro de selección de empresa solo para administradores -->
+                {% if user.is_superuser %}
+                <form method="GET" action="" class="d-flex justify-content-center align-items-center">
+                    <label for="empresa-dropdown" class="form-label text-white me-3">Seleccionar empresa:</label>
+                    <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()" style="width: auto;">
+                        <option value="">Seleccionar empresa...</option>
+                        <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
+                        {% for empresa in empresas %}
+                            <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -22,9 +36,24 @@
                 <h5 class="mb-0">Filtros de Búsqueda</h5>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row justify-content-center">
+                    <!-- Filtro de búsqueda por empresa solo para administradores -->
+                    {% if user.is_superuser %}
+                    <div class="col-md-6 text-center">
+                        <label for="empresa_autocomplete" class="form-label">Buscar por empresa:</label>
+                        <div class="input-group justify-content-center">
+                            <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Buscar por empresa..." value="{{ search_empresa }}" autocomplete="off">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="row mt-3">
                     <!-- Filtro por operatividad -->
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4">
                         <label class="form-label">Mostrar por operatividad:</label>
                         <div class="form-check">
                             <input type="radio" name="operatividad" id="operativo" value="operativo" class="form-check-input filtro-radio" {% if operatividad == 'operativo' %}checked{% endif %}>
@@ -38,7 +67,7 @@
                     </div>
 
                     <!-- Filtro por huella -->
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4">
                         <label class="form-label">Filtrar por huella:</label>
                         <div class="form-check">
                             <input type="radio" name="huella" id="huella_0_3" value="0_3" class="form-check-input filtro-radio" {% if huella == '0_3' %}checked{% endif %}>
@@ -56,7 +85,7 @@
                     </div>
 
                     <!-- Filtro por renovabilidad -->
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4">
                         <label class="form-label">Renovabilidad:</label>
                         <div class="form-check">
                             <input type="radio" name="renovable" id="renovable_si" value="si" class="form-check-input filtro-radio" {% if renovable == 'si' %}checked{% endif %}>
@@ -67,17 +96,6 @@
                             <label for="renovable_no" class="form-check-label">No renovable</label>
                         </div>
                         <button type="button" class="btn btn-link btn-reset" data-filtro="renovable">Quitar filtro</button>
-                    </div>
-                </div>
-
-                <!-- Filtro por orden -->
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="ordenar" class="form-label">Ordenar por:</label>
-                        <select name="ordenar" class="form-select filtro-select">
-                            <option value="reciente" {% if ordenar == 'reciente' %}selected{% endif %}>Más reciente</option>
-                            <option value="antigua" {% if ordenar == 'antigua' %}selected{% endif %}>Más antigua</option>
-                        </select>
                     </div>
                 </div>
             </div>
@@ -91,7 +109,7 @@
                         <th>Posición</th>
                         <th>Placa</th>
                         <th>Vehículo</th>
-                        <th>Tipo de Vehículo</th>
+                        <th>Configuración</th>
                         <th>Medida</th>
                         <th>Marca</th>
                         <th>Diseño</th>
@@ -115,17 +133,17 @@
                         <td>{{ neumatico.diseño }}</td>
                         <td>{{ neumatico.modelo }}</td>
                         <td>{{ neumatico.dot }}</td>
-                        <td>{{ neumatico.presion }}</td>
-                        <td>{{ neumatico.huella }}</td>
+                        <!-- Mostrar campos vacíos si son None -->
+                        <td>{{ neumatico.presion|default_if_none:"" }}</td>
+                        <td>{{ neumatico.huella|default_if_none:"" }}</td>
                         <td>
-                            {% if neumatico.averias.exists %}
+                            {% if neumatico.averias.count == 0 %}
+                            {% else %}
                                 <ul>
                                 {% for averia in neumatico.averias.all %}
                                     <li>{{ averia.nombre }} ({{ averia.get_estado_neumatico_display }})</li>
                                 {% endfor %}
                                 </ul>
-                            {% else %}
-                                <span class="text-muted">Sin averías</span>
                             {% endif %}
                         </td>
                         <td>{{ neumatico.renovable|yesno:"Sí,No" }}</td>

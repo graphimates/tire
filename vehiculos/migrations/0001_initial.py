@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('placa', models.CharField(max_length=20)),
                 ('modelo', models.CharField(max_length=50)),
-                ('tipo', models.CharField(choices=[('2x2', 'Vehículo 2x2'), ('4x2', 'Vehículo 4x2'), ('4x2L', 'Vehículo 4x2L'), ('6x2', 'Vehículo 6x2'), ('6x2M', 'Vehículo 6x2M'), ('6x4', 'Vehículo 6x4'), ('T2x0', 'Vehículo T2x0'), ('T4x0', 'Vehículo T4x0'), ('T6x0', 'Vehículo T6x0')], max_length=20)),
+                ('tipo', models.CharField(choices=[('4x2LT', 'Vehículo 4x2LT'), ('4x2', 'Vehículo 4x2'), ('4x2L', 'Vehículo 4x2L'), ('6x2', 'Vehículo 6x2'), ('6x2M', 'Vehículo 6x2M'), ('6x4', 'Vehículo 6x4'), ('T2x0', 'Vehículo T2x0'), ('T4x0', 'Vehículo T4x0'), ('T6x0', 'Vehículo T6x0')], max_length=20)),
                 ('ultima_inspeccion', models.DateTimeField(blank=True, null=True)),
                 ('usuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vehiculos', to=settings.AUTH_USER_MODEL)),
             ],

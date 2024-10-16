@@ -138,8 +138,23 @@
         </div>
     </div>
 </div>
+<script>
+    let isFormSubmitted = false;  // Variable para saber si el formulario fue enviado
 
-<!-- Scripts para Validación -->
+    // Detectar si el formulario es enviado
+    document.querySelector('form').addEventListener('submit', function() {
+        isFormSubmitted = true;
+    });
+
+    // Detectar si el usuario intenta salir de la página sin guardar
+    window.addEventListener('beforeunload', function(event) {
+        if (!isFormSubmitted) {
+            // Hacer una llamada AJAX para eliminar el neumático temporal
+            navigator.sendBeacon('{% url "eliminar_neumatico_temporal" vehiculo.id neumatico.posicion %}');
+        }
+    });
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const checkboxes = document.querySelectorAll('input[name="averias"]');

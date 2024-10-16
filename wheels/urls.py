@@ -11,7 +11,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('login/', views.login_view, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('user_dashboard/', views.user_dashboard, name='user_dashboard'),
 
     # Rutas de usuarios
     path('usuarios/ver/', usuarios_views.ver_usuarios, name='ver_usuarios'),    

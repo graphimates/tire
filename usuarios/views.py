@@ -26,6 +26,7 @@ def ver_usuarios(request):
     usuarios = Usuario.objects.all()  # Obtener todos los usuarios
     return render(request, 'usuarios/ver_usuarios.html', {'usuarios': usuarios})
 
+
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
 @never_cache  # Deshabilitar la caché
@@ -36,6 +37,7 @@ def eliminar_usuario(request, user_id):
         return redirect('ver_usuarios')  # Redirigir de nuevo a la lista de usuarios
     return render(request, 'usuarios/eliminar_confirmacion.html', {'usuario': usuario})
 
+# Vista para el registro de usuario
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder
 @never_cache  # Deshabilitar la caché
@@ -43,13 +45,18 @@ def crear_usuario(request):
     if request.method == 'POST':
         form = UsuarioForm(request.POST, request.FILES)  # Agregar request.FILES
         if form.is_valid():
-            usuario = form.save(commit=False)
-            usuario.set_password(form.cleaned_data['password'])  # Encriptar la contraseña
-            usuario.save()
-            return redirect('ver_usuarios')  # Redirigir a la lista de usuarios después de la creación
+            empresa = form.cleaned_data.get('empresa')
+            if Usuario.objects.filter(empresa=empresa).exists():
+                form.add_error('empresa', 'El nombre de la empresa ya está registrado. Por favor, elija un nombre diferente.')
+            else:
+                usuario = form.save(commit=False)
+                usuario.set_password(form.cleaned_data['password'])  # Encriptar la contraseña
+                usuario.save()
+                return redirect('ver_usuarios')  # Redirigir a la lista de usuarios después de la creación
     else:
         form = UsuarioForm()
     return render(request, 'usuarios/crear_usuario.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_admin)  # Solo administradores pueden acceder

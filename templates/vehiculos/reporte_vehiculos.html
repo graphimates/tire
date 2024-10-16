@@ -121,7 +121,11 @@
                                                 <th>Presión</th>
                                                 <th>Huella</th>
                                                 <th>Averías</th>
+                                                {% if user.is_superuser %}
+
                                                 <th>Acción</th>
+                                                {% endif %}
+
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -141,34 +145,39 @@
                                                 </td>
                                                 <!-- Los demás campos de la tabla -->
                                                 {% if item.neumaticos_por_posicion|get_item:posicion %}
-                                                {% with neumatico=item.neumaticos_por_posicion|get_item:posicion %}
-                                                <td>{{ neumatico.medida.medida|default_if_none:"" }}</td>
-                                                <td>{{ neumatico.marca|default_if_none:"" }}</td>
-                                                <td>{{ neumatico.diseño|default_if_none:"" }}</td>
-                                                <td>{{ neumatico.modelo|default_if_none:"" }}</td>
-                                                <td>{{ neumatico.dot|default_if_none:"" }}</td>
-                                                <td>{{ neumatico.presion|default_if_none:"0.0" }}</td>
-                                                <td>{{ neumatico.huella|default_if_none:"0.0" }}</td>
-                                                <td>
-                                                    {% for averia in neumatico.averias.all %}
-                                                    {{ averia.nombre }}
-                                                    {% empty %}
-                                                    Sin averías
-                                                    {% endfor %}
-                                                </td>
+                                                    {% with neumatico=item.neumaticos_por_posicion|get_item:posicion %}
+                                                    <td>{{ neumatico.medida.medida|default_if_none:"" }}</td>
+                                                    <td>{{ neumatico.marca|default_if_none:"" }}</td>
+                                                    <td>{{ neumatico.diseño|default_if_none:"" }}</td>
+                                                    <td>{{ neumatico.modelo|default_if_none:"" }}</td>
+                                                    <td>{{ neumatico.dot|default_if_none:"" }}</td>
+                                                    <td>{{ neumatico.presion|default_if_none:"" }}</td>
+                                                    <td>{{ neumatico.huella|default_if_none:"" }}</td>
+                                                    <td>
+                                                        {% if neumatico.averias.exists %}
+                                                            {% for averia in neumatico.averias.all %}
+                                                            {{ averia.nombre }}
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            Sin averías
+                                                        {% endif %}
+                                                    </td>
+                                                    {% endwith %}
+                                                {% else %}
+                                                    <!-- Mostrar celdas vacías si no hay neumático registrado -->
+                                                    <td colspan="8">Neumático no registrado</td>
+                                                {% endif %}
+                                                <!-- Botón de Editar siempre visible -->
+                                                {% if user.is_superuser %}
                                                 <td>
                                                     <a href="{% url 'editar_neumatico' item.vehiculo.id posicion %}" class="btn btn-warning btn-sm">Editar</a>
                                                 </td>
-                                                {% endwith %}
-                                                {% else %}
-                                                <td colspan="{% if user.is_superuser %}10{% else %}9{% endif %}">Neumático no registrado</td>
                                                 {% endif %}
                                             </tr>
                                             {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
-                                                                
                             </div>
                         </div>
                     </div>

@@ -6,12 +6,12 @@ from neumatico.models import Neumatico
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.cache import never_cache  # Importamos el decorador para deshabilitar la caché
 import json  # Asegúrate de importar json
+from django.contrib import messages  # Importar para mostrar mensajes al usuario
 
 # Función para verificar si el usuario es administrador
 def is_admin(user):
     return user.is_superuser
 
-# Vista para añadir un vehículo a un usuario específico
 @login_required
 @user_passes_test(is_admin)
 def crear_vehiculo(request, user_id):
@@ -22,28 +22,36 @@ def crear_vehiculo(request, user_id):
             vehiculo = form.save(commit=False)
             vehiculo.usuario = usuario
             vehiculo.save()
-            
-            # Ahora, crear los neumáticos relacionados
-            for posicion in range(1, vehiculo.cantidad_neumaticos + 1):
-                Neumatico.objects.create(
-                    vehiculo=vehiculo,
-                    posicion=posicion,
-                    modelo='',
-                    marca='',
-                    diseño='',
-                    dot='',
-                    presion=0.0,
-                    huella=0.0,
-                    renovable=False
-                )
-            
-            # Actualizar la flota
+
+            try:
+                # Crear los neumáticos relacionados
+                for posicion in range(1, vehiculo.cantidad_neumaticos + 1):
+                    Neumatico.objects.create(
+                        vehiculo=vehiculo,
+                        posicion=posicion,
+                        modelo='',
+                        marca='',
+                        diseño='',
+                        dot='',
+                        presion=None,  # No asignar presión
+                        huella=None,   # No asignar huella
+                        renovable=False,  # No es renovable inicialmente
+                        averias=None  # No asignar averías
+                    )
+            except Exception as e:
+                # Capturar el error y redirigir o mostrar un mensaje
+                messages.error(request, "Ocurrió un error al crear los neumáticos, pero el vehículo fue creado exitosamente.")
+                # Puedes redirigir a otra URL si lo prefieres
+                return redirect('ver_usuarios')
+
+            # Actualizar la flota del usuario
             usuario.flota += 1
             usuario.save()
+
             return redirect('ver_usuarios')
     else:
         form = VehiculoForm()
-    
+
     return render(request, 'vehiculos/crear_vehiculo.html', {'form': form, 'usuario': usuario})
 
 @login_required

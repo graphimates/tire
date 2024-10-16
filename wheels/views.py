@@ -8,28 +8,31 @@ from django.views.decorators.cache import never_cache
 from averias.models import Averia
 import json
 from django.http import JsonResponse
+from django.contrib.auth.forms import AuthenticationForm
 
 # Vista para el login
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('index')
     
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = authenticate(request, email=email, password=password)
-        
-        if user is not None:
-            login(request, user)
-            if user.is_superuser:
-                return redirect('index')
-            else:
-                return redirect('user_dashboard')
-        else:
-            return render(request, 'login.html', {'error': 'Credenciales incorrectas.'})
+    form = AuthenticationForm(request, data=request.POST or None)
     
-    return render(request, 'login.html')
-
+    if request.method == 'POST':
+        if form.is_valid():
+            email = request.POST.get('username')  # AuthenticationForm usa 'username' para el campo de email
+            password = request.POST.get('password')
+            user = authenticate(request, email=email, password=password)
+            
+            if user is not None:
+                login(request, user)
+                if user.is_superuser:
+                    return redirect('index')
+                else:
+                    return redirect('index')
+            else:
+                form.add_error(None, 'Credenciales incorrectas.')
+    
+    return render(request, 'login.html', {'form': form})
 
 # Vista para el index (admin panel)
 @login_required
@@ -100,8 +103,8 @@ def index(request):
             if averia.servicio_requerido in servicios_por_vehiculo:
                 servicios_por_vehiculo[averia.servicio_requerido].add(neumatico.vehiculo.placa)
 
-        if not tiene_averia_no_operativo and neumatico.huella > 0:
-            # Es operativo
+        # Es operativo si no tiene una avería no operativa, independientemente de la huella
+        if not tiene_averia_no_operativo:
             operativos_count += 1
             neumaticos_operativos.append(neumatico)
 
@@ -113,7 +116,7 @@ def index(request):
             elif neumatico.huella > 6:
                 huella_6_mas += 1
         else:
-            # Es no operativo si tiene una avería no operativa o huella = 0
+            # Es no operativo solo si tiene una avería no operativa
             no_operativos_count += 1
             neumaticos_no_operativos.append(neumatico)
 
@@ -144,22 +147,14 @@ def index(request):
 
     return render(request, 'index.html', context)
 
-# Vista para obtener sugerencias de empresas basadas en la búsqueda
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from usuarios.models import Usuario
-
-from django.http import JsonResponse
 
 # Vista para autocompletar empresas
 @login_required
 def autocomplete_empresas(request):
     if request.is_ajax():
         term = request.GET.get('term', '')
-        print(f"Buscando empresas que contengan: {term}")  # Agregar un log temporal para verificar
         empresas = Usuario.objects.filter(empresa__icontains=term).exclude(is_superuser=True).values_list('empresa', flat=True).distinct()
         empresas_list = list(empresas)
-        print(f"Empresas encontradas: {empresas_list}")  # Agregar un log temporal para verificar
         return JsonResponse(empresas_list, safe=False)
 
 
@@ -172,11 +167,3 @@ def empresa_autocomplete(request):
         results = list(empresas)
         return JsonResponse(results, safe=False)
     return JsonResponse([], safe=False)
-
-
-
-# Vista para usuarios normales (user_dashboard)
-@login_required
-@never_cache
-def user_dashboard(request):
-    return render(request, 'index.html')
