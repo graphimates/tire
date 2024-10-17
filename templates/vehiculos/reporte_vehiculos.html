@@ -39,17 +39,6 @@
         <div class="card-body">
             <form method="GET" class="mb-4">
                 <div class="row">
-                    <!-- Filtro de búsqueda por empresa con autocompletado -->
-                    {% if user.is_superuser %}
-                    <div class="col-md-4 d-flex align-items-end">
-                        <label for="search_empresa">Buscar por empresa:</label>
-                        <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control me-2" placeholder="Ingrese el nombre de la empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
-                        <span class="input-group-text">
-                            <i class="fas fa-search"></i> <!-- Icono de lupa -->
-                        </span>
-                    </div>
-                    {% endif %}
-
                     <!-- Filtro por criticidad -->
                     <div class="col-md-4">
                         <label for="criticidad">Filtrar por criticidad:</label>
@@ -204,6 +193,36 @@
             <p>No tienes vehículos registrados.</p>
         {% endif %}
     </div>
+
+    <!-- Paginación -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <!-- Botón de página anterior -->
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            <!-- Números de página -->
+            {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}">{{ num }}</a>
+                </li>
+            {% endfor %}
+
+            <!-- Botón de página siguiente -->
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 
 <script>

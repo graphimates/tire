@@ -53,30 +53,33 @@ def crear_vehiculo(request, user_id):
         form = VehiculoForm()
 
     return render(request, 'vehiculos/crear_vehiculo.html', {'form': form, 'usuario': usuario})
+from django.core.paginator import Paginator
 
 @login_required
 @never_cache
 def reporte_vehiculos(request):
     vehiculos_con_neumaticos = []
 
-    # Filtrar por empresa
-    search_empresa = request.GET.get('search_empresa', '')
+    # Obtener los valores de los filtros desde el formulario GET
+    selected_empresa = request.GET.get('selected_empresa', '')
     order_by = request.GET.get('order_by', 'desc')
     criticidad = request.GET.get('criticidad', '')
 
+    # Si el usuario es superusuario, obtener la lista de empresas
     if request.user.is_superuser:
         empresas = Usuario.objects.values_list('empresa', flat=True).distinct()
         vehiculos = Vehiculo.objects.all()
 
-        if search_empresa:
-            vehiculos = vehiculos.filter(usuario__empresa__icontains=search_empresa)
+        # Si hay una empresa seleccionada, filtrar los vehículos por empresa
+        if selected_empresa and selected_empresa != 'todas':
+            vehiculos = vehiculos.filter(usuario__empresa__iexact=selected_empresa)
 
         if criticidad:
             vehiculos = vehiculos.filter(neumaticos__averias__criticidad=criticidad).distinct()
 
     else:
         vehiculos = Vehiculo.objects.filter(usuario=request.user)
-        empresas = []
+        empresas = []  # No mostrar la lista de empresas si no es superusuario
 
     # Ordenar los vehículos por fecha de inspección
     if order_by == 'asc':
@@ -84,7 +87,13 @@ def reporte_vehiculos(request):
     else:
         vehiculos = vehiculos.order_by('-ultima_inspeccion')
 
-    for vehiculo in vehiculos:
+    # Paginación - mostrar 8 vehículos por página
+    paginator = Paginator(vehiculos, 8)  # 8 vehículos por página
+    page_number = request.GET.get('page')  # Número de la página actual
+    page_obj = paginator.get_page(page_number)  # Obtener la página actual
+
+    # Recorrer los vehículos en la página actual y preparar el contexto
+    for vehiculo in page_obj:
         neumaticos_por_posicion = {}
         tiene_averias = False
 
@@ -103,10 +112,14 @@ def reporte_vehiculos(request):
             'tiene_averias': tiene_averias  # Añadir la variable tiene_averias
         })
 
+    # Asegurarse de pasar 'selected_empresa', 'page_obj' y empresas al contexto
     return render(request, 'vehiculos/reporte_vehiculos.html', {
         'vehiculos_con_neumaticos': vehiculos_con_neumaticos,
-        'empresas_json': json.dumps(list(empresas)),
+        'empresas': empresas,
+        'selected_empresa': selected_empresa,
+        'page_obj': page_obj,  # Pasar el objeto de paginación al template
     })
+
 
 
 @never_cache

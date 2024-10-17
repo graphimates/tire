@@ -15,8 +15,8 @@
         {% if request.user.is_superuser %}
         <div class="row justify-content-center mt-2">
             <div class="col-md-4">
-                <form method="GET" action="" class="d-flex justify-content-center align-items-center">
-                    <label for="empresa-dropdown" class="form-label text-white me-2">Seleccionar empresa:</label>
+                <form method="GET" action="" class="text-center">
+                    <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
                     <select id="empresa-dropdown" name="usuario_id" class="form-select" onchange="this.form.submit()">
                         <option value="todas" {% if not selected_user %}selected{% endif %}>Todas las empresas</option>
                         {% for usuario in usuarios %}
@@ -236,7 +236,7 @@
     const perdidaMesData = {{ perdida_mes|safe }};
 
     const perdidaMesChart = new Chart(ctx3, {
-        type: 'bar',  // Puedes cambiar 'bar' a 'line' si prefieres una gráfica de línea
+        type: 'bar',
         data: {
             labels: mesesLabels,
             datasets: [{

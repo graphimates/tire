@@ -161,37 +161,37 @@ def editar_neumatico(request, vehiculo_id, posicion):
     return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico, 'vehiculo': vehiculo})
 
 # Vista para ver neumáticos
+from django.core.paginator import Paginator
+
 @login_required
 def ver_neumaticos(request):
     # Si el usuario es admin, puede ver todos los neumáticos
     if request.user.is_superuser:
         neumaticos = Neumatico.objects.select_related('vehiculo').all()
-        # Obtener todas las empresas disponibles (distintas) relacionadas con los vehículos
         empresas = Vehiculo.objects.values_list('usuario__empresa', flat=True).distinct()
     else:
         # Los usuarios normales solo pueden ver los neumáticos de sus propios vehículos
         neumaticos = Neumatico.objects.filter(vehiculo__usuario=request.user)
         empresas = []  # No mostrar empresas si no es superusuario
 
-    # Obtener los valores de los filtros de la URL
+    # Filtros
     operatividad = request.GET.get('operatividad')
     huella = request.GET.get('huella')
     renovable = request.GET.get('renovable')
     search_empresa = request.GET.get('search_empresa', '').strip()
     selected_empresa = request.GET.get('selected_empresa', '')
 
-    # Filtrar por empresa si se ha seleccionado una empresa
+    # Filtrar por empresa
     if selected_empresa and selected_empresa != 'todas':
         neumaticos = neumaticos.filter(vehiculo__usuario__empresa=selected_empresa)
 
-    # Filtrar por búsqueda de empresa si se ha ingresado un texto de búsqueda
+    # Filtrar por búsqueda de empresa
     if search_empresa:
         neumaticos = neumaticos.filter(vehiculo__usuario__empresa__icontains=search_empresa)
 
     # Filtrar por operatividad
     if operatividad:
         if operatividad == 'operativo':
-            # Filtramos por neumáticos que no tienen averías "no operativo"
             neumaticos = neumaticos.exclude(averias__estado='no_operativo')
         elif operatividad == 'fuera_de_uso':
             neumaticos = neumaticos.filter(averias__estado='no_operativo')
@@ -212,15 +212,22 @@ def ver_neumaticos(request):
         elif renovable == 'no':
             neumaticos = neumaticos.filter(renovable=False)
 
+    # Paginación
+    paginator = Paginator(neumaticos, 20)  # 20 neumáticos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'neumaticos/ver_neumaticos.html', {
-        'neumaticos': neumaticos,
+        'neumaticos': page_obj,  # Pasar el objeto de paginación
         'empresas': empresas,
         'operatividad': operatividad,
         'huella': huella,
         'renovable': renovable,
         'search_empresa': search_empresa,
-        'selected_empresa': selected_empresa
+        'selected_empresa': selected_empresa,
+        'page_obj': page_obj,  # Pasar el objeto de paginación al template
     })
+
 
 
 @login_required

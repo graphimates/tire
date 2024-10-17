@@ -1,40 +1,70 @@
+# views.py
+
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Usuario
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import UsuarioForm
+from .forms import UsuarioForm, ModificarImagenForm, ProfileForm
 from django.views.decorators.cache import never_cache
-from .forms import ModificarImagenForm
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .forms import ProfileForm
 from averias.models import Averia
 import csv
 from django.http import HttpResponse
 from neumatico.models import Neumatico, HistorialInspeccion
 from vehiculos.models import Vehiculo
-
+from django.core.paginator import Paginator
+from collections import Counter
+from django.utils import timezone
 
 # Función para verificar si el usuario es administrador
 def is_admin(user):
     return user.is_superuser
 
-# Vista para mostrar los usuarios en una tabla
+# Vista para mostrar usuarios con paginación y filtro por empresa
 @login_required
 @user_passes_test(is_admin)
 @never_cache
 def ver_usuarios(request):
-    usuarios = Usuario.objects.all()  # Obtener todos los usuarios
-    return render(request, 'usuarios/ver_usuarios.html', {'usuarios': usuarios})
+    # Obtener el filtro de empresa seleccionado, por defecto 'todas'
+    selected_empresa = request.GET.get('selected_empresa', 'todas')
+
+    # Obtener todos los usuarios
+    usuarios = Usuario.objects.all()
+
+    # Aplicar filtro de empresa si se selecciona una específica
+    if selected_empresa and selected_empresa != 'todas':
+        usuarios = usuarios.filter(empresa__icontains=selected_empresa)
+
+    # Paginación para usuarios, mostrar 10 usuarios por página
+    paginator = Paginator(usuarios, 10)  # 10 usuarios por página
+    page_number = request.GET.get('page')
+    usuarios_page_obj = paginator.get_page(page_number)
+
+    # Obtener todas las empresas distintas para el filtro desplegable (sin paginación)
+    empresas_list = Usuario.objects.values_list('empresa', flat=True).distinct().order_by('empresa')
+
+    return render(request, 'usuarios/ver_usuarios.html', {
+        'usuarios': usuarios_page_obj,    # Objeto paginado para usuarios
+        'empresas': empresas_list,        # Lista completa de empresas para el filtro
+        'selected_empresa': selected_empresa,
+    })
+
+# ... (otras vistas permanecen igual)
 
 
+
+# Vista para eliminar usuario con opción de descargar la información antes de eliminar
 @login_required
 @user_passes_test(is_admin)
 @never_cache
 def eliminar_usuario(request, user_id):
     usuario = get_object_or_404(Usuario, id=user_id)
+    
     if request.method == 'POST':
-        usuario.delete()
-        return redirect('ver_usuarios')
+        if 'descargar' in request.POST:
+            return descargar_informacion_usuario(request, user_id)  # Descargar información
+        elif 'eliminar' in request.POST:
+            usuario.delete()
+            return redirect('ver_usuarios')
+    
     return render(request, 'usuarios/eliminar_confirmacion.html', {'usuario': usuario})
 
 # Vista para el registro de usuario

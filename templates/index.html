@@ -9,7 +9,9 @@
         <div class="row justify-content-center">
             <div class="col-12 text-center">
                 <!-- Título centrado correctamente -->
-                <h1 class="header-title text-white mb-3" style="text-align: center;">Bienvenido {{ user.empresa }} - Resumen de Neumáticos</h1>
+                <h1 class="header-title text-white mb-3" style="text-align: center;">
+                    Bienvenido {{ user.empresa }} - Resumen de Neumáticos
+                </h1>
             </div>
         </div>
         <!-- Filtro Seleccionar Empresa Centrando Debajo del Título -->
@@ -19,10 +21,12 @@
                 <form method="GET" action="" class="text-center">
                     <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
                     <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()">
-                        <option value="">Seleccionar empresa...</option>
+                        <option></option> <!-- Placeholder para Select2 -->
                         <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
                         {% for empresa in empresas %}
-                            <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
+                            <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>
+                                {{ empresa }}
+                            </option>
                         {% endfor %}
                     </select>
                 </form>
@@ -31,26 +35,6 @@
         {% endif %}
     </div>
 </div>
-
-<!-- Sección de Búsqueda y Filtro, solo visible para superusuarios -->
-{% if user.is_superuser %}
-<div class="mt-5 mb-5 shadow-lg rounded content-box">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <!-- Búsqueda por Empresa -->
-            <form method="GET" action="" class="d-flex align-items-center mb-4">
-                <div class="input-group" style="flex-grow: 1;">
-                    <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Buscar por empresa..." value="{{ request.GET.search_empresa }}" autocomplete="off">
-                </div>
-                <button class="btn btn-primary ms-2" type="submit" style="min-width: 100px;">
-                    <i class="fas fa-search"></i> Buscar
-                </button>
-                <div class="dropdown-menu" id="autocomplete-results" style="position: absolute; z-index: 1000;"></div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 <!-- Sección de Tarjetas Resumen (con hover) -->
 <div class="row mt-4">

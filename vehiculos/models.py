@@ -12,6 +12,8 @@ class Vehiculo(models.Model):
         ('T2x0', 'Vehículo T2x0'),
         ('T4x0', 'Vehículo T4x0'),
         ('T6x0', 'Vehículo T6x0'),
+        ('TT6x0', 'Vehículo TT6x0'),
+
     ]
     
     usuario = models.ForeignKey(Usuario, related_name='vehiculos', on_delete=models.CASCADE)
@@ -36,5 +38,7 @@ class Vehiculo(models.Model):
             'T2x0': 4,
             'T4x0': 8,
             'T6x0': 12,  # Aquí especificamos que el tipo T6x0 tiene 12 neumáticos
+            'TT6x0': 12,
+
         }
         return cantidad_por_tipo.get(self.tipo, 4)  # Valor por defecto si el tipo no existe

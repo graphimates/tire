@@ -7,21 +7,25 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 text-center">
-                <!-- Título centrado -->
+                <!-- Título centrado correctamente -->
                 <h1 class="header-title text-white mb-4">Reporte de Neumáticos</h1>
 
                 <!-- Filtro de selección de empresa solo para administradores -->
                 {% if user.is_superuser %}
-                <form method="GET" action="" class="d-flex justify-content-center align-items-center">
-                    <label for="empresa-dropdown" class="form-label text-white me-3">Seleccionar empresa:</label>
-                    <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()" style="width: auto;">
-                        <option value="">Seleccionar empresa...</option>
-                        <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
-                        {% for empresa in empresas %}
-                            <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
+                <div class="row justify-content-center mt-2">
+                    <div class="col-md-4">
+                        <form method="GET" action="" class="text-center">
+                            <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
+                            <select id="empresa-dropdown" name="selected_empresa" class="form-select" onchange="this.form.submit()">
+                                <option value="">Seleccionar empresa...</option>
+                                <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
+                                {% for empresa in empresas %}
+                                    <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -36,21 +40,6 @@
                 <h5 class="mb-0">Filtros de Búsqueda</h5>
             </div>
             <div class="card-body">
-                <div class="row justify-content-center">
-                    <!-- Filtro de búsqueda por empresa solo para administradores -->
-                    {% if user.is_superuser %}
-                    <div class="col-md-6 text-center">
-                        <label for="empresa_autocomplete" class="form-label">Buscar por empresa:</label>
-                        <div class="input-group justify-content-center">
-                            <input type="text" id="empresa_autocomplete" name="search_empresa" class="form-control" placeholder="Buscar por empresa..." value="{{ search_empresa }}" autocomplete="off">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fas fa-search"></i> Buscar
-                            </button>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-
                 <div class="row mt-3">
                     <!-- Filtro por operatividad -->
                     <div class="col-md-4">
@@ -133,7 +122,6 @@
                         <td>{{ neumatico.diseño }}</td>
                         <td>{{ neumatico.modelo }}</td>
                         <td>{{ neumatico.dot }}</td>
-                        <!-- Mostrar campos vacíos si son None -->
                         <td>{{ neumatico.presion|default_if_none:"" }}</td>
                         <td>{{ neumatico.huella|default_if_none:"" }}</td>
                         <td>
@@ -153,6 +141,31 @@
             </table>
         </div>
 
+        <!-- Paginación -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if neumaticos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ neumaticos.previous_page_number }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for num in neumaticos.paginator.page_range %}
+                    <li class="page-item {% if neumaticos.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if neumaticos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ neumaticos.next_page_number }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+
         <!-- Mensaje si no hay neumáticos -->
         {% if not neumaticos %}
             <p class="text-center text-muted mt-4">No hay neumáticos disponibles para los filtros aplicados.</p>
@@ -165,7 +178,7 @@ $(document).ready(function() {
     $('#datatable').DataTable({
         "pagingType": "full_numbers",
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        responsive: false,  // Desactivamos la respuesta para mantener el scroll horizontal
+        responsive: false,
         language: {
             search: "_INPUT_",
             searchPlaceholder: "Buscar registros",
@@ -183,18 +196,11 @@ document.addEventListener('DOMContentLoaded', function() {
     radios.forEach(function(radio) {
         radio.addEventListener('click', function() {
             if (lastChecked === this) {
-                this.checked = false;  // Destildar el radio si es el mismo
-                lastChecked = null;  // Reiniciar la variable de control
+                this.checked = false;
+                lastChecked = null;
             } else {
                 lastChecked = this;
             }
-            document.getElementById('filtros-form').submit();
-        });
-    });
-
-    const selects = document.querySelectorAll('.filtro-select');
-    selects.forEach(function(select) {
-        select.addEventListener('change', function() {
             document.getElementById('filtros-form').submit();
         });
     });

@@ -856,3 +856,33 @@ footer {
   width: 100px; /* Ajustar tamaño del logo */
   margin-bottom: 20px;
 }
+
+/* Limitar la altura del dropdown y habilitar el scroll */
+.select2-dropdown {
+  max-height: 200px !important; /* Ajustar la altura para mostrar solo 5 opciones visibles */
+  overflow-y: auto !important;
+}
+
+/* Evitar overflow en el select original */
+.select2-container--default .select2-selection--single {
+  overflow: hidden;
+  height: auto;
+}
+
+/* Asegurarse de que el contenedor no tenga un segundo scroll */
+.select2-container--default .select2-results>.select2-results__options {
+  max-height: 200px !important; /* La misma altura que el dropdown */
+  overflow-y: auto !important;
+}
+
+/* Limitar la altura del dropdown y habilitar el scroll solo en el menú de opciones */
+.select2-dropdown {
+  max-height: none !important; /* Quita cualquier restricción de altura del contenedor general */
+  overflow: hidden !important;  /* Quita el overflow del dropdown */
+}
+
+.select2-results__options {
+  max-height: 200px !important; /* Limita el tamaño máximo de las opciones */
+  overflow-y: auto !important;  /* Habilita el scroll solo en las opciones */
+}
+

@@ -1,3 +1,4 @@
+<!-- ver_usuarios.html -->
 {% extends "base.html" %}
 
 {% block title %}Ver Usuarios{% endblock %}
@@ -6,70 +7,136 @@
 <!-- Panel Header -->
 <div class="panel-header panel-header-sm">
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-12 text-center">
-                <h2 class="header-title">Gestión de Usuarios</h2>
+                <h2 class="header-title text-white mb-4">Gestión de Usuarios</h2>
             </div>
         </div>
+
+        <!-- Filtro Seleccionar Empresa Centrando Debajo del Título -->
+        {% if user.is_superuser %}
+        <div class="row justify-content-center mt-2">
+            <div class="col-md-4">
+                <form method="GET" action="" class="text-center">
+                    <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
+                    <select id="empresa-dropdown" name="selected_empresa" class="form-select mt-2" onchange="this.form.submit()">
+                        <option value="">Seleccionar empresa...</option>
+                        <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
+                        {% for empresa in empresas %}
+                            <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
+<!-- Contenido principal -->
 <div class="content">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h4 class="card-title">Lista de Usuarios</h4>
+    <!-- Tabla de Usuarios -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title">Lista de Usuarios</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Contenedor que permite el scroll horizontal sin cambiar tamaño -->
+                    <div class="table-responsive" style="overflow-x: auto; white-space: nowrap;">
+                        <table class="table table-bordered table-hover" style="table-layout: fixed; width: 100%;">
+                            <thead class="bg-light text-dark">
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th style="width: 150px;">Nombre</th>
+                                    <th style="width: 150px;">Apellido</th>
+                                    <th style="width: 250px;">Email</th>
+                                    <th style="width: 200px;">Empresa</th>
+                                    <th style="width: 100px;">¿Es Admin?</th>
+                                    <th style="width: 100px;">¿Activo?</th>
+                                    <th style="width: 200px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                <tr>
+                                    <th scope="row">{{ usuario.id }}</th>
+                                    <td>{{ usuario.first_name }}</td>
+                                    <td>{{ usuario.last_name }}</td>
+                                    <td>{{ usuario.email }}</td>
+                                    <td>{{ usuario.empresa }}</td>
+                                    <td>{{ usuario.is_superuser|yesno:"Sí,No" }}</td>
+                                    <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
+                                    <td>
+                                        <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm" title="Eliminar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                        <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm" title="Añadir Vehículo">
+                                            <i class="fas fa-car"></i>
+                                        </a>
+                                        <a href="{% url 'descargar_informacion_usuario' usuario.id %}" class="btn btn-secondary btn-sm" title="Descargar Información">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Paginación para usuarios -->
+                    {% if usuarios.has_other_pages %}
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <!-- Botón de página anterior -->
+                            {% if usuarios.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ usuarios.previous_page_number }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&laquo;</span>
+                            </li>
+                            {% endif %}
+
+                            <!-- Números de página -->
+                            {% for num in usuarios.paginator.page_range %}
+                                {% if usuarios.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > usuarios.number|add:'-3' and num < usuarios.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <!-- Botón de página siguiente -->
+                            {% if usuarios.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ usuarios.next_page_number }}{% if selected_empresa %}&selected_empresa={{ selected_empresa }}{% endif %}" aria-label="Siguiente">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&raquo;</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-          <!-- Contenedor que permite el scroll horizontal sin cambiar tamaño -->
-          <div class="table-responsive" style="overflow-x: auto; white-space: nowrap;">
-            <table class="table table-bordered table-hover" style="table-layout: fixed; width: 100%;">
-              <thead class="bg-light text-dark"> <!-- Cambiado a text-dark para que siempre sea negro -->
-                <tr>
-                  <th style="width: 50px;">#</th>
-                  <th style="width: 150px;">Nombre</th>
-                  <th style="width: 150px;">Apellido</th>
-                  <th style="width: 250px;">Email</th>
-                  <th style="width: 200px;">Empresa</th>
-                  <th style="width: 100px;">¿Es Admin?</th>
-                  <th style="width: 100px;">¿Activo?</th>
-                  <th style="width: 200px;">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for usuario in usuarios %}
-                <tr>
-                  <th scope="row">{{ usuario.id }}</th>
-                  <td>{{ usuario.first_name }}</td>
-                  <td>{{ usuario.last_name }}</td>
-                  <td>{{ usuario.email }}</td>
-                  <td>{{ usuario.empresa }}</td>
-                  <td>{{ usuario.is_superuser|yesno:"Sí,No" }}</td>
-                  <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
-                  <td>
-                    <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm" title="Eliminar">
-                      <i class="fas fa-trash-alt"></i>
-                    </a>
-                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm" title="Editar">
-                      <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="{% url 'crear_vehiculo' usuario.id %}" class="btn btn-info btn-sm" title="Añadir Vehículo">
-                      <i class="fas fa-car"></i>
-                    </a>
-                    <a href="{% url 'descargar_informacion_usuario' usuario.id %}" class="btn btn-secondary btn-sm" title="Descargar Información">
-                      <i class="fas fa-download"></i>
-                    </a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 
 {% endblock %}
