@@ -265,34 +265,50 @@ def ver_neumaticos(request):
 
 
 # neumatico/views.py
+from django.contrib.auth import get_user_model
 
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from neumatico.models import Neumatico, HistorialInspeccion
-from vehiculos.models import Vehiculo
-from django.utils import timezone
+Usuario = get_user_model()
+
 from datetime import timedelta
 from collections import Counter
+from django.utils import timezone
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from usuarios.models import Usuario
 
 @login_required
 def historico_datos(request, user_id=None):
+    # Función auxiliar para obtener el índice del mes basado en la fecha de inspección
     def obtener_indice_mes(fecha):
-        """Obtiene el índice del mes basado en los últimos 6 meses."""
-        if fecha:
-            hoy = timezone.now().date()
-            delta_meses = (hoy.year - fecha.year) * 12 + (hoy.month - fecha.month)
-            if 0 <= delta_meses < 6:
-                return 5 - delta_meses
-        return None
+        hoy = timezone.now().date()
+        delta_meses = (hoy.year - fecha.year) * 12 + (hoy.month - fecha.month)
+        return 5 - delta_meses if 0 <= delta_meses < 6 else None
 
-    # Obtener el usuario seleccionado o todos
+    # Obtener el usuario seleccionado o el actual
     selected_user_id = request.GET.get('usuario_id', user_id)
-    if request.user.is_superuser and selected_user_id and selected_user_id != "todas":
-        selected_user = get_object_or_404(Usuario, id=selected_user_id)
-    else:
-        selected_user = None if selected_user_id == "todas" else request.user
+    rango_fecha = request.GET.get('rango_fecha')  # Filtro de rango de fecha predefinido
 
-    # Obtener neumáticos actuales y historial de inspecciones
+    hoy = timezone.now().date()
+    if rango_fecha == '1_semana':
+        fecha_inicio = hoy - timedelta(weeks=1)
+    elif rango_fecha == '1_mes':
+        fecha_inicio = hoy - timedelta(days=30)
+    elif rango_fecha == '3_meses':
+        fecha_inicio = hoy - timedelta(days=90)
+    elif rango_fecha == '6_meses':
+        fecha_inicio = hoy - timedelta(days=180)
+    else:
+        fecha_inicio = None
+
+    # Obtener el usuario seleccionado y filtrar los datos
+    if request.user.is_superuser and selected_user_id and selected_user_id != "todas":
+        selected_user = Usuario.objects.get(id=selected_user_id)
+    elif selected_user_id == "todas":
+        selected_user = None
+    else:
+        selected_user = request.user
+
+    # Filtrar los neumáticos y el historial de inspecciones por usuario y fecha
     if selected_user:
         neumaticos_actuales = Neumatico.objects.filter(vehiculo__usuario=selected_user)
         historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=selected_user)
@@ -300,13 +316,16 @@ def historico_datos(request, user_id=None):
         neumaticos_actuales = Neumatico.objects.all()
         historial_inspecciones = HistorialInspeccion.objects.all()
 
-    # Inicializar contadores
+    if fecha_inicio:
+        neumaticos_actuales = neumaticos_actuales.filter(fecha_inspeccion__gte=fecha_inicio)
+        historial_inspecciones = historial_inspecciones.filter(fecha_inspeccion__gte=fecha_inicio)
+
+    # Inicializar los contadores para los neumáticos
     operativos_data = 0
     renovables_data = 0
     desperdicio_data = 0
 
     # Preparar datos para la gráfica (últimos 6 meses)
-    hoy = timezone.now().date()
     meses_labels = [(hoy - timedelta(days=30 * i)).strftime('%B') for i in range(6)][::-1]  # Últimos 6 meses
     operativos_mes = [0] * 6
     renovables_mes = [0] * 6
@@ -366,7 +385,7 @@ def historico_datos(request, user_id=None):
                     renovables_data += 1
                     renovables_mes[indice_mes] += 1
 
-    # Preparar los datos de averías para la otra gráfica
+    # Preparar los datos de averías para la gráfica de averías
     averias_counter = Counter()
     for neumatico in neumaticos_actuales:
         for averia in neumatico.averias.all():
@@ -388,17 +407,9 @@ def historico_datos(request, user_id=None):
         suma_acumulada += cantidad
         porcentaje_acumulado.append(round((suma_acumulada / total_averias) * 100, 2)) if total_averias > 0 else []
 
-    # Calcular la última inspección
-    if neumaticos_actuales.exists() or historial_inspecciones.exists():
-        # Obtener todas las fechas de inspección de neumáticos actuales e historial
-        fechas_inspeccion = list(neumaticos_actuales.values_list('fecha_inspeccion', flat=True)) + \
-                             list(historial_inspecciones.values_list('fecha_inspeccion', flat=True))
-        # Filtrar fechas válidas
-        fechas_inspeccion = [fecha for fecha in fechas_inspeccion if fecha]
-        if fechas_inspeccion:
-            ultima_inspeccion = max(fechas_inspeccion)
-        else:
-            ultima_inspeccion = None
+    # Obtener la última inspección
+    if historial_inspecciones.exists():
+        ultima_inspeccion = historial_inspecciones.order_by('-fecha_inspeccion').first()
     else:
         ultima_inspeccion = None
 
@@ -418,8 +429,8 @@ def historico_datos(request, user_id=None):
         'operativos_mes': operativos_mes,
         'renovables_mes': renovables_mes,
         'desperdicio_mes': desperdicio_mes,
-        'perdida_mes': perdida_mes,  # Agregamos la pérdida por mes al contexto
-        'ultima_inspeccion': ultima_inspeccion,  # Agregar la última inspección al contexto
+        'perdida_mes': perdida_mes,  # Pérdida por mes
+        'ultima_inspeccion': ultima_inspeccion,  # Última inspección
     }
 
     return render(request, 'neumaticos/historico_datos.html', context)

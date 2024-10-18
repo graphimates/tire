@@ -19,7 +19,6 @@
                     <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
                     <select id="empresa-dropdown" name="usuario_id" class="form-select" onchange="this.form.submit()">
                         <option value="">Seleccionar empresa...</option>
-
                         <option value="todas" {% if not selected_user %}selected{% endif %}>Todas las empresas</option>
                         {% for usuario in usuarios %}
                             {% if not usuario.is_superuser %}
@@ -29,10 +28,41 @@
                             {% endif %}
                         {% endfor %}
                     </select>
+
+                    <!-- Filtro de Rango de Fecha Predefinido -->
+                    <label for="rango_fecha" class="form-label text-white mt-3">Rango de fechas:</label>
+                    <select id="rango_fecha" name="rango_fecha" class="form-select" onchange="this.form.submit()">
+                        <option value="">Seleccionar rango...</option>
+                        <option value="1_semana" {% if request.GET.rango_fecha == '1_semana' %}selected{% endif %}>Última semana</option>
+                        <option value="1_mes" {% if request.GET.rango_fecha == '1_mes' %}selected{% endif %}>Último mes</option>
+                        <option value="3_meses" {% if request.GET.rango_fecha == '3_meses' %}selected{% endif %}>Últimos 3 meses</option>
+                        <option value="6_meses" {% if request.GET.rango_fecha == '6_meses' %}selected{% endif %}>Últimos 6 meses</option>
+                    </select>
+                    
+                    <button type="submit" class="btn btn-primary mt-3">Aplicar Filtro</button>
                 </form>
             </div>
         </div>
         {% endif %}
+    </div>
+</div>
+
+<!-- Sección de Última Inspección -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 mb-4">
+            <div class="card text-center bg-white text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Última Inspección</h5>
+                    {% if ultima_inspeccion %}
+                        <!-- Mostrar la fecha de la última inspección -->
+                        <p class="card-text">{{ ultima_inspeccion.fecha_inspeccion|date:"d/m/Y H:i" }}</p>
+                    {% else %}
+                        <p class="card-text">Sin registros de inspección.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

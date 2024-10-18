@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
-from neumatico.models import Neumatico
+from neumatico.models import Neumatico, HistorialInspeccion  # Asegúrate de importar HistorialInspeccion si lo necesitas
 from usuarios.models import Usuario
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
@@ -11,8 +11,9 @@ from averias.models import Averia
 import json
 from django.http import JsonResponse
 from django.contrib.auth.forms import AuthenticationForm
-from vehiculos.models import Vehiculo  # Asegúrate de importar Vehiculo
+from vehiculos.models import Vehiculo
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Max  # Importar Max para agregaciones
 
 # Función para verificar si el usuario es administrador
 def is_admin(user):
@@ -132,19 +133,30 @@ def index(request):
     empresas = Usuario.objects.values_list('empresa', flat=True).distinct().exclude(is_superuser=True) if request.user.is_superuser else []
     empresas_json = json.dumps(list(empresas))  # Convertir a JSON para el autocompletar
 
-    # Calcular la última inspección según el tipo de usuario y selección
+    # Calcular la última inspección y el conteo de flota
     if not request.user.is_superuser:
-        # Para usuarios no administradores, obtener la última inspección de sus vehículos
-        ultima_inspeccion = Vehiculo.objects.filter(usuario=request.user).order_by('-ultima_inspeccion').first()
+        # Para usuarios no administradores, obtener la última inspección de sus neumáticos actuales
+        ultima_inspeccion = Neumatico.objects.filter(vehiculo__usuario=request.user, fecha_inspeccion__isnull=False).order_by('-fecha_inspeccion').first()
+        # Calcular el conteo de flota (vehículos) del usuario
+        fleet_count = Vehiculo.objects.filter(usuario=request.user).count()
     else:
         # Para administradores, determinar la última inspección según la selección
         if selected_empresa and selected_empresa != 'todas':
-            ultima_inspeccion = Vehiculo.objects.filter(usuario__empresa__iexact=selected_empresa).order_by('-ultima_inspeccion').first()
+            usuarios_empresa = Usuario.objects.filter(empresa__iexact=selected_empresa).exclude(is_superuser=True)
+            # Obtener la última inspección de los neumáticos actuales de los usuarios de la empresa seleccionada
+            ultima_inspeccion = Neumatico.objects.filter(vehiculo__usuario__in=usuarios_empresa, fecha_inspeccion__isnull=False).order_by('-fecha_inspeccion').first()
+            # Calcular el conteo de flota de la empresa seleccionada
+            fleet_count = Vehiculo.objects.filter(usuario__in=usuarios_empresa).count()
         elif selected_empresa == 'todas':
-            ultima_inspeccion = Vehiculo.objects.order_by('-ultima_inspeccion').first()
+            # Obtener la última inspección de todos los neumáticos actuales
+            ultima_inspeccion = Neumatico.objects.filter(fecha_inspeccion__isnull=False).order_by('-fecha_inspeccion').first()
+            # Calcular el conteo total de flota
+            fleet_count = Vehiculo.objects.all().count()
         else:
-            # Si no se ha seleccionado ninguna empresa, opta por la última inspección general
-            ultima_inspeccion = Vehiculo.objects.order_by('-ultima_inspeccion').first()
+            # Si no se ha seleccionado ninguna empresa, opta por la última inspección general de neumáticos actuales
+            ultima_inspeccion = Neumatico.objects.filter(fecha_inspeccion__isnull=False).order_by('-fecha_inspeccion').first()
+            # Calcular el conteo total de flota
+            fleet_count = Vehiculo.objects.all().count()
 
     # Preparar el contexto para la vista
     context = {
@@ -163,11 +175,10 @@ def index(request):
         'neumaticos_operativos': neumaticos_operativos,
         'neumaticos_no_operativos': neumaticos_no_operativos,
         'ultima_inspeccion': ultima_inspeccion,  # Agregar la última inspección al contexto
+        'fleet_count': fleet_count,  # Agregar el conteo de flota al contexto
     }
 
     return render(request, 'index.html', context)
-
-
 
 # Vista para autocompletar empresas
 @login_required
@@ -177,7 +188,6 @@ def autocomplete_empresas(request):
         empresas = Usuario.objects.filter(empresa__icontains=term).exclude(is_superuser=True).values_list('empresa', flat=True).distinct()
         empresas_list = list(empresas)
         return JsonResponse(empresas_list, safe=False)
-
 
 @login_required
 def empresa_autocomplete(request):
