@@ -26,6 +26,9 @@
                             <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
                         {% endfor %}
                     </select>
+                    <!-- Mantener los otros filtros en campos ocultos para no perderlos -->
+                    <input type="hidden" name="criticidad" value="{{ request.GET.criticidad }}">
+                    <input type="hidden" name="order_by" value="{{ request.GET.order_by }}">
                 </form>
             </div>
         </div>
@@ -58,6 +61,9 @@
                             <option value="desc" {% if request.GET.order_by == 'desc' %}selected{% endif %}>Descendente</option>
                         </select>
                     </div>
+
+                    <!-- Mantener los otros filtros en campos ocultos -->
+                    <input type="hidden" name="selected_empresa" value="{{ request.GET.selected_empresa }}">
                 </div>
             </form>
         </div>

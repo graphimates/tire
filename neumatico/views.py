@@ -15,6 +15,7 @@ from vehiculos.models import Vehiculo
 from usuarios.models import Usuario
 from averias.models import Averia
 from .forms import NeumaticoForm, MedidaForm
+from django.core.paginator import Paginator
 
 
 # Función para verificar si el usuario es administrador
@@ -160,18 +161,42 @@ def editar_neumatico(request, vehiculo_id, posicion):
 
     return render(request, 'neumaticos/editar_neumatico.html', {'form': form, 'neumatico': neumatico, 'vehiculo': vehiculo})
 
+from django.http import JsonResponse, HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.csrf import csrf_exempt
+from .models import Neumatico, HistorialInspeccion
+from .forms import NeumaticoForm
+from django.utils import timezone
+from django.core.exceptions import ValidationError
+from vehiculos.models import Vehiculo
+from django.http import JsonResponse, HttpResponseForbidden
+
+@csrf_exempt
+@login_required
+@user_passes_test(is_admin)
+def eliminar_neumatico_temporal(request, vehiculo_id, posicion):
+    if request.method == 'POST':
+        vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
+        try:
+            neumatico = Neumatico.objects.get(vehiculo=vehiculo, posicion=posicion, temp=True)
+            neumatico.delete()
+            return JsonResponse({'status': 'success'})
+        except Neumatico.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Neumático temporal no encontrado.'}, status=404)
+    else:
+        return HttpResponseForbidden()
 # Vista para ver neumáticos
-from django.core.paginator import Paginator
 
 @login_required
 def ver_neumaticos(request):
     # Si el usuario es admin, puede ver todos los neumáticos
     if request.user.is_superuser:
-        neumaticos = Neumatico.objects.select_related('vehiculo').all()
+        neumaticos = Neumatico.objects.select_related('vehiculo__usuario').all()
         empresas = Vehiculo.objects.values_list('usuario__empresa', flat=True).distinct()
     else:
         # Los usuarios normales solo pueden ver los neumáticos de sus propios vehículos
-        neumaticos = Neumatico.objects.filter(vehiculo__usuario=request.user)
+        neumaticos = Neumatico.objects.filter(vehiculo__usuario=request.user).select_related('vehiculo__usuario')
         empresas = []  # No mostrar empresas si no es superusuario
 
     # Filtros
@@ -183,7 +208,7 @@ def ver_neumaticos(request):
 
     # Filtrar por empresa
     if selected_empresa and selected_empresa != 'todas':
-        neumaticos = neumaticos.filter(vehiculo__usuario__empresa=selected_empresa)
+        neumaticos = neumaticos.filter(vehiculo__usuario__empresa__iexact=selected_empresa)
 
     # Filtrar por búsqueda de empresa
     if search_empresa:
@@ -217,6 +242,15 @@ def ver_neumaticos(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Calcular la última inspección
+    if neumaticos.exists():
+        # Obtener los vehículos únicos asociados a los neumáticos filtrados
+        vehiculos = Vehiculo.objects.filter(neumaticos__in=neumaticos).distinct()
+        # Obtener la última inspección entre estos vehículos
+        ultima_inspeccion = vehiculos.order_by('-ultima_inspeccion').first()
+    else:
+        ultima_inspeccion = None
+
     return render(request, 'neumaticos/ver_neumaticos.html', {
         'neumaticos': page_obj,  # Pasar el objeto de paginación
         'empresas': empresas,
@@ -226,33 +260,39 @@ def ver_neumaticos(request):
         'search_empresa': search_empresa,
         'selected_empresa': selected_empresa,
         'page_obj': page_obj,  # Pasar el objeto de paginación al template
+        'ultima_inspeccion': ultima_inspeccion,  # Agregar la última inspección al contexto
     })
 
 
+# neumatico/views.py
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from neumatico.models import Neumatico, HistorialInspeccion
+from vehiculos.models import Vehiculo
+from django.utils import timezone
+from datetime import timedelta
+from collections import Counter
 
 @login_required
 def historico_datos(request, user_id=None):
-    from datetime import timedelta
-
     def obtener_indice_mes(fecha):
-        """Función para obtener el índice del mes basado en la fecha de inspección.
-        Considera los últimos 6 meses desde la fecha actual."""
+        """Obtiene el índice del mes basado en los últimos 6 meses."""
         if fecha:
             hoy = timezone.now().date()
             delta_meses = (hoy.year - fecha.year) * 12 + (hoy.month - fecha.month)
-            # Aceptar solo los últimos 6 meses
             if 0 <= delta_meses < 6:
                 return 5 - delta_meses
         return None
 
-    # Obtener el usuario seleccionado o el actual
+    # Obtener el usuario seleccionado o todos
     selected_user_id = request.GET.get('usuario_id', user_id)
-    if request.user.is_superuser and selected_user_id != "todas":
-        selected_user = Usuario.objects.get(id=selected_user_id)
+    if request.user.is_superuser and selected_user_id and selected_user_id != "todas":
+        selected_user = get_object_or_404(Usuario, id=selected_user_id)
     else:
         selected_user = None if selected_user_id == "todas" else request.user
 
-    # Obtener los neumáticos actuales y el historial de inspecciones del usuario seleccionado o de todos
+    # Obtener neumáticos actuales y historial de inspecciones
     if selected_user:
         neumaticos_actuales = Neumatico.objects.filter(vehiculo__usuario=selected_user)
         historial_inspecciones = HistorialInspeccion.objects.filter(vehiculo__usuario=selected_user)
@@ -260,7 +300,7 @@ def historico_datos(request, user_id=None):
         neumaticos_actuales = Neumatico.objects.all()
         historial_inspecciones = HistorialInspeccion.objects.all()
 
-    # Inicializar los contadores para los neumáticos
+    # Inicializar contadores
     operativos_data = 0
     renovables_data = 0
     desperdicio_data = 0
@@ -348,6 +388,20 @@ def historico_datos(request, user_id=None):
         suma_acumulada += cantidad
         porcentaje_acumulado.append(round((suma_acumulada / total_averias) * 100, 2)) if total_averias > 0 else []
 
+    # Calcular la última inspección
+    if neumaticos_actuales.exists() or historial_inspecciones.exists():
+        # Obtener todas las fechas de inspección de neumáticos actuales e historial
+        fechas_inspeccion = list(neumaticos_actuales.values_list('fecha_inspeccion', flat=True)) + \
+                             list(historial_inspecciones.values_list('fecha_inspeccion', flat=True))
+        # Filtrar fechas válidas
+        fechas_inspeccion = [fecha for fecha in fechas_inspeccion if fecha]
+        if fechas_inspeccion:
+            ultima_inspeccion = max(fechas_inspeccion)
+        else:
+            ultima_inspeccion = None
+    else:
+        ultima_inspeccion = None
+
     context = {
         'labels': labels,
         'data_barras': data_barras_porcentaje,
@@ -365,12 +419,10 @@ def historico_datos(request, user_id=None):
         'renovables_mes': renovables_mes,
         'desperdicio_mes': desperdicio_mes,
         'perdida_mes': perdida_mes,  # Agregamos la pérdida por mes al contexto
+        'ultima_inspeccion': ultima_inspeccion,  # Agregar la última inspección al contexto
     }
 
     return render(request, 'neumaticos/historico_datos.html', context)
-
-
-
 
 
 

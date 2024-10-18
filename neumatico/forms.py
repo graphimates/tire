@@ -1,4 +1,3 @@
-# neumatico/forms.py
 from django import forms
 from .models import Neumatico, MedidaNeumatico
 
@@ -39,7 +38,6 @@ class NeumaticoForm(forms.ModelForm):
                 cleaned_data['renovable'] = False
 
         return cleaned_data
-
 
 # Formulario para MedidaNeumatico
 class MedidaForm(forms.ModelForm):

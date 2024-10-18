@@ -63,8 +63,8 @@ class Neumatico(models.Model):
 
         # Ahora podemos acceder a 'self.averias'
         if not self._state.adding:  # Solo si el objeto ya existe en la base de datos
-            if self.presion is None or self.huella is None or not self.averias.exists():
-                # Si los campos críticos están vacíos o no hay averías, marcar el neumático como no renovable
+            if self.presion is None or self.huella is None:
+                # Si los campos críticos están vacíos, marcar el neumático como no renovable
                 if self.renovable != False:
                     self.renovable = False
                     # Guardar nuevamente solo si 'renovable' cambió

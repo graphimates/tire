@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+# wheels/views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from neumatico.models import Neumatico
 from usuarios.models import Usuario
 from django.utils.decorators import method_decorator
@@ -9,6 +11,12 @@ from averias.models import Averia
 import json
 from django.http import JsonResponse
 from django.contrib.auth.forms import AuthenticationForm
+from vehiculos.models import Vehiculo  # Asegúrate de importar Vehiculo
+from django.core.exceptions import ObjectDoesNotExist
+
+# Función para verificar si el usuario es administrador
+def is_admin(user):
+    return user.is_superuser
 
 # Vista para el login
 def login_view(request):
@@ -25,10 +33,7 @@ def login_view(request):
             
             if user is not None:
                 login(request, user)
-                if user.is_superuser:
-                    return redirect('index')
-                else:
-                    return redirect('index')
+                return redirect('index')
             else:
                 form.add_error(None, 'Credenciales incorrectas.')
     
@@ -66,9 +71,9 @@ def index(request):
 
     # Obtener los neumáticos según el usuario seleccionado o filtrado
     if selected_user:
-        neumaticos = Neumatico.objects.filter(vehiculo__usuario=selected_user)
+        neumaticos = Neumatico.objects.filter(vehiculo__usuario=selected_user).select_related('vehiculo__usuario').prefetch_related('averias')
     else:
-        neumaticos = Neumatico.objects.filter(vehiculo__usuario__in=usuarios_filtrados)
+        neumaticos = Neumatico.objects.filter(vehiculo__usuario__in=usuarios_filtrados).select_related('vehiculo__usuario').prefetch_related('averias')
 
     # Inicializar contadores y listas
     total_neumaticos = 0
@@ -120,12 +125,26 @@ def index(request):
             no_operativos_count += 1
             neumaticos_no_operativos.append(neumatico)
 
-    # Convertir los sets de placas a su cantidad de vehículos únicos
-    servicios_contados = {servicio: len(placas) for servicio, placas in servicios_por_vehiculo.items()}
+    # Convertir los sets de placas a listas
+    servicios_por_vehiculo_list = {servicio: list(placas) for servicio, placas in servicios_por_vehiculo.items()}
 
     # Obtener todas las empresas para el autocompletado y la lista desplegable (solo para superusuarios)
     empresas = Usuario.objects.values_list('empresa', flat=True).distinct().exclude(is_superuser=True) if request.user.is_superuser else []
     empresas_json = json.dumps(list(empresas))  # Convertir a JSON para el autocompletar
+
+    # Calcular la última inspección según el tipo de usuario y selección
+    if not request.user.is_superuser:
+        # Para usuarios no administradores, obtener la última inspección de sus vehículos
+        ultima_inspeccion = Vehiculo.objects.filter(usuario=request.user).order_by('-ultima_inspeccion').first()
+    else:
+        # Para administradores, determinar la última inspección según la selección
+        if selected_empresa and selected_empresa != 'todas':
+            ultima_inspeccion = Vehiculo.objects.filter(usuario__empresa__iexact=selected_empresa).order_by('-ultima_inspeccion').first()
+        elif selected_empresa == 'todas':
+            ultima_inspeccion = Vehiculo.objects.order_by('-ultima_inspeccion').first()
+        else:
+            # Si no se ha seleccionado ninguna empresa, opta por la última inspección general
+            ultima_inspeccion = Vehiculo.objects.order_by('-ultima_inspeccion').first()
 
     # Preparar el contexto para la vista
     context = {
@@ -135,7 +154,7 @@ def index(request):
         'huella_0_3': huella_0_3,
         'huella_3_6': huella_3_6,
         'huella_6_mas': huella_6_mas,
-        'servicios_por_vehiculo': servicios_por_vehiculo,
+        'servicios_por_vehiculo': servicios_por_vehiculo_list,  # Pasar listas de placas
         'usuarios': usuarios_filtrados,
         'selected_user': selected_user,
         'empresas': empresas,
@@ -143,9 +162,11 @@ def index(request):
         'selected_empresa': selected_empresa,
         'neumaticos_operativos': neumaticos_operativos,
         'neumaticos_no_operativos': neumaticos_no_operativos,
+        'ultima_inspeccion': ultima_inspeccion,  # Agregar la última inspección al contexto
     }
 
     return render(request, 'index.html', context)
+
 
 
 # Vista para autocompletar empresas

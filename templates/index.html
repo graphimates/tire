@@ -36,6 +36,26 @@
     </div>
 </div>
 
+<!-- Sección de Última Inspección -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Cambiar 'bg-info text-white' a 'bg-white text-dark' para fondo blanco y texto negro -->
+            <div class="card text-center bg-white text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Última Inspección</h5>
+                    {% if ultima_inspeccion and ultima_inspeccion.ultima_inspeccion %}
+                        <!-- Mostrar solo la fecha de la inspección -->
+                        <p class="card-text">{{ ultima_inspeccion.ultima_inspeccion|date:"d/m/Y H:i" }}</p>
+                    {% else %}
+                        <p class="card-text">Sin registros de inspección.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Sección de Tarjetas Resumen (con hover) -->
 <div class="row mt-4">
     <!-- Tarjeta Total Neumáticos -->
@@ -113,6 +133,7 @@
                     <tbody>
                         <tr>
                             <td>
+                                <!-- Mostrar el conteo de placas -->
                                 <span class="num-hover">{{ servicios_por_vehiculo.alineacion|length }}</span>
                                 <button class="btn btn-link p-0 ms-2 toggle-btn num-hover" data-target="placas-alineacion">
                                     <i class="fas fa-chevron-down"></i>
@@ -120,6 +141,8 @@
                                 <div id="placas-alineacion" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.alineacion %}
                                         <div>{{ placa }}</div>
+                                    {% empty %}
+                                        <div>No hay vehículos que requieran este servicio.</div>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -131,6 +154,8 @@
                                 <div id="placas-balanceo" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.balanceo %}
                                         <div>{{ placa }}</div>
+                                    {% empty %}
+                                        <div>No hay vehículos que requieran este servicio.</div>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -142,6 +167,8 @@
                                 <div id="placas-rotacion" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.rotacion %}
                                         <div>{{ placa }}</div>
+                                    {% empty %}
+                                        <div>No hay vehículos que requieran este servicio.</div>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -153,6 +180,8 @@
                                 <div id="placas-montura" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.montura %}
                                         <div>{{ placa }}</div>
+                                    {% empty %}
+                                        <div>No hay vehículos que requieran este servicio.</div>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -164,6 +193,8 @@
                                 <div id="placas-calibracion" class="collapse-content" style="display: none;">
                                     {% for placa in servicios_por_vehiculo.calibracion %}
                                         <div>{{ placa }}</div>
+                                    {% empty %}
+                                        <div>No hay vehículos que requieran este servicio.</div>
                                     {% endfor %}
                                 </div>
                             </td>

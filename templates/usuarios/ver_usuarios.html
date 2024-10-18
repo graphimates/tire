@@ -20,7 +20,6 @@
                 <form method="GET" action="" class="text-center">
                     <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
                     <select id="empresa-dropdown" name="selected_empresa" class="form-select mt-2" onchange="this.form.submit()">
-                        <option value="">Seleccionar empresa...</option>
                         <option value="todas" {% if selected_empresa == 'todas' %}selected{% endif %}>Todas las empresas</option>
                         {% for empresa in empresas %}
                             <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>

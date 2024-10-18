@@ -16,12 +16,12 @@
 
 <!-- Contenedor principal con sombra y fondo blanco -->
 <div class="container-fluid mt-5">
-    <div class="bg-white p-4 shadow-lg rounded zoom-card">
+    <div class="bg-white p-4 shadow-lg rounded zoom-card text-center">
         <!-- Título en negro -->
         <h4 class="text-dark mb-4">Subir Archivo CSV para Inspecciones</h4>
 
         <!-- Formulario para subir el archivo CSV -->
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
             {% csrf_token %}
             <div class="form-group">
                 <label for="csv_file" class="btn btn-secondary">Seleccionar archivo CSV</label>
@@ -33,7 +33,7 @@
 
         <!-- Mostrar errores si los hay -->
         {% if errores %}
-        <div class="alert alert-danger mt-4">
+        <div class="alert alert-danger mt-4 text-left">
             <h5>Errores encontrados:</h5>
             <ul>
                 {% for error in errores %}
@@ -52,7 +52,7 @@
 
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
-                    <thead class="bg-light">
+                    <thead class="bg-light text-center">
                         <tr>
                             <th>Posición</th>
                             <th>Medida</th>
@@ -69,7 +69,7 @@
                     </thead>
                     <tbody>
                         {% for fila in inspecciones %}
-                        <tr>
+                        <tr class="text-center">
                             <td>{{ fila.posicion }}</td>
                             <td>{{ fila.medida }}</td>
                             <td>{{ fila.marca }}</td>
@@ -95,9 +95,9 @@
         {% endfor %}
 
         <!-- Botón para confirmar la subida -->
-        <form method="POST" action="{% url 'confirmar_inspecciones' %}">
+        <form method="POST" action="{% url 'confirmar_inspecciones' %}" class="d-flex justify-content-center mt-4">
             {% csrf_token %}
-            <button type="submit" class="btn btn-success mt-4">Confirmar Subida</button>
+            <button type="submit" class="btn btn-success">Confirmar Subida</button>
         </form>
         {% endif %}
     </div>

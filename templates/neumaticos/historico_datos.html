@@ -18,6 +18,8 @@
                 <form method="GET" action="" class="text-center">
                     <label for="empresa-dropdown" class="form-label text-white">Seleccionar empresa:</label>
                     <select id="empresa-dropdown" name="usuario_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Seleccionar empresa...</option>
+
                         <option value="todas" {% if not selected_user %}selected{% endif %}>Todas las empresas</option>
                         {% for usuario in usuarios %}
                             {% if not usuario.is_superuser %}

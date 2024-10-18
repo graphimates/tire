@@ -23,10 +23,35 @@
                                     <option value="{{ empresa }}" {% if selected_empresa == empresa %}selected{% endif %}>{{ empresa }}</option>
                                 {% endfor %}
                             </select>
+
+                            <!-- Mantener los otros filtros seleccionados en campos ocultos -->
+                            <input type="hidden" name="operatividad" value="{{ request.GET.operatividad }}">
+                            <input type="hidden" name="huella" value="{{ request.GET.huella }}">
+                            <input type="hidden" name="renovable" value="{{ request.GET.renovable }}">
                         </form>
                     </div>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Última Inspección (Solo una instancia) -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Cambiar 'bg-info text-white' a 'bg-white text-dark' para fondo blanco y texto negro -->
+            <div class="card text-center bg-white text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Última Inspección</h5>
+                    {% if ultima_inspeccion and ultima_inspeccion.ultima_inspeccion %}
+                        <!-- Mostrar solo la fecha de la inspección -->
+                        <p class="card-text">{{ ultima_inspeccion.ultima_inspeccion|date:"d/m/Y H:i" }}</p>
+                    {% else %}
+                        <p class="card-text">Sin registros de inspección.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -86,6 +111,9 @@
                         </div>
                         <button type="button" class="btn btn-link btn-reset" data-filtro="renovable">Quitar filtro</button>
                     </div>
+
+                    <!-- Mantener los otros filtros seleccionados en campos ocultos -->
+                    <input type="hidden" name="selected_empresa" value="{{ request.GET.selected_empresa }}">
                 </div>
             </div>
         </form>
@@ -93,7 +121,7 @@
         <!-- Tabla con scroll horizontal -->
         <div class="table-responsive shadow-lg bg-white p-4 zoom-card">
             <table id="datatable" class="table table-striped table-hover table-bordered table-adaptive">
-                <thead class="bg-primary text-white">
+                <thead class="table-light">
                     <tr>
                         <th>Posición</th>
                         <th>Placa</th>
@@ -126,6 +154,7 @@
                         <td>{{ neumatico.huella|default_if_none:"" }}</td>
                         <td>
                             {% if neumatico.averias.count == 0 %}
+                                Sin averías
                             {% else %}
                                 <ul>
                                 {% for averia in neumatico.averias.all %}
@@ -170,6 +199,26 @@
         {% if not neumaticos %}
             <p class="text-center text-muted mt-4">No hay neumáticos disponibles para los filtros aplicados.</p>
         {% endif %}
+    </div>
+</div>
+
+<!-- Sección de Última Inspección (Solo una instancia) -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Cambiar 'bg-info text-white' a 'bg-white text-dark' para fondo blanco y texto negro -->
+            <div class="card text-center bg-white text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Última Inspección</h5>
+                    {% if ultima_inspeccion and ultima_inspeccion.ultima_inspeccion %}
+                        <!-- Mostrar solo la fecha de la inspección -->
+                        <p class="card-text">{{ ultima_inspeccion.ultima_inspeccion|date:"d/m/Y H:i" }}</p>
+                    {% else %}
+                        <p class="card-text">Sin registros de inspección.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
