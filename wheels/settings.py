@@ -170,3 +170,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     # ... tus rutas ...
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'specify-works-cycles-combining.trycloudflare.com']
+
+CSRF_TRUSTED_ORIGINS = ['https://specify-works-cycles-combining.trycloudflare.com']
+
+CSRF_COOKIE_SECURE = False
